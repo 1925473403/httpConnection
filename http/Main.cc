@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
+#include <sys/time.h>
 #include <unistd.h>
 #include <errno.h>
 #include <limits.h>
@@ -57,6 +59,7 @@
 #include "BasicStatusLine.h"
 #include "BasicLineParser.h"
 #include "BufferedHeader.h"
+#include "HttpDateGenerator.h"
 using namespace std;
 
 int main() {
@@ -67,5 +70,7 @@ int main() {
     ProtocolVersion p("http", 1, 1);
     BasicRequestLine b("GET", "http://google.com", &p);
     std::cout << b.toString() << std::endl;
+    HttpDateGenerator DATE_GENERATOR ;
+    std::cout << "date: " << DATE_GENERATOR.getCurrentDate() << std::endl;
     return 0;
 }
