@@ -1,0 +1,2 @@
+class AbstractHttpClientConnection : public HttpClientConnection {
+};

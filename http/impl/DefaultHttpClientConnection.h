@@ -1,0 +1,2 @@
+public DefaultHttpClientConnection : public SocketHttpClientConnection {
+};

@@ -1,0 +1,24 @@
+g++ -g -m64 -std="c++11" -o main -I. -I./inc -I./protocol -I./util -I./params -I./message Main.cc \
+                        protocol/HTTP.cc \
+                        HttpHost.cc \
+                        HttpVersion.cc \
+                        ProtocolVersion.cc \
+                        ./util/CharArrayBuffer.cc \
+                        ./util/ByteArrayBuffer.cc \
+                        params/CoreProtocolPNames.cc \
+                        params/HttpProtocolParams.cc \
+                        message/ParserCursor.cc \
+                        message/BasicHeader.cc \
+                        message/BasicHeaderValueFormatter.cc \
+                        message/BasicHeaderValueParser.cc \
+                        message/BasicHeaderElement.cc \
+                        message/BasicNameValuePair.cc \
+                        message/BasicLineFormatter.cc \
+                        message/BasicRequestLine.cc \
+                        message/AbstractHttpMessage.cc \
+                        message/BasicHttpRequest.cc \
+                        message/HeaderGroup.cc \
+                        message/BasicListHeaderIterator.cc \
+                        params/AbstractHttpParams.cc \
+                        params/BasicHttpParams.cc \
+                        params/Value.cc -lpthread
