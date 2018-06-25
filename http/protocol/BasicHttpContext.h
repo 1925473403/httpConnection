@@ -1,37 +1,16 @@
-#include <iostream>
-#include <string>
-#include <unordered_map>
-#include "HttpContext.h"
 #include "HttpException.h"
+#ifndef BASICHTTPCONTEXT_H
+#define BASICHTTPCONTEXT_H
 class BasicHttpContext : public HttpContext {
     private:
         HttpContext *parentContext;
-        std::unordered_map<std::string, HttpContext*> map;
+        std::unordered_map<std::string, ValueBase*> map;
     public:
-        BasicHttpContext() : parentContext(NULL) { }
-        BasicHttpContext(HttpContext *obj) : parentContext(obj) { }
+        BasicHttpContext();
+        BasicHttpContext(HttpContext *obj) ;
         ~BasicHttpContext() { }
-        HttpContext* getAttribute(std::string &id) {
-            if (id.length() == 0) throw IllegalArgumentException("Id may not be null");
-            HttpContext *obj = NULL;
-            std::unordered_map<std::string, HttpContext*>::iterator it = map.end();
-            if (map.size() != 0) it = map.find(id);
-            if (it == map.end() && parentContext != NULL)
-                obj = parentContext->getAttribute(id);
-            return obj;
-        }
-        void setAttribute(std::string &id, HttpContext *obj) {
-            if (id.length() == 0) throw IllegalArgumentException("Id may not be null");
-            map.insert(std::make_pair(id, obj));
-        }
-        HttpContext *removeAttribute(std::string &id) {
-            HttpContext *obj = NULL;
-            if (id.length() == 0) throw IllegalArgumentException("Id may not be null");
-            std::unordered_map<std::string, HttpContext*>::iterator it = map.find(id);
-            if (it != map.end()) {
-                obj = it->second;
-                map.erase(it);
-            }
-            return obj;
-        }
+        ValueBase* getAttribute(std::string id) ;
+        void setAttribute(std::string id, ValueBase *obj) ;
+        ValueBase *removeAttribute(std::string id) ;
 };
+#endif

@@ -1,3 +1,5 @@
+#ifndef EXECUTIONCONTEXT_H
+#define EXECUTIONCONTEXT_H
 class ExecutionContext {
     public:
         static std::string HTTP_CONNECTION ;
@@ -7,3 +9,4 @@ class ExecutionContext {
         static std::string HTTP_PROXY_HOST ;
         static std::string HTTP_REQ_SENT ;
 };
+#endif

@@ -23,6 +23,7 @@
 #include "CharArrayBuffer.h"
 #endif
 #include "HttpException.h"
+#include "Value.h"
 #include "HttpContext.h"
 #include "BasicHttpContext.h"
 #include "DefaultedHttpContext.h"
@@ -58,14 +59,6 @@
 #include "BufferedHeader.h"
 using namespace std;
 
-std::string HttpContext::RESERVED_PREFIX = "http.";
-std::string ExecutionContext::HTTP_CONNECTION  = "http.connection";
-std::string ExecutionContext::HTTP_REQUEST = "http.request";
-std::string ExecutionContext::HTTP_RESPONSE = "http.response";
-std::string ExecutionContext::HTTP_TARGET_HOST = "http.target_host";
-std::string ExecutionContext::HTTP_PROXY_HOST = "http.proxy_host";
-std::string ExecutionContext::HTTP_REQ_SENT = "http.request_sent";
-pthread_mutex_t SyncBasicHttpContext::mutex ;
 int main() {
     HttpVersion *h = HttpVersion::HTTP_1_0;
     std::cout << h->toString() << std::endl;

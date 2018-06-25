@@ -1,4 +1,6 @@
-#include <pthread.h>
+#include "HttpException.h"
+#ifndef SYNCBASICHTTPCONTEXT_H
+#define SYNCBASICHTTPCONTEXT_H
 class SyncBasicHttpContext : public BasicHttpContext {
         static pthread_mutex_t mutex;
         class Lock {
@@ -10,21 +12,9 @@ class SyncBasicHttpContext : public BasicHttpContext {
                 ~Lock() { pthread_mutex_unlock(&lck); }
         };
     public:
-        SyncBasicHttpContext(HttpContext *context): BasicHttpContext(context) { }
-        HttpContext *getAttribute(std::string &id) {
-            HttpContext *obj = NULL;
-            Lock l(mutex);
-            obj = BasicHttpContext::getAttribute(id);
-            return obj;
-        }
-        void setAttribute(std::string &id, HttpContext *obj) {
-            Lock l(mutex);
-            BasicHttpContext::setAttribute(id, obj);
-        }
-        HttpContext *removeAttribute(std::string &id) {
-            HttpContext *obj = NULL;
-            Lock l(mutex);
-            obj = BasicHttpContext::removeAttribute(id);
-            return obj;
-        }
+        SyncBasicHttpContext(HttpContext *context);
+        ValueBase *getAttribute(std::string id);
+        void setAttribute(std::string id, ValueBase *obj);
+        ValueBase *removeAttribute(std::string id);
 };
+#endif

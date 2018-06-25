@@ -8,6 +8,9 @@ g++ -g -m64 -std="c++11" -o main -I. -I${SRC_HOME}/inc -I${SRC_HOME}/protocol -I
                         ${SRC_HOME}/util/ByteArrayBuffer.cc \
                         ${SRC_HOME}/params/CoreProtocolPNames.cc \
                         ${SRC_HOME}/params/HttpProtocolParams.cc \
+                        ${SRC_HOME}/params/AbstractHttpParams.cc \
+                        ${SRC_HOME}/params/BasicHttpParams.cc \
+                        ${SRC_HOME}/params/Value.cc \
                         ${SRC_HOME}/message/ParserCursor.cc \
                         ${SRC_HOME}/message/BasicHeader.cc \
                         ${SRC_HOME}/message/BasicHeaderValueFormatter.cc \
@@ -20,11 +23,13 @@ g++ -g -m64 -std="c++11" -o main -I. -I${SRC_HOME}/inc -I${SRC_HOME}/protocol -I
                         ${SRC_HOME}/message/BasicHttpRequest.cc \
                         ${SRC_HOME}/message/HeaderGroup.cc \
                         ${SRC_HOME}/message/BasicListHeaderIterator.cc \
-                        ${SRC_HOME}/params/AbstractHttpParams.cc \
-                        ${SRC_HOME}/params/BasicHttpParams.cc \
-                        ${SRC_HOME}/params/Value.cc \
                         ${SRC_HOME}/message/BasicHeaderIterator.cc \
                         ${SRC_HOME}/message/BasicHeaderElementIterator.cc \
                         ${SRC_HOME}/message/BufferedHeader.cc \
                         ${SRC_HOME}/message/BasicStatusLine.cc \
-                        ${SRC_HOME}/message/BasicLineParser.cc -lpthread
+                        ${SRC_HOME}/message/BasicLineParser.cc \
+                        ${SRC_HOME}/protocol/HttpContext.cc \
+                        ${SRC_HOME}/protocol/ExecutionContext.cc \
+                        ${SRC_HOME}/protocol/BasicHttpContext.cc \
+                        ${SRC_HOME}/protocol/DefaultedHttpContext.cc \
+                        ${SRC_HOME}/protocol/SyncBasicHttpContext.cc -lpthread
