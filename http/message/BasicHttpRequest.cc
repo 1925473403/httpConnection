@@ -21,8 +21,8 @@
 #include "BasicHttpRequest.h"
 #endif
 BasicHttpRequest::BasicHttpRequest(std::string m, std::string u) {
-    if (method.length() == 0) throw IllegalArgumentException("Method name may not be null");
-    if (uri.length() == 0) throw IllegalArgumentException("Request URI may not be null");
+    if (method.length() == 0) throw IllegalArgumentException("Method name may not be NULL");
+    if (uri.length() == 0) throw IllegalArgumentException("Request URI may not be NULL");
     method = m;
     uri = u;
     requestline = 0;

@@ -34,6 +34,8 @@ class CharArrayBuffer {
         char* buffer() const { return _buffer; }
         bool isEmpty() const { return len == 0; }
         bool isFull() const { return len == _capacity; }
+        int indexOf(int ch, int beginIndex, int endIndex);
+        int indexOf(int ch);
         std::string substring(int beginIndex, int endIndex);
         std::string substringTrimmed(int beginIndex, int endIndex);
 };

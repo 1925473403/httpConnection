@@ -2,7 +2,6 @@
 #ifndef BASICHEADERVALUEPARSER_H
 #define BASICHEADERVALUEPARSER_H
 class BasicHeaderValueParser : public HeaderValueParser {
-    static BasicHeaderValueParser DEFAULT;
     static char PARAM_DELIMITER;
     static char ELEM_DELIMITER;
     static char ALL_DELIMITERS[2];
@@ -11,6 +10,7 @@ class BasicHeaderValueParser : public HeaderValueParser {
         HeaderElement* createHeaderElement(std::string name, std::string value, vector<NameValuePair*> &params);
         NameValuePair* createNameValuePair(std::string name, std::string value);
     public:
+        static BasicHeaderValueParser DEFAULT;
         void unref();
         static void parseElements(std::string &value, HeaderValueParser *parser, vector<HeaderElement*>&) throw (ParseException);
         void parseElements(CharArrayBuffer &buffer, ParserCursor *cursor, vector<HeaderElement*> &) throw (ParseException);

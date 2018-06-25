@@ -4,7 +4,7 @@
 #define HEADERELEMENTITERARTOR_H
 class HeaderElementIterator {
     public:
-    virtual ~HeaderElementIterator = 0;
+    virtual ~HeaderElementIterator() { }
     virtual bool hasNext() = 0;
     virtual HeaderElement* nextElement() = 0;
 };

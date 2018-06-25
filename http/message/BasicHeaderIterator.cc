@@ -1,4 +1,6 @@
 #include "HttpException.h"
+#include "Header.h"
+#include "HeaderIterator.h"
 #include <iterator>
 #include <algorithm>
 #ifndef BASICHEADERITERATOR_H
@@ -9,10 +11,10 @@ BasicHeaderIterator::BasicHeaderIterator(vector<Header *> &headers, std::string 
     currentIndex = findNext(-1);
 }
 
-BasicHeaderIterator::BasicHeaderIterator(const BasicHeaderIterator& rhs) {
+BasicHeaderIterator::BasicHeaderIterator(const BasicHeaderIterator& rhs):allHeaders(rhs.allHeaders) {
     currentIndex = rhs.currentIndex;
     headerName = rhs.headerName;
-    std::copy(rhs.allHeaders.begin(), rhs.allHeaders.end(), std::back_inserter(allHeaders));
+//    std::copy(rhs.allHeaders.begin(), rhs.allHeaders.end(), std::back_inserter(allHeaders));
 }
 
 BasicHeaderIterator& BasicHeaderIterator::operator=(const BasicHeaderIterator& rhs) {

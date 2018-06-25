@@ -12,12 +12,13 @@ class BasicHeaderElementIterator : public HeaderElementIterator {
         BasicHeaderElementIterator(HeaderIterator* ht, HeaderValueParser* p);
         BasicHeaderElementIterator(HeaderIterator* ht);
         BasicHeaderElementIterator(const BasicHeaderElementIterator&);
-        BasicHeaderElementIterator& operator(const BasicHeaderElementIterator&);
+        BasicHeaderElementIterator& operator=(const BasicHeaderElementIterator&);
+        ~BasicHeaderElementIterator();
         void bufferHeaderValue();
         void parseNextElement();
         bool hasNext();
-        Header* nextHeader() throw (NoSuchElementException);
-        Header* next() throw (NoSuchElementException);
+        HeaderElement* nextElement() ;
+        HeaderElement* next() throw (NoSuchElementException);
         void remove() throw(UnsupportedOperationException);
 };
 #endif

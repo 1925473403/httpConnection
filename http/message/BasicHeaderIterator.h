@@ -9,7 +9,7 @@ class BasicHeaderIterator : public HeaderIterator {
     public:
         BasicHeaderIterator(vector<Header *> &headers, std::string name);
         BasicHeaderIterator(const BasicHeaderIterator&);
-        BasicHeaderIterator& operator(const BasicHeaderIterator&);
+        BasicHeaderIterator& operator=(const BasicHeaderIterator&);
         int findNext(int from);
         bool filterHeader(int index);
         bool hasNext();

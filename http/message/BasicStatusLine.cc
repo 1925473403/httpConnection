@@ -1,5 +1,13 @@
+#include "CharArrayBuffer.h"
+#include "ProtocolVersion.h"
+#include "RequestLine.h"
+#include "StatusLine.h"
+#include "Header.h"
+#include "FormattedHeader.h"
+#include "LineFormatter.h"
+#include "BasicLineFormatter.h"
 #ifndef BASICSTATUSLINE_H
-#define "BasicStatusLine.h"
+#include "BasicStatusLine.h"
 #endif
 BasicStatusLine::BasicStatusLine(ProtocolVersion *version, int sc, std::string r) : protoVersion(version), statusCode(sc), reasonPhrase(r) {
     if (version == NULL) throw IllegalArgumentException("Protocol version may not be null.");

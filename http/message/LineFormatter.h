@@ -1,9 +1,4 @@
 #include "HttpException.h"
-//#include "CharArrayBuffer.h"
-//#include "ProtocolVersion.h"
-//#include "RequestLine.h"
-//#include "StatusLine.h"
-//#include "Header.h"
 #ifndef LINEFORMATTER_H
 #define LINEFORMATTER_H
 class LineFormatter {

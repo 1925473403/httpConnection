@@ -115,6 +115,18 @@ void CharArrayBuffer::setLength(int l) {
     if (len < 0 || len > _capacity) throw IndexOutOfBoundsException();
     len = l;
 }
+
+int CharArrayBuffer::indexOf(int ch, int beginIndex, int endIndex) {
+    if (beginIndex < 0) beginIndex = 0;
+    if (endIndex > len) endIndex = len;
+    if (beginIndex > endIndex) return -1;
+    for (int i = beginIndex; i < endIndex; i++) if (_buffer[i] == ch) return i;
+    return -1;
+}
+
+int CharArrayBuffer::indexOf(int ch) {
+    return indexOf(ch, 0, len);
+}
 std::string CharArrayBuffer::substring(int beginIndex, int endIndex) {
     if (beginIndex < 0) throw IndexOutOfBoundsException();
     if (endIndex > len)  throw IndexOutOfBoundsException();

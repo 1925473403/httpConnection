@@ -12,13 +12,14 @@ class BasicLineParser  : public LineParser {
         static BasicLineParser DEFAULT;
         BasicLineParser(ProtocolVersion *proto);
         BasicLineParser();
+        ~BasicLineParser() { }
         static ProtocolVersion* parseProtocolVersion(std::string value, LineParser *parser) throw (ParseException);
         ProtocolVersion* parseProtocolVersion(CharArrayBuffer &buffer, ParserCursor *cursor) throw (ParseException);
         bool hasProtocolVersion(CharArrayBuffer &buffer, ParserCursor *cursor);
         static RequestLine* parseRequestLine(std::string value, LineParser *parser) throw (ParseException);
-        RequestLine*parseRequestLine(CharArrayBuffer &buffer, ParserCursor *cursor) throw (ParseException);
+        RequestLine* parseRequestLine(CharArrayBuffer &buffer, ParserCursor *cursor) throw (ParseException);
         static StatusLine* parseStatusLine(std::string value, LineParser *parser) throw (ParseException);
-        StatusLine*parseStatusLine(CharArrayBuffer &buffer, ParserCursor *cursor) throw (ParseException);
+        StatusLine* parseStatusLine(CharArrayBuffer &buffer, ParserCursor *cursor) throw (ParseException);
         static Header* parseHeader(std::string value, LineParser *parser) throw (ParseException);
         Header* parseHeader(CharArrayBuffer &buffer) throw (ParseException);
 };

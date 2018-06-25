@@ -8,11 +8,12 @@ class BufferedHeader : public FormattedHeader {
     int valuePos;
     public:
     BufferedHeader(CharArrayBuffer &b) throw (ParseException);
-    std::string getName() const { return name; }
-    std::string getValue() const { return buffer.substringTrimmed(valuePos, buffer.length()); }
+    ~BufferedHeader() { }
+    std::string getName() { return name; }
+    std::string getValue() { return buffer.substringTrimmed(valuePos, buffer.length()); }
     void getElements(vector<HeaderElement *> &) throw (ParseException);
-    int getValuePos() const { return valuePos; }
-    CharArrayBuffer& getBuffer() { return buffer; }
+    int getValuePos() { return valuePos; }
+    CharArrayBuffer getBuffer() { return buffer; }
     std::string toString() { buffer.toString(); }
 };
 #endif
