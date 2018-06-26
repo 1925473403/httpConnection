@@ -3,7 +3,7 @@
 #define TOKENITERATOR_H
 class TokenIterator {
     public:
-    virtual ~TokenIterator() = 0;
+    virtual ~TokenIterator() { }
     virtual bool hasNext() = 0;
     virtual std::string nextToken() = 0;
 };

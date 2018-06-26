@@ -3,7 +3,7 @@
 #define HTTPRESPONSE_H
 class HttpResponse : public HttpMessage {
     public:
-    virtual ~HttpResponse() = 0;
+    virtual ~HttpResponse() { }
     virtual StatusLine* getStatusLine() = 0;
     virtual void setStatusLine(StatusLine *statline) = 0;
     virtual void setStatusLine(ProtocolVersion *ver, int code) = 0;

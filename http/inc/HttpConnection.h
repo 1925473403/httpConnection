@@ -3,7 +3,7 @@
 #define HTTPCONNECTION_H
 class HttpConnection {
     public:
-        virtual ~HttpConnection() = 0;
+        virtual ~HttpConnection() { }
         virtual void close() throw (IOException) = 0;
         virtual bool isOpen() const = 0;
         virtual bool isStale() const = 0;
