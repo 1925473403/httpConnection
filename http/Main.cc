@@ -60,6 +60,7 @@
 #include "BasicLineParser.h"
 #include "BufferedHeader.h"
 #include "HttpDateGenerator.h"
+#include "UriPatternMatcher.h"
 using namespace std;
 
 int main() {

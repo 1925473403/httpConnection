@@ -54,11 +54,18 @@ int main() {
     params->setParameter("ProtocolVersion", &vpv);
     std::cout << "BOOLEAN: " << params->getBooleanParameter("BOOLEAN", true) << std::endl;
     ValueBase *v = params->getParameter("ProtocolVersion");
+    ProtocolVersion *p = type_cast<ProtocolVersion *>(v);
+    if (p) {
+        std::cout << p->toString() << std::endl;
+        std::cout << "cast success " << std::endl;
+    } else std::cout << "cast failure" << std::endl;
+    /*
     Value<ProtocolVersion*> *v1 = dynamic_cast<Value <ProtocolVersion *> *> (v);
     if (v1 != NULL) {
         ProtocolVersion *p = v1->value();
         std::cout << p->toString() << std::endl;
     }
+    */
     HttpParams *httpParams = new DefaultedHttpParams(params, params);
     delete httpParams;
     delete params;

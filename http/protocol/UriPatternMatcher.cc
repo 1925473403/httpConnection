@@ -1,4 +1,5 @@
 #include "HttpException.h"
+#include "Value.h"
 #ifndef URIPATTERNMATCHER_H
 #include "UriPatternMatcher.h"
 #endif
@@ -30,7 +31,7 @@ ValueBase* UriPatternMatcher::lookup(std::string requestURI) {
     if (requestURI.length() == 0) throw IllegalArgumentException("URI request pattern may not be null");
     int index = requestURI.find("?");
     if (index != std::string::npos) {
-        requestURI = requestURI.substring(0, index);
+        requestURI = requestURI.substr(0, index);
     }
     ValueBase *handler;
     unordered_map<std::string, ValueBase *>::iterator it = handlerMap.find(requestURI);
@@ -61,18 +62,24 @@ bool UriPatternMatcher::matchUriRequestPattern(std::string pattern, std::string 
 }
 
 bool UriPatternMatcher::starts_with(std::string requestUri, std::string pattern) {
-    for (int i = 0; i < std::min<int>(requestUri.length(), pattern.length()); i++) {
-        if (requestUri[i] != pattern[i]) return false;
+    int to = 0;
+    int po = 0;
+    int pc = pattern.length();
+    if (requestUri.length() - pc < 0) return false;
+    while (--pc >= 0) {
+        if (requestUri[to++] != pattern[po]) return false;
     }
     return true;
 }
 
 bool UriPatternMatcher::ends_with(std::string requestUri, std::string pattern) {
-    int k = pattern.length() - 1;
-    int j = requestUri.length() - 1;
-    for (int i = std::min<int>(requestUri.length(), pattern.length()); i >= 0; i--) {
-        if (requestUri[j] != pattern[k]) return false;
-        j--; k--;
+    int toffset = requestUri.length() - pattern.length();
+    int to = toffset;
+    int po = 0;
+    int pc = pattern.length();
+    if ((toffset < 0) || (toffset > requestUri.length() - pc)) return false;
+    while (--pc >= 0) {
+        if (requestUri[to++] != pattern[po++]) return false;
     }
     return true;
 }

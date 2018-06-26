@@ -20,5 +20,12 @@ class Value : public ValueBase {
         os << m_value;
     }
 };
+template<class T>
+T type_cast(ValueBase *object) {
+    if (object == NULL) return NULL;
+    Value<T> *obj = dynamic_cast<Value<T> *>(object);
+    if (obj) return obj->value();
+    return NULL;
+}
 ostream& operator<<(ostream &os, ValueBase &rhs);
 #endif

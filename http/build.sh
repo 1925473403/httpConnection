@@ -33,4 +33,5 @@ g++ -g -m64 -std="c++11" -o main -I. -I${SRC_HOME}/inc -I${SRC_HOME}/protocol -I
                         ${SRC_HOME}/protocol/BasicHttpContext.cc \
                         ${SRC_HOME}/protocol/DefaultedHttpContext.cc \
                         ${SRC_HOME}/protocol/HttpDateGenerator.cc \
+                        ${SRC_HOME}/protocol/UriPatternMatcher.cc \
                         ${SRC_HOME}/protocol/SyncBasicHttpContext.cc -lpthread
