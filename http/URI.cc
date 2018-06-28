@@ -50,7 +50,7 @@ long URI::H_URIC_NO_SLASH = H_UNRESERVED | H_ESCAPED | URI::highMask(";?:@&=+$,"
 char hexDigits[16] = { "012345678ABCDEF" };
 typedef unsigned char byte;
 
-URI::URI(std::string str) throw (URISyntaxException) {
+URI::URI(std::string str) throw (URISyntaxException) : port(-1) {
     Parser p(this, str);
     p.parse(false);
 }
@@ -60,14 +60,14 @@ URI::URI(std::string scheme, std::string userInfo, std::string host, int port, s
     Parser p(this, s);
     p.parse(true);
 }
-URI::URI(std::string scheme, std::string auth, std::string path, std::string query, std::string fragment) throw (URISyntaxException) {
+URI::URI(std::string scheme, std::string auth, std::string path, std::string query, std::string fragment) throw (URISyntaxException) : port(-1) {
     std::string s = toString(scheme, "", auth, "", "", -1, path, query, fragment);
     URI::checkPath(s, scheme, path);
     Parser p(this, s);
     p.parse(false);
 }
 URI::URI(std::string scheme, std::string host, std::string path, std::string fragment) throw (URISyntaxException) : URI(scheme, "", host, -1, path, "", fragment) { }
-URI::URI(std::string scheme, std::string ssp, std::string fragment) throw (URISyntaxException) {
+URI::URI(std::string scheme, std::string ssp, std::string fragment) throw (URISyntaxException) : port(-1) {
     std::string s = toString(scheme, ssp, "", "", "", -1, "", "", fragment);
     Parser p(this, s);
     p.parse(false);
@@ -431,7 +431,7 @@ void URI::defineString() {
                 sb << userInfo;
                 sb << "@";
             }
-            bool needBrackets = ((host.find(":") >= 0)  && !URI::starts_with(host, "[") && !URI::ends_with(host, "]"));
+            bool needBrackets = ((host.find(":") != std::string::npos)  && !URI::starts_with(host, "[") && !URI::ends_with(host, "]"));
             if (needBrackets) sb << "[";
             sb << host;
             if (needBrackets) sb << "]";
@@ -545,8 +545,8 @@ URI URI::normalize(URI &u) {
     return v;
 }
 
-void URI::split(char *path, int* segs, int ns) {
-    int end = strlen(path) - 1;
+void URI::split(char *path, int pathlen, int* segs, int ns) {
+    int end = pathlen - 1;
     int p = 0;
     int i = 0;
     while (p <= end) {
@@ -569,8 +569,8 @@ void URI::split(char *path, int* segs, int ns) {
     if (i != ns) throw InternalError();
 }
 
-int URI::join(char *path, int* segs, int ns) {
-    int end = strlen(path) - 1;
+int URI::join(char *path, int pathlen, int* segs, int ns) {
+    int end = pathlen - 1;
     int p = 0;
     if (path[p] == '\0') path[p++] = '/';
     for (int i = 0; i < ns; i++) {
@@ -587,8 +587,8 @@ int URI::join(char *path, int* segs, int ns) {
     return p;
 }
 
-void URI::removeDots(char *path, int* segs, int ns) {
-    int end = strlen(path) - 1;
+void URI::removeDots(char *path, int pathlen, int* segs, int ns) {
+    int end = pathlen - 1;
     for (int i = 0; i < ns; i++) {
         int dots = 0;
         do {
@@ -622,7 +622,7 @@ void URI::removeDots(char *path, int* segs, int ns) {
     }
 }
 
-void URI::maybeAddLeadingDot(char *path, int* segs, int ns) {
+void URI::maybeAddLeadingDot(char *path, int pathlen, int* segs, int ns) {
     if (path[0] == '\0') return;
     int f = 0;
     while (f < ns) {
@@ -631,8 +631,8 @@ void URI::maybeAddLeadingDot(char *path, int* segs, int ns) {
     }
     if ((f >= ns) || (f == 0)) return;
     int p = segs[f];
-    while ((p < strlen(path) && path[p] != ':') && (path[p] != '\0')) p++;
-    if (p >= strlen(path) || path[p] == '\0') return;
+    while ((p < pathlen && path[p] != ':') && (path[p] != '\0')) p++;
+    if (p >= pathlen || path[p] == '\0') return;
     path[0] = '.';
     path[1] = '\0';
     segs[0] = 0;
@@ -698,10 +698,10 @@ std::string URI::normalize(std::string ps) {
     char path[ps.length()];
     strcpy(path, ps.c_str());
     int segs[ns];
-    URI::split(path, segs, ns);
-    URI::removeDots(path, segs, ns);
-    URI::maybeAddLeadingDot(path, segs, ns);
-    std::string s(path, URI::join(path, segs, ns));
+    URI::split(path, ps.length(), segs, ns);
+    URI::removeDots(path, ps.length(), segs, ns);
+    URI::maybeAddLeadingDot(path, ps.length(), segs, ns);
+    std::string s(path, URI::join(path, ps.length(), segs, ns));
     if (s == ps) return ps;
     return s;
 }
@@ -881,7 +881,7 @@ int URI::Parser::scan(int start, int end, std::string err, std::string stop) {
     while (p < end) {
         char c = charAt(p);
         if (err.find(c) != std::string::npos) return -1;
-        if (stop.find(c) == std::string::npos) break; 
+        if (stop.find(c) != std::string::npos) break; 
         p++;
     }
     return p;

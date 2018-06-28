@@ -121,10 +121,10 @@ class URI : Comparable<URI> {
         static bool ends_with(std::string requestUri, std::string pattern);
         static bool starts_with(std::string requestUri, std::string pattern);
         static int needsNormalization(std::string path);
-        static void maybeAddLeadingDot(char *path, int* segs, int ns);
-        static void removeDots(char *path, int* segs, int ns);
-        static int join(char *path, int* segs, int ns);
-        static void split(char *path, int* segs, int ns);
+        static void maybeAddLeadingDot(char *path, int pathlen, int* segs, int ns);
+        static void removeDots(char *path, int pathlen, int* segs, int ns);
+        static int join(char *path, int pathlen, int* segs, int ns);
+        static void split(char *path, int pathlen, int* segs, int ns);
         std::string resolvePath(std::string base, std::string child, bool absolute);
         void defineString();
         void defineSchemeSpecificPart();
@@ -139,7 +139,6 @@ class URI : Comparable<URI> {
         static int compareIgnoringCase(std::string s, std::string t);
         void appendSchemeSpecificPart(stringstream &sb, std::string opaquePart, std::string auth, std::string userInfo, std::string host, int port, std::string path, std::string query) ;
         void appendFragment(stringstream &sb, std::string fragment);
-        URI relativize(URI &uri);
         static URI relativize(URI &base, URI &child);
     public:
         URI(const URI &rhs);
@@ -180,5 +179,6 @@ class URI : Comparable<URI> {
         URI resolve(URI &base, URI &child) ;
         URI resolve(std::string str) ;
         URI resolve(URI &uri);
+        URI relativize(URI &uri);
 };
 #endif

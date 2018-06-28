@@ -74,8 +74,25 @@ int main() {
     std::cout << b.toString() << std::endl;
     HttpDateGenerator DATE_GENERATOR ;
     std::cout << "date: " << DATE_GENERATOR.getCurrentDate() << std::endl;
-    std::string URISTR("abc://admin:admin@geeksforgeeks.org:1234/path/data?key=value&key2=value2#fragid1");
+    //std::string URISTR("abc://admin:admin@geeksforgeeks.org:1234/path/data?key=value&key2=value2#fragid1");
+    //std::string URISTR("https://www.google.com/search?q=pure+virtual+function&ie=utf-8&oe=utf-8&client=firefox-b-1-ab");
+    std::string URISTR;
+    cin >> URISTR;
     URI uri(URISTR);
-    std::cout << "scheme: " << uri.getScheme() << std::endl;
+    URI uriBase("http://www.somedomain.com/");
+    
+    std::cout << "scheme: " << uri.getScheme() 
+              << "\nauthority: " << uri.getAuthority() 
+              << "\npath: " << uri.getPath()
+              << "\nquery: " << uri.getQuery()
+              << "\nfragment: " << uri.getFragment()
+              << "\nUser Info: " << uri.getUserInfo()
+              << "\nURI is absolute: " << ((uri.isAbsolute())? "TRUE" : "FALSE") 
+              << "\nURI is opaque: " << ((uri.isOpaque())? "TURE" : "FALSE") << std::endl;
+    
+    URI uriResolved = uriBase.resolve (uri);
+    std::cout << "Resolved URI = " << uriResolved.toString () << std::endl;
+    URI uriRelativized = uriBase.relativize (uriResolved);
+    std::cout << "Relativized URI = " << uriRelativized.toString () << std::endl;
     return 0;
 }
