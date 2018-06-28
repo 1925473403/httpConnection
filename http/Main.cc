@@ -60,6 +60,7 @@
 #include "BasicLineParser.h"
 #include "BufferedHeader.h"
 #include "HttpDateGenerator.h"
+#include "URI.h"
 #include "UriPatternMatcher.h"
 using namespace std;
 
@@ -73,5 +74,8 @@ int main() {
     std::cout << b.toString() << std::endl;
     HttpDateGenerator DATE_GENERATOR ;
     std::cout << "date: " << DATE_GENERATOR.getCurrentDate() << std::endl;
+    std::string URISTR("abc://admin:admin@geeksforgeeks.org:1234/path/data?key=value&key2=value2#fragid1");
+    URI uri(URISTR);
+    std::cout << "scheme: " << uri.getScheme() << std::endl;
     return 0;
 }

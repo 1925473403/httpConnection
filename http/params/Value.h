@@ -28,4 +28,5 @@ T type_cast(ValueBase *object) {
     return NULL;
 }
 ostream& operator<<(ostream &os, ValueBase &rhs);
+bool equalsIgnoreCase(std::string, std::string);
 #endif

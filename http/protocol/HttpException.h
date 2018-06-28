@@ -4,6 +4,7 @@
 #include <vector>
 #include <unordered_map>
 #include <string>
+#include <sstream>
 #include <stdarg.h>
 using namespace std;
 #ifndef HTTPEXCEPTION_H
@@ -12,6 +13,15 @@ class IOException : public std::exception {
     public:
         IOException() { }
         virtual ~IOException() { }
+        IOException(const IOException &rhs) {
+            strcpy(m_reason, rhs.m_reason);
+        }
+        IOException& operator=(const IOException &rhs) {
+            if (this != &rhs) {
+                strcpy(m_reason, rhs.m_reason);
+            }
+            return *this;
+        }
         IOException(std::string &str) {
             snprintf(m_reason, 511, "%s", str.c_str());
         }
@@ -29,7 +39,91 @@ class IOException : public std::exception {
     protected:
         char m_reason[512];
 };
+class InternalError : public IOException {
+    public:
+        InternalError() : IOException() { }
+        InternalError(std::string s) : IOException(s) { }
+        InternalError(const char *str, ...) {
+            va_list args;
+            va_start(args, str);
+            vsnprintf(m_reason, 511, str, args);
+            va_end(args);
+        }
+};
+class NullPointerException : public IOException {
+    public:
+        NullPointerException() : IOException() { }
+        NullPointerException(std::string s):IOException(s) { }
+        NullPointerException(const char *str, ...) {
+            va_list args;
+            va_start(args, str);
+            vsnprintf(m_reason, 511, str, args);
+            va_end(args);
+        }
+};
+
+class IllegalArgumentException:public IOException {
+    public:
+        IllegalArgumentException() : IOException() { }
+        IllegalArgumentException(std::string str) : IOException(str) { }
+        IllegalArgumentException(const char* str, ...) {
+            va_list args;
+            va_start(args, str);
+            vsnprintf(m_reason, 511, str, args);
+            va_end(args);
+        }
+};
+
+class URISyntaxException : public IOException {
+    std::string input;
+    int index;
+    public:
+        URISyntaxException() : IOException() { }
+        URISyntaxException(const URISyntaxException& rhs) : IOException(rhs) {
+            input = rhs.input;
+            index = rhs.index;
+        }
+        URISyntaxException& operator=(const URISyntaxException &rhs) {
+            if (this != &rhs) {
+                IOException::operator=(rhs);
+                input = rhs.input;
+                index = rhs.index;
+            }
+            return *this;
+        }
+        URISyntaxException(std::string i, std::string r, int in) : IOException(r) {
+            if ((i.length() == 0) || (r.length() == 0)) throw NullPointerException();
+            if (in< -1) throw IllegalArgumentException();
+            input = i;
+            index = in;
+        }
+        URISyntaxException(std::string i, std::string r): URISyntaxException(i, r, -1) { }
+        std::string getInput() { return input; }
+        std::string getReason() {
+            std::string reason(IOException::what());
+            return reason;
+        }
+        int getIndex() { return index; }
+        const char *what() const throw () {
+            stringstream ss;
+            ss << IOException::what();
+            if (index > -1) {
+                ss << " at index ";
+                ss << index;
+            }
+            ss << ": ";
+            ss << input;
+            return ss.str().c_str();
+        }
+        int describe(char *apStr, int len) {
+            std::string str = what();
+            if ((apStr) && len > 1)
+                return snprintf(apStr, len - 1, "%s", str.c_str());
+            return 0;
+        }
+};
 class MalformedURLException : public std::exception {
+
     public:
         MalformedURLException(std::string &str) {
             snprintf(m_reason, 511, "%s", str.c_str());
@@ -46,18 +140,6 @@ class MalformedURLException : public std::exception {
     private:
         char m_reason[512];
 };
-
-class IllegalArgumentException:public IOException {
-    public:
-        IllegalArgumentException(std::string str) : IOException(str) { }
-        IllegalArgumentException(const char* str, ...) {
-            va_list args;
-            va_start(args, str);
-            vsnprintf(m_reason, 511, str, args);
-            va_end(args);
-        }
-};
-
 class IndexOutOfBoundsException:public std::exception {
     char m_reason[512];
     public:
@@ -179,5 +261,30 @@ class IllegalStateException : public IOException {
             vsnprintf(m_reason, 511, str, args);
             va_end(args);
         }
+};
+class ClientProtocolException : public IOException {
+    public:
+        ClientProtocolException() : IOException() { }
+        ClientProtocolException(std::string s): IOException(s) { }
+        ClientProtocolException(const char *str, ...) {
+            va_list args;
+            va_start(args, str);
+            vsnprintf(m_reason, 511, str, args);
+            va_end(args);
+        }
+        ClientProtocolException(const char *str, va_list args) : IOException() {
+            vsnprintf(m_reason, 511, str, args);
+        }
+};
+class HttpResponseException  : public ClientProtocolException {
+    int statusCode;
+    va_list m_args;
+    public:
+        HttpResponseException(int s, std::string str):ClientProtocolException(str), statusCode(s) {
+        }
+        HttpResponseException(int s, const char *str, ...): ClientProtocolException(str,  (va_start(m_args, str), m_args)), statusCode(s) {
+            va_end(m_args);
+        }
+        int getStatusCode() { return statusCode; }
 };
 #endif

@@ -3,6 +3,7 @@ g++ -g -m64 -std="c++11" -o main -I. -I${SRC_HOME}/inc -I${SRC_HOME}/protocol -I
                         ${SRC_HOME}/protocol/HTTP.cc \
                         ${SRC_HOME}/HttpHost.cc \
                         ${SRC_HOME}/HttpVersion.cc \
+                        ${SRC_HOME}/URI.cc \
                         ${SRC_HOME}/ProtocolVersion.cc \
                         ${SRC_HOME}/util/CharArrayBuffer.cc \
                         ${SRC_HOME}/util/ByteArrayBuffer.cc \

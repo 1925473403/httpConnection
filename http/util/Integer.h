@@ -15,4 +15,7 @@ class Integer {
             snprintf(str, 127, "%d", x);
             return std::string(str);
         }
+        static int parseInt(std::string s) {
+            return Integer::parseInt(s.c_str());
+        }
 };

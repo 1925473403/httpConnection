@@ -1,7 +1,9 @@
 #include "HttpException.h"
 #include "Comparable.h"
+#include <sstream>
 #ifndef URI_H
 #define URI_H
+typedef unsigned char byte;
 class URI : Comparable<URI> {
     private:
         std::string scheme;
@@ -13,25 +15,170 @@ class URI : Comparable<URI> {
         std::string path;
         std::string query;
         std::string schemeSpecificPart;
-        int hash;
+        int _hash;
         std::string decodedUserInfo;
         std::string decodedAuthority;
         std::string decodedPath;
         std::string decodedQuery;
         std::string decodedFragment;
         std::string decodedSchemeSpecificPart;
-        std::string string;
+        std::string _string;
+        static long L_DIGIT;
+        static long H_DIGIT;
+        static long L_UPALPHA;
+        static long H_UPALPHA;
+        static long L_LOWALPHA;
+        static long H_LOWALPHA;
+        static long L_ALPHA;
+        static long H_ALPHA;
+        static long L_ALPHANUM;
+        static long H_ALPHANUM;
+        static long L_HEX;
+        static long H_HEX;
+        static long L_MARK;
+        static long H_MARK;
+        static long L_UNRESERVED;
+        static long H_UNRESERVED;
+        static long L_RESERVED;
+        static long H_RESERVED;
+        static long L_ESCAPED;
+        static long H_ESCAPED;
+        static long L_URIC;
+        static long H_URIC;
+        static long L_PCHAR;
+        static long H_PCHAR;
+        static long L_PATH;
+        static long H_PATH;
+        static long L_DASH;
+        static long H_DASH;
+        static long L_DOT;
+        static long H_DOT;
+        static long L_USERINFO;
+        static long H_USERINFO;
+        static long L_REG_NAME;
+        static long H_REG_NAME;
+        static long L_SERVER;
+        static long H_SERVER;
+        static long L_SERVER_PERCENT;
+        static long H_SERVER_PERCENT;
+        static long L_LEFT_BRACKET;
+        static long H_LEFT_BRACKET;
+        static long L_SCHEME;
+        static long H_SCHEME;
+        static long L_URIC_NO_SLASH;
+        static long H_URIC_NO_SLASH;
+
+
         URI() { }
+        class Parser {
+            public:
+                Parser(URI *, std::string);
+                void parse(bool rsa) throw (URISyntaxException);
+            private:
+                URI *uri;
+                std::string input;
+                bool requireServerAuthority;
+                int ipv6byteCount;
+                void fail(std::string reason) throw(URISyntaxException);
+                void fail(std::string reason, int p) throw(URISyntaxException);
+                void failExpecting(std::string expected, int p) throw(URISyntaxException);
+                void failExpecting(std::string expected, std::string prior, int p) throw(URISyntaxException);
+                std::string substring(int start, int end);
+                char charAt(int p);
+                bool at(int start, int end, char c) ;
+                bool at(int start, int end, std::string s);
+                int scan(int start, int end, char c);
+                int scan(int start, int end, std::string err, std::string stop);
+                int scanEscape(int start, int n, char first) throw (URISyntaxException);
+                int scan(int start, int n, long lMask, long highMask) throw (URISyntaxException);
+                void checkChars(int start, int end, long lMask, long highMask, std::string what) throw (URISyntaxException);
+                void checkChar(int p, long lMask, long hMask, std::string what) throw (URISyntaxException);
+                int parseHierarchical(int start, int n) throw (URISyntaxException);
+                int parseAuthority(int start, int n) throw (URISyntaxException);
+                int parseServer(int start, int n) throw(URISyntaxException);
+                int scanByte(int start, int n) throw (URISyntaxException);
+                int scanIPv4Address(int start, int n, bool strict) throw (URISyntaxException);
+                int takeIPv4Address(int start, int n, std::string expected) throw (URISyntaxException);
+                int parseIPv4Address(int start, int n);
+                int parseHostname(int start, int n) throw (URISyntaxException);
+                int parseIPv6Reference(int start, int n) throw (URISyntaxException);
+                int scanHexPost(int start, int n) throw (URISyntaxException);
+                int scanHexSeq(int start, int n) throw (URISyntaxException);
+        };
+        static long lowMask(int first, int last);
+        static long lowMask(std::string chars);
+        static long highMask(std::string chars);
+        static long highMask(int first, int last);
+        static bool match(char c, long lMask, long hMask);
+        static void appendEscape(stringstream &ss, byte b);
+        static bool isISOControl(char c) ;
+        static void appendEncoded(stringstream &ss, char c);
+        static std::string quote(std::string s, long lMask, long hMask);
+        std::string encode(std::string s) ;
+        static int decode(char c);
+        static byte decode(char c1, char c2);
+        static std::string decode(std::string s);
+        static bool ends_with(std::string requestUri, std::string pattern);
+        static bool starts_with(std::string requestUri, std::string pattern);
+        static int needsNormalization(std::string path);
+        static void maybeAddLeadingDot(char *path, int* segs, int ns);
+        static void removeDots(char *path, int* segs, int ns);
+        static int join(char *path, int* segs, int ns);
+        static void split(char *path, int* segs, int ns);
+        std::string resolvePath(std::string base, std::string child, bool absolute);
+        void defineString();
+        void defineSchemeSpecificPart();
+        void appendAuthority(stringstream &sb, std::string auth, std::string userInfo, std::string host, int port);
+        static void checkPath(std::string s, std::string scheme, std::string path) throw (URISyntaxException);
+        static int compare(std::string s, std::string t);
+        int hash(int h, std::string s);
+        static bool equal(std::string s, std::string t);
+        static int toUpper(char c) ;
+        static int toLower(char c);
+        static bool equalIgnoringCase(std::string s, std::string t);
+        static int compareIgnoringCase(std::string s, std::string t);
+        void appendSchemeSpecificPart(stringstream &sb, std::string opaquePart, std::string auth, std::string userInfo, std::string host, int port, std::string path, std::string query) ;
+        void appendFragment(stringstream &sb, std::string fragment);
+        URI relativize(URI &uri);
+        static URI relativize(URI &base, URI &child);
     public:
         URI(const URI &rhs);
         URI& operator=(const URI &rhs);
         URI(std::string str) throw (URISyntaxException);
         URI(std::string scheme, std::string userInfo, std::string host, int port, std::string path, std::string query, std::string fragment) throw (URISyntaxException);
-        URI(std::string scheme, std::string authority, std::string path, std::string query, std::string fragment) throw (URISyntaxException);
-        URI(std::string scheme, std::string host, std::string path,, std::string fragment) throw (URISyntaxException);
+        URI(std::string scheme, std::string auth, std::string path, std::string query, std::string fragment) throw (URISyntaxException);
+        URI(std::string scheme, std::string host, std::string path, std::string fragment) throw (URISyntaxException);
         URI(std::string scheme, std::string ssp, std::string fragment) throw (URISyntaxException);
         static URI create(std::string str);
-        URI parseServerAuthority() throw (URISyntaxException);
-
+        URI& parseServerAuthority() throw (URISyntaxException);
+        std::string toString(std::string scheme, std::string opaquePart, std::string auth, std::string userInfo, std::string host, int port, std::string path, std::string query, std::string fragment);
+        std::string toString();
+        std::string toASCIIString();
+        int compareTo(URI &that);
+        int hashCode() ;
+        bool equals(URI &ob);
+        std::string getFragment() ;
+        std::string getRawFragment() ;
+        std::string getQuery();
+        std::string getRawQuery();
+        std::string getPath() ;
+        std::string getRawPath();
+        int getPort();
+        std::string getHost() ;
+        std::string getUserInfo();
+        std::string getRawUserInfo();
+        std::string getAuthority();
+        std::string getRawAuthority() ;
+        std::string getSchemeSpecificPart();
+        std::string getRawSchemeSpecificPart();
+        bool isOpaque();
+        bool isAbsolute();
+        std::string getScheme();
+        static URI normalize(URI &);
+        URI normalize();
+        static std::string normalize(std::string ps);
+        URI resolve(URI &base, URI &child) ;
+        URI resolve(std::string str) ;
+        URI resolve(URI &uri);
 };
 #endif
