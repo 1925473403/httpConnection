@@ -15,6 +15,6 @@ void HttpRequestHandlerRegistry::setHandlers(unordered_map<std::string, ValueBas
     matcher.setHandlers(map);
 }
 HttpRequestHandler *HttpRequestHandlerRegistry::lookup(std::string requestURI) {
-    HttpRequestHandler *handler = type_cast<HttpRequestHandler *>(matcher.lookup(requestUri));
+    HttpRequestHandler *handler = type_cast<HttpRequestHandler *>(matcher.lookup(requestUri, NULL));
     return handler;
 }

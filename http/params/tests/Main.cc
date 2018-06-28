@@ -54,7 +54,7 @@ int main() {
     params->setParameter("ProtocolVersion", &vpv);
     std::cout << "BOOLEAN: " << params->getBooleanParameter("BOOLEAN", true) << std::endl;
     ValueBase *v = params->getParameter("ProtocolVersion");
-    ProtocolVersion *p = type_cast<ProtocolVersion *>(v);
+    ProtocolVersion *p = type_cast<ProtocolVersion *>(v, NULL);
     if (p) {
         std::cout << p->toString() << std::endl;
         std::cout << "cast success " << std::endl;

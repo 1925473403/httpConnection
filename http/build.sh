@@ -1,5 +1,8 @@
 SRC_HOME=/home/fworks/replay/httpConnection/http
-g++ -g -m64 -std="c++11" -o main -I. -I${SRC_HOME}/inc -I${SRC_HOME}/protocol -I${SRC_HOME}/util -I${SRC_HOME}/params -I${SRC_HOME}/message ${SRC_HOME}/Main.cc \
+g++ -g -m64 -std="c++11" -o main -I. \
+                        -I${SRC_HOME}/inc -I${SRC_HOME}/protocol -I${SRC_HOME}/util \
+                        -I${SRC_HOME}/params -I${SRC_HOME}/message -I${SRC_HOME}/client/params \
+                        ${SRC_HOME}/Main.cc \
                         ${SRC_HOME}/protocol/HTTP.cc \
                         ${SRC_HOME}/HttpHost.cc \
                         ${SRC_HOME}/HttpVersion.cc \
@@ -12,6 +15,9 @@ g++ -g -m64 -std="c++11" -o main -I. -I${SRC_HOME}/inc -I${SRC_HOME}/protocol -I
                         ${SRC_HOME}/params/AbstractHttpParams.cc \
                         ${SRC_HOME}/params/BasicHttpParams.cc \
                         ${SRC_HOME}/params/Value.cc \
+                        ${SRC_HOME}/client/params/CookiePolicy.cc \
+                        ${SRC_HOME}/client/params/ClientPNames.cc \
+                        ${SRC_HOME}/client/params/HttpClientParams.cc \
                         ${SRC_HOME}/message/ParserCursor.cc \
                         ${SRC_HOME}/message/BasicHeader.cc \
                         ${SRC_HOME}/message/BasicHeaderValueFormatter.cc \

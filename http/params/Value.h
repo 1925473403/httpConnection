@@ -21,11 +21,11 @@ class Value : public ValueBase {
     }
 };
 template<class T>
-T type_cast(ValueBase *object) {
-    if (object == NULL) return NULL;
+T type_cast(ValueBase *object, T d) {
+    if (object == NULL) return d;
     Value<T> *obj = dynamic_cast<Value<T> *>(object);
     if (obj) return obj->value();
-    return NULL;
+    return d;
 }
 ostream& operator<<(ostream &os, ValueBase &rhs);
 bool equalsIgnoreCase(std::string, std::string);
