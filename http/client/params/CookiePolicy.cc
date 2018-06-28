@@ -1,6 +1,6 @@
 #include "HttpException.h"
 #ifndef COOKIEPOLICY_H
-#define COOKIEPOLICY_H
+#include "CookiePolicy.h"
 #endif
 std::string CookiePolicy::BROWSER_COMPATIBILITY("compatibility");
 std::string CookiePolicy::NETSCAPE("netscape");

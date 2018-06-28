@@ -4,10 +4,10 @@
 class CookiePolicy {
     CookiePolicy() { }
     public:
-        std::string BROWSER_COMPATIBILITY;
-        std::string NETSCAPE;
-        std::string RFC_2109;
-        std::string RFC_2965;
-        std::string BEST_MATCH;
+        static std::string BROWSER_COMPATIBILITY;
+        static std::string NETSCAPE;
+        static std::string RFC_2109;
+        static std::string RFC_2965;
+        static std::string BEST_MATCH;
 };
 #endif
