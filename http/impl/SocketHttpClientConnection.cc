@@ -1,4 +1,7 @@
+#include "Value.h"
+#ifndef SOCKETHTTPCLIENTCONNECTION_H
 #include "SocketHttpClientConnection.h"
+#endif
 SocketHttpClientConnection::SocketHttpClientConnection() { }
 SocketHttpClientConnection::~SocketHttpClientConnection() { }
 SessionInputBuffer* SocketHttpClientConnection::createSessionInputBuffer(Socket &, int, HttpParams*) throws IOException {

@@ -22,6 +22,11 @@ BasicLineParser BasicLineParser::DEFAULT;
 ProtocolVersion* BasicLineParser::createProtocolVersion(int major, int minor) {
     return protocol->forVersion(major, minor);
 }
+
+void BasicLineParser::unref() {
+    if (this == &(BasicLineParser::DEFAULT)) return;
+    delete this;
+}
 RequestLine* BasicLineParser::createRequestLine(std::string method, std::string uri, ProtocolVersion *ver) {
     return new BasicRequestLine(method, uri, ver);
 }

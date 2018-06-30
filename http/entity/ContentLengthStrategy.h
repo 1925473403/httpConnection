@@ -5,7 +5,7 @@ class ContentLengthStrategy {
     public:
         static int IDENTITY;
         static int CHUNKED;
-        virtual long determineLength(HttpMessage *) throws HttpException = 0;
-        virtual ~ContentLengthStrategy() = 0;
+        virtual long determineLength(HttpMessage *) throw(HttpException) = 0;
+        virtual ~ContentLengthStrategy() { }
 };
 #endif

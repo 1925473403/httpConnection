@@ -8,11 +8,12 @@ class BasicLineParser  : public LineParser {
         RequestLine* createRequestLine(std::string method, std::string uri, ProtocolVersion *ver);
         StatusLine* createStatusLine(ProtocolVersion *ver, int status, std::string reason);
         void skipWhitespace(CharArrayBuffer &buffer, ParserCursor *cursor);
+        ~BasicLineParser() { }
     public:
+        virtual void unref();
         static BasicLineParser DEFAULT;
         BasicLineParser(ProtocolVersion *proto);
         BasicLineParser();
-        ~BasicLineParser() { }
         static ProtocolVersion* parseProtocolVersion(std::string value, LineParser *parser) throw (ParseException);
         ProtocolVersion* parseProtocolVersion(CharArrayBuffer &buffer, ParserCursor *cursor) throw (ParseException);
         bool hasProtocolVersion(CharArrayBuffer &buffer, ParserCursor *cursor);

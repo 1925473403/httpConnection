@@ -78,7 +78,7 @@ int main() {
     //std::string URISTR("abc://admin:admin@geeksforgeeks.org:1234/path/data?key=value&key2=value2#fragid1");
     std::string URISTR("https://www.google.com/search?q=pure+virtual+function&ie=utf-8&oe=utf-8&client=firefox-b-1-ab");
     //std::string URISTR;
-    //cin >> URISTR;
+    cin >> URISTR;
     URI uri(URISTR);
     URI uriBase("http://www.somedomain.com/");
     

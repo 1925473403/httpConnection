@@ -8,10 +8,10 @@ class AbstractMessageParser : public HttpMessageParser {
         int maxLineLen;
         LineParser *lineParser;
     protected:
-        HttpMessage* parseHead(SessionInputBuffer*) throws IOException, HttpException, ParseException = 0;
+        virtual HttpMessage* parseHead(SessionInputBuffer*) throw(IOException, HttpException, ParseException) = 0;
     public:
         AbstractMessageParser(SessionInputBuffer *, LineParser*, HttpParams*);
-        vector<Header> parseHeaders(SessionInputBuffer *, int, int LineParser*) throws HttpException, IOException;
-        HttpMessage* parse() throws IOException, HttpException;
+        static void parseHeaders(SessionInputBuffer *, int, int LineParser*, vector<Header *> &headers) throw(HttpException, IOException);
+        virtual HttpMessage* parse() throw(IOException, HttpException) = 0;
 };
 #endif

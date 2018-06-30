@@ -2,6 +2,7 @@
 #ifndef BASICLINEFORMATTER_H
 #define BASICLINEFORMATTER_H
 class BasicLineFormatter : public LineFormatter {
+        ~BasicLineFormatter()  { }
     protected:
         CharArrayBuffer& initBuffer(CharArrayBuffer&);
         int estimateProtocolVersionLen(ProtocolVersion*);
@@ -10,7 +11,7 @@ class BasicLineFormatter : public LineFormatter {
         void doFormatHeader(CharArrayBuffer&, Header*);
     public:
         static BasicLineFormatter DEFAULT;
-        ~BasicLineFormatter()  { }
+        void unref();
         std::string formatProtocolVersion(ProtocolVersion *, LineFormatter*);
         CharArrayBuffer appendProtocolVersion(CharArrayBuffer&, ProtocolVersion*);
         std::string formatRequestLine(RequestLine *,LineFormatter*);

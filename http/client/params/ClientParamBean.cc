@@ -1,4 +1,8 @@
 #include "HttpException.h"
+#include "Value.h"
+#include "ClientPNames.h"
+#include "CookiePolicy.h"
+#include "HttpParams.h"
 #ifndef CLIENTPARAMBEAN_H
 #include "ClientParamBean.h"
 #endif
@@ -9,7 +13,7 @@ void ClientParamBean:: setConnectionManagerFactoryClassName (std::string factory
     params->setParameter(ClientPNames::CONNECTION_MANAGER_FACTORY_CLASS_NAME, factory);
 }
 
-void ClientParamBean:: setConnectionManagerFactory(ClientConnectionManagerFactory factory) {
+void ClientParamBean:: setConnectionManagerFactory(ClientConnectionManagerFactory* factory) {
     params->setParameter(ClientPNames::CONNECTION_MANAGER_FACTORY, factory);
 }
 
@@ -37,7 +41,7 @@ void ClientParamBean:: setCookiePolicy (std::string policy) {
     params->setParameter(ClientPNames::COOKIE_POLICY, policy);
 }
 
-void ClientParamBean:: setVirtualHost (HttpHost host) {
+void ClientParamBean:: setVirtualHost (HttpHost* host) {
     params->setParameter(ClientPNames::VIRTUAL_HOST, host);
 }
 
@@ -45,6 +49,6 @@ void ClientParamBean:: setDefaultHeaders (Collection <Header> headers) {
     params->setParameter(ClientPNames::DEFAULT_HEADERS, headers);
 }
 
-void ClientParamBean:: setDefaultHost (HttpHost host) {
+void ClientParamBean:: setDefaultHost (HttpHost* host) {
     params->setParameter(ClientPNames::DEFAULT_HOST, host);
 }
