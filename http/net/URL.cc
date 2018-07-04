@@ -41,7 +41,7 @@ bool URL::isValidProtocol(std::string pro) {
     int len = pro.length();
     if (len == 0) return false;
     char c = pro[0];
-    if (::isalpha(c)) return false;
+    if (::isalpha(c) == 0) return false;
     for (int i = 1; i < len; i++) {
         c = pro[i];
         if (!isalnum(c) && c != '.' && c != '+' && c != '-') return false;
@@ -138,13 +138,13 @@ URLStreamHandler *URL::getURLStreamHandler(std::string proto) {
     return h;
 }
 
-URL::URL(std::string spec) throw (MalformedURLException) : URL(*this, spec) {
+URL::URL(std::string &spec) throw (MalformedURLException) : URL(*this, spec) {
 }
 
-URL::URL(URL &context, std::string spec) throw (MalformedURLException) : URL(context, spec, NULL) {
+URL::URL(URL &context, std::string &spec) throw (MalformedURLException) : URL(context, spec, NULL) {
 }
 
-URL::URL(URL &context, std::string spec, URLStreamHandler *h) throw (MalformedURLException) : protocol(""), host(""), path(""), port(-1),
+URL::URL(URL &context, std::string &spec, URLStreamHandler *h) throw (MalformedURLException) : protocol(""), host(""), path(""), port(-1),
      file(""),
      query(""),
      authority(""),
@@ -152,7 +152,8 @@ URL::URL(URL &context, std::string spec, URLStreamHandler *h) throw (MalformedUR
      ref(""),
      hostAddress(0),
      handler(0) {
-    std::string original = spec;
+    std::string original;
+    original.assign(spec);
     int i, limit, c;
     int start = 0;
     std::string newProtocol = "";
@@ -176,7 +177,7 @@ URL::URL(URL &context, std::string spec, URLStreamHandler *h) throw (MalformedUR
             }
         }
         protocol = newProtocol;
-        if ((this != &context) && (newProtocol == "") || equalsIgnoreCase(newProtocol, context.getProtocol())) {
+        if ((this != &context) && ((newProtocol == "") || equalsIgnoreCase(newProtocol, context.getProtocol()))) {
             if (h == NULL) h = context.handler;
             if (context.getPath() != "" && starts_with(context.getPath(), "/")) newProtocol = "";
             if (newProtocol == "") {

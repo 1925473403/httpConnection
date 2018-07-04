@@ -43,7 +43,7 @@ void URLStreamHandler::parseURL(URL &u, std::string spec, int start, int limit) 
             i = spec.find('?', start);
             if (i < 0 || i > limit) i = limit;
         }
-        host = authority = spec.substr(start, i);
+        host = authority = spec.substr(start, i - start);
         int ind = authority.find('@');
         if (ind != std::string::npos) {
             if (ind != authority.find_last_of('@')) {

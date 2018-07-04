@@ -36,12 +36,12 @@ class URL {
         URLStreamHandler *handler;
         URL(const URL &rhs);
         URL& operator=(const URL &rhs);
+        URL(std::string &spec) throw (MalformedURLException);
         URL(std::string pro, std::string h, int p, std::string f) throw (MalformedURLException);
         URL(std::string pro, std::string h, std::string f) throw (MalformedURLException);
         URL(std::string pro, std::string h, int p, std::string f, URLStreamHandler *hand) throw (MalformedURLException);
-        URL(std::string spec) throw (MalformedURLException);
-        URL(URL &context, std::string spec) throw (MalformedURLException);
-        URL(URL &content, std::string spec, URLStreamHandler *handler) throw (MalformedURLException);
+        URL(URL &context, std::string &spec) throw (MalformedURLException);
+        URL(URL &content, std::string &spec, URLStreamHandler *handler) throw (MalformedURLException);
         ~URL();
         void set(std::string pro, std::string h, int p, std::string f, std::string r);
         void set(std::string pro, std::string h, int p, std::string auth, std::string ui, std::string pt, std::string q, std::string rr);

@@ -94,7 +94,7 @@ int main() {
     std::cout << "Enter URI (eg: https://www.google.com/search?q=pure+virtual+function&ie=utf-8&oe=utf-8&client=firefox-b-1-ab) ";
     std::string URISTR("https://www.google.com/search?q=pure+virtual+function&ie=utf-8&oe=utf-8&client=firefox-b-1-ab");
     //std::string URISTR;
-    cin >> URISTR;
+    //cin >> URISTR;
     {
         URL u(URISTR);
         std::cout << "\nhost: " << u.getHost() << "\nport: " << u.getPort() << "\nUserInfo: " << u.getUserInfo() << "\nAuthority: " << u.getAuthority() << "\nFile: " << u.getFile() << "\nRef: " << u.getRef() << "\nProtocol: " << u.getProtocol() << "\nExternalForm: " << u.toExternalForm() << std::endl;
