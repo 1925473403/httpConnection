@@ -8,37 +8,46 @@ class Parts {
         std::string _path;
         std::string _ref;
     public:
-        Parts(std::string f) {
-            int ind = f.find("#");
-        }
+        Parts(std::string f);
+        Parts(const Parts &rhs);
+        Parts& operator=(const Parts &rhs) ;
         std::string getPath() { return _path; }
         std::string getQuery() { return _query; }
-        std::string getRef() { return ref; }
+        std::string getRef() { return _ref; }
 };
+class URLStreamHandler;
+class URLStreamHandlerFactory;
 class URL {
     private:
-        std::string _protocol;
-        std::string _host;
-        int _port;
-        std::string _file;
-        std::string _query;
-        std::string _authority;
-        std::string _userInfo;
-        std::string _ref;
-        InetAddress hotAddress;
+        std::string protocol;
+        std::string host;
+        std::string path;
+        int port;
+        std::string file;
+        std::string query;
+        std::string authority;
+        std::string userInfo;
+        std::string ref;
+        static URLStreamHandlerFactory *urlStreamHandlerFactory;
         bool isValidProtocol(std::string pro);
-        unordered_map<std::string, URLStreamHandler*> handlers;
+        static unordered_map<std::string, URLStreamHandler*> handlers;
     public:
+        InetAddress *hostAddress;
+        URLStreamHandler *handler;
+        URL(const URL &rhs);
+        URL& operator=(const URL &rhs);
         URL(std::string pro, std::string h, int p, std::string f) throw (MalformedURLException);
         URL(std::string pro, std::string h, std::string f) throw (MalformedURLException);
-        URL(std::string pro, std::string h, int p, std::string f, URLStreamHandler *handler) throw (MalformedURLException);
+        URL(std::string pro, std::string h, int p, std::string f, URLStreamHandler *hand) throw (MalformedURLException);
         URL(std::string spec) throw (MalformedURLException);
         URL(URL &context, std::string spec) throw (MalformedURLException);
         URL(URL &content, std::string spec, URLStreamHandler *handler) throw (MalformedURLException);
+        ~URL();
         void set(std::string pro, std::string h, int p, std::string f, std::string r);
         void set(std::string pro, std::string h, int p, std::string auth, std::string ui, std::string pt, std::string q, std::string rr);
         std::string getQuery();
         std::string getPath();
+        bool sameFile(URL &other);
         std::string getUserInfo();
         std::string getAuthority();
         int getPort();
@@ -47,8 +56,9 @@ class URL {
         std::string getFile();
         std::string getRef();
         std::string toString();
+        std::string getProtocol();
         std::string toExternalForm();
-	URI toURI() throw (URISyntaxException);
+        URI toURI() throw (URISyntaxException);
         static URLStreamHandler* getURLStreamHandler(std::string p);
 };
 #endif

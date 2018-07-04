@@ -1,14 +1,21 @@
-#include <string.h>
-#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdarg.h>
+#include <assert.h>
+#include <errno.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/types.h>
+#include <netdb.h>
+#include <string.h>
+#include <iostream>
 #include <vector>
 #include <unordered_map>
 #include <string>
 #include <sstream>
-#include <stdarg.h>
-#include <assert.h>
-#include <errno.h>
 using namespace std;
 #ifndef HTTPEXCEPTION_H
 #define HTTPEXCEPTION_H
@@ -41,6 +48,17 @@ class IOException : public std::exception {
         }
     protected:
         char m_reason[512];
+};
+class SecurityException : public IOException {
+    public:
+    SecurityException() : IOException() { }
+    SecurityException(std::string s) : IOException(s) { }
+    SecurityException(const char *str, ...) {
+            va_list args;
+            va_start(args, str);
+            vsnprintf(m_reason, 511, str, args);
+            va_end(args);
+    }
 };
 class UnknownHostException : public IOException {
     public:
@@ -152,6 +170,12 @@ class MalformedURLException : public std::exception {
     public:
         MalformedURLException(std::string &str) {
             snprintf(m_reason, 511, "%s", str.c_str());
+        }
+        MalformedURLException(const char *str,...) {
+            va_list args;
+            va_start(args, str);
+            vsnprintf(m_reason, 511, str, args);
+            va_end(args);
         }
         MalformedURLException(const char *str, const std::string &s) {
             snprintf(m_reason, 511, "%s %s", str, s.c_str());

@@ -1,12 +1,21 @@
-SRC_HOME=/home/fworks/replay/httpConnection/http
-g++ -g -m64 -std="c++11" -o main -I. \
+SRC_HOME=$PWD
+g++ -g -m64 -std="c++11" -o main \
                         -I${SRC_HOME}/inc -I${SRC_HOME}/protocol -I${SRC_HOME}/util \
                         -I${SRC_HOME}/params -I${SRC_HOME}/message -I${SRC_HOME}/client/params \
+                        -I${SRC_HOME}/net \
+                        ${SRC_HOME}/util/StringUtils.cc \
                         ${SRC_HOME}/Main.cc \
                         ${SRC_HOME}/protocol/HTTP.cc \
                         ${SRC_HOME}/HttpHost.cc \
                         ${SRC_HOME}/HttpVersion.cc \
                         ${SRC_HOME}/net/URI.cc \
+                        ${SRC_HOME}/net/NameResolver.cc \
+                        ${SRC_HOME}/net/InetSocketAddress.cc \
+                        ${SRC_HOME}/net/URLStreamHandler.cc \
+                        ${SRC_HOME}/net/HttpHandler.cc \
+                        ${SRC_HOME}/net/HttpsHandler.cc \
+                        ${SRC_HOME}/net/FtpHandler.cc \
+                        ${SRC_HOME}/net/URL.cc \
                         ${SRC_HOME}/ProtocolVersion.cc \
                         ${SRC_HOME}/util/CharArrayBuffer.cc \
                         ${SRC_HOME}/util/ByteArrayBuffer.cc \
@@ -41,4 +50,4 @@ g++ -g -m64 -std="c++11" -o main -I. \
                         ${SRC_HOME}/protocol/DefaultedHttpContext.cc \
                         ${SRC_HOME}/protocol/HttpDateGenerator.cc \
                         ${SRC_HOME}/protocol/UriPatternMatcher.cc \
-                        ${SRC_HOME}/protocol/SyncBasicHttpContext.cc -lpthread
+                        ${SRC_HOME}/protocol/SyncBasicHttpContext.cc -lpthread -lnsl -lresolv

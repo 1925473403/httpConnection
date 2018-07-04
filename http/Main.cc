@@ -25,6 +25,8 @@
 #include "CharArrayBuffer.h"
 #endif
 #include "HttpException.h"
+#include "Integer.h"
+#include "StringUtils.h"
 #include "Value.h"
 #include "HttpContext.h"
 #include "BasicHttpContext.h"
@@ -60,7 +62,20 @@
 #include "BasicLineParser.h"
 #include "BufferedHeader.h"
 #include "HttpDateGenerator.h"
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/types.h>
+#include <netdb.h>
+#include "NameResolver.h"
+#include "InetSocketAddress.h"
 #include "URI.h"
+#include "URL.h"
+#include "URLStreamHandler.h"
+#include "URLStreamHandlerFactory.h"
+#include "HttpHandler.h"
+#include "FtpHandler.h"
+#include "HttpsHandler.h"
 #include "UriPatternMatcher.h"
 #include "HttpClientParams.h"
 using namespace std;
@@ -76,9 +91,14 @@ int main() {
     HttpDateGenerator DATE_GENERATOR ;
     std::cout << "date: " << DATE_GENERATOR.getCurrentDate() << std::endl;
     //std::string URISTR("abc://admin:admin@geeksforgeeks.org:1234/path/data?key=value&key2=value2#fragid1");
+    std::cout << "Enter URI (eg: https://www.google.com/search?q=pure+virtual+function&ie=utf-8&oe=utf-8&client=firefox-b-1-ab) ";
     std::string URISTR("https://www.google.com/search?q=pure+virtual+function&ie=utf-8&oe=utf-8&client=firefox-b-1-ab");
     //std::string URISTR;
     cin >> URISTR;
+    {
+        URL u(URISTR);
+        std::cout << "\nhost: " << u.getHost() << "\nport: " << u.getPort() << "\nUserInfo: " << u.getUserInfo() << "\nAuthority: " << u.getAuthority() << "\nFile: " << u.getFile() << "\nRef: " << u.getRef() << "\nProtocol: " << u.getProtocol() << "\nExternalForm: " << u.toExternalForm() << std::endl;
+    }
     URI uri(URISTR);
     URI uriBase("http://www.somedomain.com/");
     
