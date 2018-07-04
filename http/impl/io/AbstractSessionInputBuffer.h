@@ -1,28 +1,21 @@
 #include "HttpException.h"
 #ifndef ABSTRACTSESSIONINPUTBUFFER_H
 #define ABSTRACTSESSIONINPUTBUFFER_H
-class AbstractSessionInputBuffer : public SessionInputBuffer, public BufferInfo {
+class AbstractSessionInputBuffer : public SessionInputBuffer{
     private:
         InputStream *instream;
         byte *buffer;
+        int bytebufferlen;
         int bufferpos;
         int bufferlen;
         ByteArrayBuffer linebuffer;
-        CharBuffer cbuf;
         bool ascii;
         int maxLineLen;
-        int minChunkLimit;
-        CodingErrorAction *onMalformedInputAction;
-        CodingErrorAction *onUnMappableInputAction;
         int locateLF();
-        int appendDecoded(CharArrayBuffer &charbuffer, ByteBuffer &bbuf) throw (IOException);
-        int handleDecodingResult(CoderResult *result, CharArrayBuffer &charbuffer, ByteBuffer &bbuf) throw (IOException);
     protected:
         void init(InputStream *ins, int buffersize, HttpParams *params);
     public:
-        int capacity() ;
-        int length();
-        int available();
+        virtual ~AbstractSessionInputBuffer() { delete [] buffer; }
         int fillBuffer() throw (IOException);
         bool hasBufferedData();
         int read () throw (IOException);

@@ -1,11 +1,14 @@
 #include <string.h>
 #include <iostream>
+#include <unistd.h>
 #include <pthread.h>
 #include <vector>
 #include <unordered_map>
 #include <string>
 #include <sstream>
 #include <stdarg.h>
+#include <assert.h>
+#include <errno.h>
 using namespace std;
 #ifndef HTTPEXCEPTION_H
 #define HTTPEXCEPTION_H
@@ -38,6 +41,28 @@ class IOException : public std::exception {
         }
     protected:
         char m_reason[512];
+};
+class UnknownHostException : public IOException {
+    public:
+    UnknownHostException() : IOException() { }
+    UnknownHostException(std::string s) : IOException(s) { }
+    UnknownHostException(const char *str, ...) {
+            va_list args;
+            va_start(args, str);
+            vsnprintf(m_reason, 511, str, args);
+            va_end(args);
+    }
+};
+class NumberFormatException : public IOException {
+    public:
+    NumberFormatException() : IOException() { }
+    NumberFormatException(std::string s) : IOException(s) { }
+    NumberFormatException(const char *str, ...) {
+            va_list args;
+            va_start(args, str);
+            vsnprintf(m_reason, 511, str, args);
+            va_end(args);
+    }
 };
 class InternalError : public IOException {
     public:

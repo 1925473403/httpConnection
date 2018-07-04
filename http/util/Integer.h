@@ -1,3 +1,4 @@
+#include "HttpException.h"
 class Integer {
     Integer();
     Integer(const Integer &);
@@ -5,6 +6,11 @@ class Integer {
     public:
         static int parseInt(const char *str) {
             int x = 0;
+            for (int i = 0; i < strlen(str); i++) {
+                if (i == 0 && (str[i] == '-' || str[i] =='+')) continue;
+                if (i != 0 && (str[i] == '-' || str[i] =='+')) throw NumberFormatException("%s is not a number", str);
+                if (!isdigit(str[i])) throw NumberFormatException("%s is not a number", str);
+            }
             if (str != NULL) {
                 x = atoi(str);
             }

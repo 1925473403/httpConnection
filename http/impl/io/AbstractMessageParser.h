@@ -6,8 +6,8 @@ class AbstractMessageParser : public HttpMessageParser {
         SessionInputBuffer *sessionBuffer;
         int maxHeaderCount;
         int maxLineLen;
-        LineParser *lineParser;
     protected:
+        LineParser *lineParser;
         virtual HttpMessage* parseHead(SessionInputBuffer*) throw(IOException, HttpException, ParseException) = 0;
     public:
         AbstractMessageParser(SessionInputBuffer *, LineParser*, HttpParams*);
