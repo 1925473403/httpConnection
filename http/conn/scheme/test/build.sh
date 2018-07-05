@@ -1,4 +1,4 @@
-SRC_HOME=/home/fworks/replay/httpConnection/http
+SRC_HOME=$PWD/../../../
 g++ -g -m64 -std="c++11" \
     -I${SRC_HOME}/protocol \
     -I${SRC_HOME}/conn/scheme \
@@ -11,6 +11,6 @@ g++ -g -m64 -std="c++11" \
     ${SRC_HOME}/util/CharArrayBuffer.cc \
     ${SRC_HOME}/protocol/HTTP.cc \
     ${SRC_HOME}/net/InetSocketAddress.cc \
-    ${SRC_HOME}/conn/scheme/NameResolver.cc -lnsl 
+    ${SRC_HOME}/net/NameResolver.cc -lnsl 
 #${SRC_HOME}/conn/scheme/SchemeRegistry.cc \
 #${SRC_HOME}/conn/scheme/Scheme.cc \
