@@ -8,7 +8,7 @@ AbstractMessageParser::AbstractMessageParser(SessionInputBuffer *buffer, LinePar
     lineParser = ((parser != null)? parser : &(BasicLineParser::DEFAULT);
 }
 
-AbstractMessageParser::parseHeaders(SessionInputBuffer *inbuffer, int maxHeaderCount, int maxLineLen, LineParser *parser, vector<Header*> &headers) throw(HttpException, IOException) {
+void AbstractMessageParser::parseHeaders(SessionInputBuffer *inbuffer, int maxHeaderCount, int maxLineLen, LineParser *parser, vector<Header*> &headers) throw(HttpException, IOException) {
     if (inbuffer == NULL) throw IllegalArgumentException("Session input buffer may not be null");
     if (parser == NULL) parser = &(BasicLineParser::DEFAULT);
 
