@@ -15,13 +15,13 @@ long StrictContentLengthStrategy::determineLength(HttpMessage *message) throw (H
         std::string s = transferEncodingHeader->getValue();
         if (equalsIgnoreCase(s, HTTP::CHUNK_CODING) {
             if (message->getProtocolVersion()->lessEquals(HttpVersion::HTTP_1_0)) throw ProtocolException("Chunked transfer encoding not allowed for %s", message->getProtocolVersion()->toString());
-            return CHUNKED;
+            return ContentLengthStrategy::CHUNKED;
         } else if (equalsIgnoreCase(s, HTTP::IDENTITY_CODING)) {
-            return IDENTITY;
+            return ContentLengthStrategy::IDENTITY;
         } else throw ProtocolException("Unsupported transfer encoding: %s", s.c_str());
     } else if (contentLengthHeader != NULL) {
         std::string s = contentLengthHeader->getValue();
         long len = Integer::parseInt(s);
         return len;
-    } else return IDENTITY;
+    } else return ContentLengthStrategy::IDENTITY;
 }

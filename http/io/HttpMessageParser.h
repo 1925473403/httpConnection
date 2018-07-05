@@ -3,6 +3,7 @@
 #define HTTPMESSAGEPARSER_H
 class HttpMessageParser {
     public:
-        HttpMessage* parse() throws IOException, HttpException = 0;
+        virtual ~HttpMessageParser() { }
+        virtual HttpMessage* parse() throw(IOException, HttpException) = 0;
 };
 #endif

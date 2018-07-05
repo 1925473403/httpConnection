@@ -22,11 +22,11 @@ long LaxContentLengthStrategy::determineLength(HttpMessage *message) throw (Http
             }
         }
         int len = encodings.size();
-        if (equalsIgnoreCase(HTTP::IDENTITY_CODING, transferEncodingHeader->getValue())) return IDENTITY;
-        else if ((len > 0) && (equalsIgnoreCase(HTTP::CHUNK_CODING, encodings[len -1]->getName()))) return CHUNKED;
+        if (equalsIgnoreCase(HTTP::IDENTITY_CODING, transferEncodingHeader->getValue())) return ContentLengthStrategy::IDENTITY;
+        else if ((len > 0) && (equalsIgnoreCase(HTTP::CHUNK_CODING, encodings[len -1]->getName()))) return ContentLengthStrategy::CHUNKED;
         else {
             if (strict) throw ProtocolException("Chunk-encoding must be the last one applied");
-            return IDENTITY;
+            return ContentLengthStrategy::IDENTITY;
         }
     } else if (contentLengthHeader != NULL) {
         long contentlen = -1;
@@ -39,8 +39,8 @@ long LaxContentLengthStrategy::determineLength(HttpMessage *message) throw (Http
             if (contentlen > 0) break;
         }
         if (contentlen >= 0) return contentlen;
-        else return IDENTITY;
+        else return ContentLengthStrategy::IDENTITY;
     } else {
-        return IDENTITY;
+        return ContentLengthStrategy::IDENTITY;
     }
 }

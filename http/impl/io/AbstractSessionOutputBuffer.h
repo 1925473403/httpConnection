@@ -9,18 +9,18 @@ class AbstractSessionOutputBuffer : public SessionOutputBuffer, public BufferInf
         ByteArrayBuffer buffer;
         bool ascii;
     protected:
+        void flushBuffer () throw (IOException);
+        void init(OutputStream *oustream, int buffersize, HttpParams *params);
     public:
         virtual ~AbstractSessionOutputBuffer() { }
-        void init(OutputStream *oustream, int buffersize, HttpParams *params);
         int capacity();
         int length();
         int available();
-        void flushBuffer () throw (IOException);
         void flush() throw(IOException);
         void write(byte *b, int off, int len) throw (IOException);
         void write(byte *b, int) throw (IOException);
         void write(int b) throw (IOException);
-        void writeLine(std::string s) throw (IOException);
+        void writeLine(std::string &s) throw (IOException);
         void writeLine(CharArrayBuffer &charbuffer) throw (IOException);
 };
 #endif

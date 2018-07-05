@@ -207,6 +207,17 @@ class IndexOutOfBoundsException:public std::exception {
             return 0;
         }
 };
+class ArrayIndexOutOfBoundsException : public IOException {
+    public:
+    ArrayIndexOutOfBoundsException() : IOException() { }
+    ArrayIndexOutOfBoundsException(std::string str):IOException(str) { }
+    ArrayIndexOutOfBoundsException(const char *str,...) {
+        va_list args;
+        va_start(args, str);
+        vsnprintf(m_reason, 511, str, args);
+        va_end(args);
+    }
+};
 class NoHttpResponseException : public IOException {
     public:
     NoHttpResponseException(std::string str):IOException(str) { }

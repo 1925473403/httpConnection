@@ -15,7 +15,7 @@ bool HttpRequestExecutor::canResponseHaveBody(HttpRequest *request, HttpResponse
     int status = response->getStatusLine()->getStatusCode();
     return status >= HttpStatus::SC_OK && status != HttpStatus::SC_NO_CONTENT && status != HttpStatus::SC_NOT_MODIFIED && status != HttpStatus::SC_RESET_CONTENT;
 }
-HttpResponse* HttpRequestExecutor::execute(HttpRequest* request, HttpClientConnection* conn, HttpContext* context) throws IOException, HttpException {
+HttpResponse* HttpRequestExecutor::execute(HttpRequest* request, HttpClientConnection* conn, HttpContext* context) throw (IOException, HttpException) {
     if (request == NULL) throw IllegalArgumentException("HTTP request may not be null");
     if (conn == NULL) throw IllegalArgumentException("Client connection may not be null");
     if (context == NULL) throw IllegalArgumentException("HTTP context may not be null");
@@ -35,13 +35,13 @@ HttpResponse* HttpRequestExecutor::execute(HttpRequest* request, HttpClientConne
     }
     return NULL;
 }
-void HttpRequestExecutor::preProcess(HttpRequest* request, HttpProcessor* processor, HttpContext* context) throws HttpException, IOException {
+void HttpRequestExecutor::preProcess(HttpRequest* request, HttpProcessor* processor, HttpContext* context)  throw (IOException, HttpException) {
     if (request == NULL) throw IllegalArgumentException("HTTP request may not be null");
     if (processor == NULL) throw IllegalArgumentException("HTTP processor may not be null");
     if (context == NULL) throw IllegalArgumentException("HTTP context may not be null");
     processor->process(request, context);
 }
-HttpResponse* HttpRequestExecutor::doSendRequest(HttpRequest* request, HttpClientConnection* conn, HttpContext* context) throws IOException, HttpException {
+HttpResponse* HttpRequestExecutor::doSendRequest(HttpRequest* request, HttpClientConnection* conn, HttpContext* context) throw (IOException, HttpException) {
     if (request == NULL) throw IllegalArgumentException("HTTP request may not be null");
     if (conn == NULL) throw IllegalArgumentException("Client connection may not be null");
     if (context == NULL) throw IllegalArgumentException("HTTP context may not be null");
@@ -76,7 +76,7 @@ HttpResponse* HttpRequestExecutor::doSendRequest(HttpRequest* request, HttpClien
     context->setAttribute(ExecutionContext::HTTP_REQ_SENT, true);
     return response;
 }
-HttpResponse* HttpRequestExecutor::doReceiveResponse(HttpRequest *request, HttpClientConnection* conn, HttpContext* context) throws IOException, HttpException {
+HttpResponse* HttpRequestExecutor::doReceiveResponse(HttpRequest *request, HttpClientConnection* conn, HttpContext* context) throw (IOException, HttpException) {
     if (request == NULL) throw IllegalArgumentException("HTTP request may not be null");
     if (conn == NULL) throw IllegalArgumentException("Client connection may not be null");
     if (context == NULL) throw IllegalArgumentException("HTTP context may not be null");
@@ -91,7 +91,7 @@ HttpResponse* HttpRequestExecutor::doReceiveResponse(HttpRequest *request, HttpC
     }
     return response;
 }
-void HttpRequestExecutor::postProcess(HttpRequest* request, HttpProcessor* processor, HttpContext* context) throws HttpException, IOException {
+void HttpRequestExecutor::postProcess(HttpRequest* request, HttpProcessor* processor, HttpContext* context)  throw (IOException, HttpException) {
     if (response == NULL) throw IllegalArgumentException("HTTP response may not be null");
     if (processor == NULL) throw IllegalArgumentException("HTTP processor may not be null");
     if (context == NULL) throw IllegalArgumentException("HTTP context may not be null");

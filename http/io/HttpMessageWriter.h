@@ -3,6 +3,7 @@
 #define HTTPMESSAGEWRITER_H
 class HttpMessageWriter {
     public:
-        void write(HttpMessage *message) throws IOException, HttpException = 0;
+        virtual ~HttpMessageWriter() { }
+        virtual void write(HttpMessage *message) throw(IOException, HttpException) = 0;
 };
 #endif

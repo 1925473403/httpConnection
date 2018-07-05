@@ -5,9 +5,9 @@ class EntitySerializer {
     private:
         ContentLengthStrategy *lenStrategy;
     protected:
-        ostream& doSerialize(SessionOutputBuffer*, HttpMessage*) throws HttpException, IOException;
+        ostream& doSerialize(SessionOutputBuffer*, HttpMessage*) throw(HttpException, IOException);
     public:
         EntitySerializer(ContentLengthStrategy *);
-        void serialize(SessionOutputBuffer*, HttpMessage*, HttpEntity*) throws HttpException, IOException;
+        void serialize(SessionOutputBuffer*, HttpMessage*, HttpEntity*) throw(HttpException, IOException);
 };
 #endif

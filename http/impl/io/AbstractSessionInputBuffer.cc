@@ -32,7 +32,7 @@ int AbstractSessionInputBuffer::fillBuffer() throw (IOException) {
         }
     }
     int l, off = bufferlen, len = bytebufferlen - bufferlen;
-    l = instream->read(buffer, off, len);
+    l = instream->read(buffer, bytebufferlen, off, len);
     if (l == -1) return -1;
     else {
         bufferlen = off + l;
@@ -50,7 +50,7 @@ int AbstractSessionInputBuffer::read () throw (IOException) {
     }
     return buffer[bufferpos++] & 0xff;
 }
-int AbstractSessionInputBuffer::read(byte *b, int off, int len) throw (IOException) {
+int AbstractSessionInputBuffer::read(byte *b, int blen, int off, int len) throw (IOException) {
     if (b == NULL) return 0;
     int noRead = 0;
     while (!hasBufferedData()) {
@@ -59,13 +59,13 @@ int AbstractSessionInputBuffer::read(byte *b, int off, int len) throw (IOExcepti
     }
     int chunk = bufferlen - bufferpos;
     if (chunk > len) chunk = len;
-    memcpy(b + off, buffer + bufferpos, chunk);
-    bufferpos += chunk;
+    memcpy(b + off, buffer + bufferpos, chunk - off);
+    bufferpos += chunk - off;
     return chunk;
 }
-int AbstractSessionInputBuffer::read(byte *b, int len) throw (IOException) {
+int AbstractSessionInputBuffer::read(byte *b, int blen, int len) throw (IOException) {
     if (b == NULL) return 0;
-    return read(b, 0, len);
+    return read(b, blen, 0, len);
 }
 int AbstractSessionInputBuffer::readLine(CharArrayBuffer &charbuffer) throw (IOException) {
     linebuffer.clear();

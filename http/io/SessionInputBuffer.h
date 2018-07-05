@@ -3,11 +3,12 @@
 #define SESSIONINPUTBUFFER_H
 class SessionInputBuffer {
     public:
-        virtual ~SessionInputBuffer() = 0;
-        virtual int read(char *b, int off = 0, int len = 0) throws IOException = 0;
-        virtual int read() throws IOException = 0;
-        virtual int readLine(CharArrayBuffer &buffer) throws IOException = 0;
-        virtual std::string readLine() throws IOException = 0;
-        virtual bool isDataAvailable(int timeout) throws IOException = 0;
+        virtual ~SessionInputBuffer() { }
+        virtual int read(char *b, int blen, int off, int len) throw(IOException) = 0;
+        virtual int read(char *b, int blen) throw(IOException) = 0;
+        virtual int read() throw(IOException) = 0;
+        virtual int readLine(CharArrayBuffer &buffer) throw(IOException) = 0;
+        virtual std::string readLine() throw(IOException) = 0;
+        virtual bool isDataAvailable(int timeout) throw(IOException) = 0;
 };
 #endif

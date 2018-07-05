@@ -2,8 +2,6 @@
 #ifndef ABSTRACTSESSIONOUTPUTBUFFER_H
 #include "AbstractSessionOutputBuffer.h"
 #endif
-class AbstractSessionOutputBuffer : public SessionOutputBuffer, public BufferInfo {
-    private:
 char AbstractSessionOutputBuffer::CLRF[2] = { HTTP::CR, HTTP::LF };
 int AbstractSessionOutputBuffer::MAX_CHUNK = 256;
 void AbstractSessionOutputBuffer::init(OutputStream *oustream, int buffersize, HttpParams *params) : buffer(buffersize) {

@@ -12,18 +12,18 @@ class AbstractSessionInputBuffer : public SessionInputBuffer{
         bool ascii;
         int maxLineLen;
         int locateLF();
-    protected:
-        void init(InputStream *ins, int buffersize, HttpParams *params);
-    public:
-        virtual ~AbstractSessionInputBuffer() { delete [] buffer; }
-        int fillBuffer() throw (IOException);
-        bool hasBufferedData();
-        int read () throw (IOException);
-        int read(byte *b, int off, int len) throw (IOException);
-        int read(byte *b) throw (IOException);
-        int readLine(CharArrayBuffer &charbuffer) throw (IOException);
         int lineFromLineBuffer(CharArrayBuffer &charbuffer) throw (IOException);
         int lineFromReadBuffer(CharArrayBuffer &charbuffer, int pos) throw (IOException);
+    protected:
+        void init(InputStream *ins, int buffersize, HttpParams *params);
+        int fillBuffer() throw (IOException);
+        bool hasBufferedData();
+    public:
+        virtual ~AbstractSessionInputBuffer() { delete [] buffer; }
+        int read () throw (IOException);
+        int read(byte *b, int blen, int off, int len) throw (IOException);
+        int read(byte *b, int blen) throw (IOException);
+        int readLine(CharArrayBuffer &charbuffer) throw (IOException);
         std::string readLine() throw (IOExecption);
 };
 #endif

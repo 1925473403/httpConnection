@@ -3,10 +3,12 @@
 #define SESSIONOUTPUTBUFFER_H
 class SessionOutputBuffer {
     public:
-        virtual write(char *b, int off = 0, int len = 0) throws IOException = 0;
-        virtual write(int b) throws IOException = 0;
-        virtual void writeLine(std::string &) throws IOException = 0;
-        virtual void writeLine(CharArrayBuffer &) throws IOException = 0;
-        virtual void flush() throws IOException = 0;
+        virtual ~SessionOutputBuffer() { }
+        virtual write(char *b, int blen, int off, int len) throw(IOException) = 0;
+        virtual write(char *b, int blen) throw(IOException) = 0;
+        virtual write(int b) throw(IOException) = 0;
+        virtual void writeLine(std::string &) throw(IOException) = 0;
+        virtual void writeLine(CharArrayBuffer &) throw(IOException) = 0;
+        virtual void flush() throw(IOException) = 0;
 };
 #endif
