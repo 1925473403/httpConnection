@@ -24,4 +24,9 @@ class Integer {
         static int parseInt(std::string s) {
             return Integer::parseInt(s.c_str());
         }
+        static std::string toHexString(int i) {
+            stringstream s;
+            s << std::hex << i ;
+            return s.str();
+        }
 };
