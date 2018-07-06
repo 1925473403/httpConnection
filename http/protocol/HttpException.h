@@ -49,6 +49,15 @@ class IOException : public std::exception {
     protected:
         char m_reason[512];
 };
+class HttpHostConnectException : public IOException {
+    HttpHost *host;
+    public:
+    HttpHostConnectException(HttpHost *h, ConnectException &ex) : ConnectException("Connection to host refused") { 
+        host = h;
+        initCause(ex);
+    }
+    HttpHost *getHost() { return host; }
+};
 class SecurityException : public IOException {
     public:
     SecurityException() : IOException() { }
