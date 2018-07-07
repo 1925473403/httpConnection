@@ -21,6 +21,16 @@ class InetAddress : public Comparable <InetAddress> {
     static InetAddress* getByName(std::string name) throw (UnknownHostException);
     static void getAllByName(std::string name, vector<InetAddress *> &res) throw (UnknownHostException);
     static void getAllByName(std::string name, vector<InetAddress *> &res, InetAddress* reqAddr) throw (UnknownHostException);
+    bool isAnyLocalAddress() { return false; }
+    bool isLoopbackAddress()() { return false; }
+    bool isMulticastAddress() { return false; }
+    bool isLinkLocalAddress() { return false; }
+    bool isSiteLocalAddress() { return false; }
+    bool isMCGlobal() { return false; }
+    bool isMCNodeLocal() { return false; }
+    bool isMCLinkLocal() { return false; }
+    bool isMCSiteLocal() { return false; }
+    bool isMCOrgLocal() { return false; }
 };
 
 class InetSocketAddress {

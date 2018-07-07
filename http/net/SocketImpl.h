@@ -21,7 +21,7 @@ class SocketImpl {
         virtual void close() = 0;
         virtual void sendUrgentData (int data) = 0;
     public:
-        void setSocket(Socket &s);
+        void setSocket(Socket *s) { socket = s; }
         virtual ~SocketImpl() { }
         virtual void shutdownInput() = 0;
         virtual void shutdownOutput() = 0;
@@ -31,5 +31,13 @@ class SocketImpl {
         virtual int getLocalPort() = 0;
         virtual void setOption(int opt, int val) = 0;
         virtual int getOption(int opt) = 0;
+        void socketCreate(bool isServer) throw(IOException) ;
+        void socketConnect(InetAddress *address, int port, int timeout) throw (IOException) ;
+        void socketBind(InetAddress *address, int port) throw (IOException) ;
+        void socketListen(int count) throw (IOException) ;
+        void socketAccept(SocketImpl *s) throw (IOException) ;
+        int socketAvailable() throw (IOException) ;
+        void socketShutdown(int howto) throw (IOException) ;
+        void socketSendUrgentData(int data) throw (IOException) ;
 };
 #endif

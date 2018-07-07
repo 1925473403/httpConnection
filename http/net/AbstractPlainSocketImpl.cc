@@ -11,9 +11,14 @@
 int AbstractPlainSocketImpl::SHUT_RD = 0;
 int AbstractPlainSocketImpl::SHUT_WR = 1;
 void AbstractPlainSocketImpl::create(bool stream) {
+    socketCreate(stream);
 }
 
-void AbstractPlainSocketImpl::connect(std::string host, int p) throw (UnknownHostException, IOException) {
+void AbstractPlainSocketImpl::connect(std::string &host, int p) throw (UnknownHostException, IOException) {
+    connect(host.c_str(), p);
+}
+
+void AbstractPlainSocketImpl::connect(const char* host, int port) throw (UnknownHostException, IOException) {
     bool connected = false;
     try {
         InetAddress *addr = InetAddress::getByName(host);
@@ -52,6 +57,30 @@ void AbstractPlainSocketImpl::connectToAddress(InetAddress* addr, int p, int t) 
     else doConnect(addr, p, t);
 }
 
+void AbstractPlainSocketImpl::doConnect(InetAddress* addr, int port, int timeout) throw (IOException) {
+    {
+        Lock l(fdLock);
+        try {
+            acquireFD();
+            try {
+                socketConnect(address, port, timeout);
+                if (closePending) throw SocketException ("Socket closed");
+                if (socket != NULL) {
+                    socket->setBound();
+                    socket->setConnected();
+                }
+            } catch (...) {
+                releaseFD();
+                throw;
+            }
+            releaseFD();
+        } catch (const IOException &e) {
+            close();
+            throw;
+        }
+    }
+}
+
 void AbstractPlainSocketImpl::bind(InetAddress *host, int port) {
     Lock l(fdLock);
     socketBind(host, port);
@@ -68,6 +97,8 @@ void AbstractPlainSocketImpl::accept(SocketImpl *s) {
     try {
         socketAccept(s);
     } catch(...) {
+        releaseFD();
+        throw;
     }
     releaseFD();
 }
@@ -91,48 +122,56 @@ OutputStream *AbstractPlainSocketImpl::getOutputStream() {
 }
 
 int AbstractPlainSocketImpl::available() {
-    Lock l(fdLock);
-    if (isClosedOrPending()) throw IOException("Stream closed.");
-    if (isConnectionReset() || shut_rd) return 0;
     int n = 0;
-    try {
-        n = socketAvailable();
-        if (n == 0 && isConnectionResetPending()) setConnectionReset();
-    } catch (const ConnectionResetException& ex) {
-        setConnectionResetPending();
+    {
+        Lock l(fdLock);
+        if (isClosedOrPending()) throw IOException("Stream closed.");
+        if (isConnectionReset() || shut_rd) return 0;
         try {
             n = socketAvailable();
-            if (n == 0) setConnectionReset();
-        } catch (const ConnectionResetException& e) {
+            if (n == 0 && isConnectionResetPending()) setConnectionReset();
+        } catch (const ConnectionResetException& ex) {
+            setConnectionResetPending();
+            try {
+                n = socketAvailable();
+                if (n == 0) setConnectionReset();
+            } catch (const ConnectionResetException& e) {
+            }
         }
     }
     return n;
 }
 
 void AbstractPlainSocketImpl::close() {
-    Lock l(fdLock);
-    if (fd != -1) {
-        if (fdUseCount == 0) {
-            if (closePending) return;
-            closePending = true;
-            try {
-                socketPreClose();
-            } catch(...) {
-            }
-            socketClose();
-            fd = -1;
-            return;
-        } else {
-            if (!closePending) {
+    {
+        Lock l(fdLock);
+        if (fd != -1) {
+            if (fdUseCount == 0) {
+                if (closePending) return;
                 closePending = true;
-                fdUseCount--;
-                socketPreClose();
+                try {
+                    socketPreClose();
+                } catch(...) {
+                    socketClose();
+                    throw;
+                }
+                socketClose();
+                fd = -1;
+                return;
+            } else {
+                if (!closePending) {
+                    closePending = true;
+                    fdUseCount--;
+                    socketPreClose();
+                }
             }
         }
     }
 }
 
 void AbstractPlainSocketImpl::socketClose() {
+    if (fd > 0) ::close(fd);
+    fd = -1;
 }
 
 void AbstractPlainSocketImpl::reset() {

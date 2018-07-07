@@ -115,7 +115,6 @@ InetSocketAddress::InetSocketAddress(InetAddress *addr, int port) {
         addr->setipaddr(res[0]);
         si_addr.sin_addr.s_addr = inet_addr(res[0].c_str());
     }
-
 }
 InetSocketAddress::InetSocketAddress(const char *host, int p) : hostname(host), port(htons(p)) {
     bzero(&si_addr, sizeof(si_addr));

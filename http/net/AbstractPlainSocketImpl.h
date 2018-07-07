@@ -34,7 +34,8 @@ class AbstractPlainSocketImpl : public SocketImpl {
         pthread_mutex_t resetLock;
         int fdUseCount;
         void create(bool stream);
-        void connect(std::string host, int port) throw (UnknownHostException, IOException);
+        void connect(std::string &host, int port) throw (UnknownHostException, IOException);
+        void connect(const char* host, int port) throw (UnknownHostException, IOException);
         void connect(InetAddress* addr, int p) throw (IOException) ;
         void connectToAddress(InetAddress* addr, int p, int t) throw (IOException);
         void bind(InetAddress host, int port);
@@ -45,6 +46,7 @@ class AbstractPlainSocketImpl : public SocketImpl {
         int available();
         void close();
         void socketClose();
+        void doConnect(InetAddress* addr, int port, int timeout) throw (IOException) ;
     public:
         AbstractPlainSocketImpl();
         void shutdownInput();
@@ -67,13 +69,13 @@ class AbstractPlainSocketImpl : public SocketImpl {
         void setConnectionReset();
         void setConnectionResetPending();
         bool isClosedOrPending();
-        void socketCreate(bool isServer) throw(IOException) = 0;
-        void socketConnect(InetAddress *address, int port, int timeout) throw (IOException) = 0;
-        void socketBind(InetAddress *address, int port) throw (IOException) = 0;
-        void socketListen(int count) throw (IOException) = 0;
-        void socketAccept(SocketImpl *s) throw (IOException) = 0;
-        int socketAvailable() throw (IOException) = 0;
-        void socketShutdown(int howto) throw (IOException) = 0;
-        void socketSendUrgentData(int data) throw (IOException) = 0;
+        virtual void socketCreate(bool isServer) throw(IOException) = 0;
+        virtual void socketConnect(InetAddress *address, int port, int timeout) throw (IOException) = 0;
+        virtual void socketBind(InetAddress *address, int port) throw (IOException) = 0;
+        virtual void socketListen(int count) throw (IOException) = 0;
+        virtual void socketAccept(SocketImpl *s) throw (IOException) = 0;
+        virtual int socketAvailable() throw (IOException) = 0;
+        virtual void socketShutdown(int howto) throw (IOException) = 0;
+        virtual void socketSendUrgentData(int data) throw (IOException) = 0;
 };
 #endif

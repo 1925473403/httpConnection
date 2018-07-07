@@ -156,3 +156,55 @@ OutputStream* Socket::getOutputStream() {
     on = impl->getOutputStream();
     return on;
 }
+
+bool Socket::getReuseAddress() throw (SocketException){
+    if (isClosed()) throw SocketException("Socket is closed");
+
+}
+
+void Socket::close() throw (IOException) {
+    {
+        Lock l(mutex);
+        if (isClosed()) return;
+        if (created) impl->close();
+        closed = true;
+    }
+}
+
+void Socket::shutdownInput() throw (IOException) {
+    if (isClosed()) throw SocketException("Socket is closed");
+    if (!isConnected()) throw SocketException("Socket is not connected");
+    if (isInputShutdown()) throw SocketException("Socket input is already shutdown");
+    getImpl()->shutdownInput();
+    shutIn = true;
+}
+
+void Socket::shutdownOutput() throw (IOException) {
+    if (isClosed()) throw SocketException("Socket is closed");
+    if (!isConnected()) throw SocketException("Socket is not connected");
+    if (isOutputShutdown()) throw SocketException("Socket output is already shutdown");
+    getImpl()->shutdownOutput();
+    shutOut = true;
+}
+
+std::string Socket::toString() {
+    try {
+        if (isConnected()) {
+            stringstream ss;
+            ss << "Socket[addr=" << getImpl()->getInetAddress() << ",port=" << getImpl()->getPort() << ",localport=" << getImpl()->getLocalPort() << "]";
+            return ss.str();
+        }
+    } catch (const SocketException &e) {
+    }
+    return "Socket[unconnected]";
+}
+
+bool Socket::isClosed() {
+    Lock l(mutex);
+    return closed;
+}
+
+bool Socket::isInputShutdown() { return shutIn; }
+bool Socket::isOutputShutdown() { return shutOut; }
+bool Socket::isBound() { return bound || oldImpl; }
+bool Socket::isConnected() { return connected || oldImpl; }
