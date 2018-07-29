@@ -1,7 +1,20 @@
 #include "HttpException.h"
 #ifndef SOCKET_H
 #define SOCKET_H
+class SocketImpl;
+class InputStream;
+class OutputStream;
+class SocketAddress;
 class Socket {
+    struct Lock {
+        pthread_mutex_t &mutex;
+        Lock(pthread_mutex_t& m):mutex(m) {
+            pthread_mutex_lock(&mutex);
+        }
+        ~Lock() {
+            pthread_mutex_unlock(&mutex);
+        }
+    };
     private:
         bool created;
         bool bound;
@@ -24,11 +37,15 @@ class Socket {
         Socket(const char *host, int port, bool stream) throw (SocketException, IOException);
         Socket(InetAddress *addr, int port, bool stream) throw (SocketException, IOException);
         void setImpl();
+        SocketImpl* getImpl();
         void createImpl();
         InetAddress* getInetAddress();
-        InetAddress* getLocalAddress()
+        InetAddress* getLocalAddress();
         int getPort() ;
         int getLocalPort();
+        boid setConnected();
+        void setBound();
+        void setCreated();
         SocketAddress* getRemoteSocketAddress();
         SocketAddress* getLocalSocketAddress();
         InputStream* getInputStream() throw (IOException);

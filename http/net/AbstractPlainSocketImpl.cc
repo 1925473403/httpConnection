@@ -1,12 +1,20 @@
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/types.h>
+#include <netdb.h>
+#include "HttpException.h"
 #include "SocketImpl.h"
+#include "NameResolver.h"
+#include "InetSocketAddress.h"
 #include "InputStream.h"
 #include "OutputStream.h"
-#include "InetAddress.h"
 #include "SocketInputStream.h"
 #include "SocketOutputStream.h"
 #ifndef ABSTRACTPLAINSOCKETIMPL_H
 #include "AbstractPlainSocketImpl.h"
 #endif
+#include "Socket.h"
 
 int AbstractPlainSocketImpl::SHUT_RD = 0;
 int AbstractPlainSocketImpl::SHUT_WR = 1;
@@ -18,7 +26,7 @@ void AbstractPlainSocketImpl::connect(std::string &host, int p) throw (UnknownHo
     connect(host.c_str(), p);
 }
 
-void AbstractPlainSocketImpl::connect(const char* host, int port) throw (UnknownHostException, IOException) {
+void AbstractPlainSocketImpl::connect(const char* host, int p) throw (UnknownHostException, IOException) {
     bool connected = false;
     try {
         InetAddress *addr = InetAddress::getByName(host);
@@ -66,8 +74,8 @@ void AbstractPlainSocketImpl::doConnect(InetAddress* addr, int port, int timeout
                 socketConnect(address, port, timeout);
                 if (closePending) throw SocketException ("Socket closed");
                 if (socket != NULL) {
-                    socket->setBound();
                     socket->setConnected();
+                    socket->setBound();
                 }
             } catch (...) {
                 releaseFD();

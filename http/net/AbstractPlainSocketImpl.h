@@ -13,8 +13,8 @@ class AbstractPlainSocketImpl : public SocketImpl {
         }
     };
     private:
-        SocketInputStream *socketInputStream;
-        SocketOutputStream *socketOutputStream;
+        InputStream *socketInputStream;
+        OutputStream *socketOutputStream;
         int fd;
         int port;
         int localport;
@@ -32,7 +32,9 @@ class AbstractPlainSocketImpl : public SocketImpl {
     protected:
         pthread_mutex_t fdLock;
         pthread_mutex_t resetLock;
+        bool closePending;
         int fdUseCount;
+    public:
         void create(bool stream);
         void connect(std::string &host, int port) throw (UnknownHostException, IOException);
         void connect(const char* host, int port) throw (UnknownHostException, IOException);
@@ -43,11 +45,10 @@ class AbstractPlainSocketImpl : public SocketImpl {
         void accept(SocketImpl *s);
         InputStream *getInputStream();
         OutputStream *getOutputStream();
+        void doConnect(InetAddress* addr, int port, int timeout) throw (IOException) ;
         int available();
         void close();
         void socketClose();
-        void doConnect(InetAddress* addr, int port, int timeout) throw (IOException) ;
-    public:
         AbstractPlainSocketImpl();
         void shutdownInput();
         void shutdownOutput();
@@ -58,8 +59,10 @@ class AbstractPlainSocketImpl : public SocketImpl {
         void setOption(int opt, int val);
         int getOption(int opt);
         void sendUrgentData (int data);
+        int acquireFD();
+        void releaseFD();
         int getTimeout();
-        void setInputStream(SocketInputStream *in) { socketInputStream = in; }
+        void setInputStream(InputStream *in) { socketInputStream = in; }
         void setFileDescriptor(int f) { fd = f; }
         void setAddress(InetAddress *addr) { address = addr; }
         void setPort(int p) { port = p; }

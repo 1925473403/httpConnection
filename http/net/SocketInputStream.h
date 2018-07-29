@@ -1,6 +1,8 @@
 #include "HttpException.h"
 #ifndef SOCKETINPUTSTREAM_H
 #define SOCKETINPUTSTREAM_H
+class AbstractPlainSocketImpl;
+class Socket;
 class SocketInputStream : public InputStream {
     private:
         bool eof;
@@ -8,8 +10,8 @@ class SocketInputStream : public InputStream {
         char *temp;
         Socket *socket;
         bool closing;
-        static init();
-        int socketRead(int fd, char *b, int off, int len);
+        static void init();
+        int socketRead(int fd, char *b, int blen, int off, int len);
     public:
         SocketInputStream(AbstractPlainSocketImpl *);
         int read(char *b, int blen, int len) throw (IOException) ;
