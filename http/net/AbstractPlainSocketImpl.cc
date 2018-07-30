@@ -219,9 +219,19 @@ int AbstractPlainSocketImpl::getFileDescriptor() {
 }
 
 void AbstractPlainSocketImpl::setOption(int opt, int val) {
+    int rc = setsockopt(fd, SOL_SOCKET, opt, &val, sizeof(val));
+    if (rc == 0) return;
+    throw SocketException("setOption(%d, %d) failed", opt, val);
 }
 
 int AbstractPlainSocketImpl::getOption(int opt) {
+    int option_value;
+    int option_len;
+    struct linger l;
+    int rc = getsockopt(fd, SOL_SOCKET, opt, (char *)&option_value, &option_len);
+    if (rc == 0) {
+        return option_value;
+    }
 }
 
 void AbstractPlainSocketImpl::sendUrgentData (int data) throw (IOException) {

@@ -3,6 +3,10 @@
 #ifndef INETSOCKETADDRESS_H
 #define INETSOCKETADDRESS_H
 
+class SocketAddress {
+    public:
+    virtual ~SocketAddress() { }
+};
 class InetAddress : public Comparable <InetAddress> {
     std::string ipaddr;
     std::string hostname;
@@ -22,7 +26,7 @@ class InetAddress : public Comparable <InetAddress> {
     static void getAllByName(std::string name, vector<InetAddress *> &res) throw (UnknownHostException);
     static void getAllByName(std::string name, vector<InetAddress *> &res, InetAddress* reqAddr) throw (UnknownHostException);
     bool isAnyLocalAddress() { return false; }
-    bool isLoopbackAddress()() { return false; }
+    bool isLoopbackAddress() { return false; }
     bool isMulticastAddress() { return false; }
     bool isLinkLocalAddress() { return false; }
     bool isSiteLocalAddress() { return false; }
@@ -33,7 +37,7 @@ class InetAddress : public Comparable <InetAddress> {
     bool isMCOrgLocal() { return false; }
 };
 
-class InetSocketAddress {
+class InetSocketAddress : public SocketAddress {
         struct sockaddr_in si_addr;
         std::string hostname;
         int port;
@@ -45,6 +49,7 @@ class InetSocketAddress {
         InetSocketAddress();
         InetSocketAddress(const InetSocketAddress &rhs);
         InetSocketAddress& operator=(const InetSocketAddress& rhs);
+        struct sockaddr_in& getSockAddress();
 };
 ostream& operator<<(ostream &os, InetAddress &rhs) ;
 #endif
