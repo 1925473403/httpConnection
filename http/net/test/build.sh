@@ -18,6 +18,8 @@ g++ -g -m64 -std="c++11" -o main \
                         ${SRC_HOME}/net/SocketInputStream.cc \
                         ${SRC_HOME}/net/SocketOutputStream.cc \
                         ${SRC_HOME}/net/AbstractPlainSocketImpl.cc \
+                        ${SRC_HOME}/net/DualStackPlainSocketImpl.cc \
+                        ${SRC_HOME}/net/ServerSocket.cc \
                         ${SRC_HOME}/net/SocketImpl.cc \
                         ${SRC_HOME}/net/Socket.cc \
                         ${SRC_HOME}/net/URL.cc \

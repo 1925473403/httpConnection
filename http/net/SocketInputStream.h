@@ -14,11 +14,13 @@ class SocketInputStream : public InputStream {
         int socketRead(int fd, char *b, int blen, int off, int len);
     public:
         SocketInputStream(AbstractPlainSocketImpl *);
-        int read(char *b, int blen, int len) throw (IOException) ;
+        ~SocketInputStream() { }
+        int read(char *b, int blen, int len) throw (IOException)  ;
         int read(char *b, int blen, int off, int len) throw (IOException) ;
         int read() throw (IOException) ;
         long skip(long numbytes) throw (IOException) ;
         int available() throw (IOException) ;
         void close() throw (IOException) ;
+        void setEOF(bool eof) ;
 };
 #endif

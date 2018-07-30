@@ -15,7 +15,9 @@
 #include "URI.h"
 #include "URL.h"
 #include "URLStreamHandler.h"
+#include "SocketImplFactory.h"
 #include "Socket.h"
+#include "ServerSocket.h"
 
 int main() {
     return 0;

@@ -15,6 +15,8 @@
 #include "AbstractPlainSocketImpl.h"
 #endif
 #include "Socket.h"
+#include "SocketImplFactory.h"
+#include "ServerSocket.h"
 
 int AbstractPlainSocketImpl::SHUT_RD = 0;
 int AbstractPlainSocketImpl::SHUT_WR = 1;
@@ -22,17 +24,17 @@ void AbstractPlainSocketImpl::create(bool stream) {
     socketCreate(stream);
 }
 
-void AbstractPlainSocketImpl::connect(std::string &host, int p) throw (UnknownHostException, IOException) {
+void AbstractPlainSocketImpl::connect(std::string &host, int p) throw (IOException) {
     connect(host.c_str(), p);
 }
 
-void AbstractPlainSocketImpl::connect(const char* host, int p) throw (UnknownHostException, IOException) {
+void AbstractPlainSocketImpl::connect(const char* host, int p) throw (IOException) {
     bool connected = false;
     try {
         InetAddress *addr = InetAddress::getByName(host);
-        port = p;
-        address = addr;
-        connectToAddress(address, port, timeout);
+        SocketImpl::setPort(p);
+        SocketImpl::setAddress(addr);
+        connectToAddress(addr, p, timeout);
         connected = true;
     } catch (...) {
         if (!connected) {
@@ -49,10 +51,10 @@ void AbstractPlainSocketImpl::connect(const char* host, int p) throw (UnknownHos
 }
 
 void AbstractPlainSocketImpl::connect(InetAddress* addr, int p) throw (IOException) {
-    port = p;
-    address = addr;
+    SocketImpl::setPort(p);
+    SocketImpl::setAddress(addr);
     try {
-        connectToAddress(address, port, timeout);
+        connectToAddress(addr, p, timeout);
         return;
     } catch (const IOException &ex) {
         close();
@@ -61,17 +63,17 @@ void AbstractPlainSocketImpl::connect(InetAddress* addr, int p) throw (IOExcepti
 }
 
 void AbstractPlainSocketImpl::connectToAddress(InetAddress* addr, int p, int t) throw (IOException) {
-    if (address->isAnyLocalAddress()) doConnect(InetAddress::getLocalHost(), p, t);
+    if (addr->isAnyLocalAddress()) doConnect(InetAddress::getLocalHost(), p, t);
     else doConnect(addr, p, t);
 }
 
-void AbstractPlainSocketImpl::doConnect(InetAddress* addr, int port, int timeout) throw (IOException) {
+void AbstractPlainSocketImpl::doConnect(InetAddress* addr, int p, int timeout) throw (IOException) {
     {
         Lock l(fdLock);
         try {
             acquireFD();
             try {
-                socketConnect(address, port, timeout);
+                socketConnect(addr, p, timeout);
                 if (closePending) throw SocketException ("Socket closed");
                 if (socket != NULL) {
                     socket->setConnected();
@@ -89,18 +91,18 @@ void AbstractPlainSocketImpl::doConnect(InetAddress* addr, int port, int timeout
     }
 }
 
-void AbstractPlainSocketImpl::bind(InetAddress *host, int port) {
+void AbstractPlainSocketImpl::bind(InetAddress *host, int p)  throw (IOException) {
     Lock l(fdLock);
-    socketBind(host, port);
+    socketBind(host, p);
     if (socket != NULL) socket->setBound();
     if (serverSocket != NULL) serverSocket->setBound();
 }
 
-void AbstractPlainSocketImpl::listen(int baclog) {
+void AbstractPlainSocketImpl::listen(int baclog) throw (IOException) {
     socketListen(baclog);
 }
 
-void AbstractPlainSocketImpl::accept(SocketImpl *s) {
+void AbstractPlainSocketImpl::accept(SocketImpl *s) throw (IOException) {
     acquireFD();
     try {
         socketAccept(s);
@@ -111,7 +113,7 @@ void AbstractPlainSocketImpl::accept(SocketImpl *s) {
     releaseFD();
 }
 
-InputStream *AbstractPlainSocketImpl::getInputStream() {
+InputStream *AbstractPlainSocketImpl::getInputStream() throw (IOException) {
     Lock l(fdLock);
     if (isClosedOrPending()) throw IOException("Socket Closed");
     if (shut_rd) throw IOException("Socket input is shutdown");
@@ -121,7 +123,7 @@ InputStream *AbstractPlainSocketImpl::getInputStream() {
 
 
 
-OutputStream *AbstractPlainSocketImpl::getOutputStream() {
+OutputStream *AbstractPlainSocketImpl::getOutputStream() throw (IOException) {
     Lock l(fdLock);
     if (isClosedOrPending()) throw IOException("Socket Closed");
     if (shut_wr) throw IOException("Socket output is shutdown");
@@ -129,7 +131,7 @@ OutputStream *AbstractPlainSocketImpl::getOutputStream() {
     return socketOutputStream;
 }
 
-int AbstractPlainSocketImpl::available() {
+int AbstractPlainSocketImpl::available()  throw (IOException) {
     int n = 0;
     {
         Lock l(fdLock);
@@ -150,28 +152,26 @@ int AbstractPlainSocketImpl::available() {
     return n;
 }
 
-void AbstractPlainSocketImpl::close() {
-    {
-        Lock l(fdLock);
-        if (fd != -1) {
-            if (fdUseCount == 0) {
-                if (closePending) return;
-                closePending = true;
-                try {
-                    socketPreClose();
-                } catch(...) {
-                    socketClose();
-                    throw;
-                }
+void AbstractPlainSocketImpl::close()  throw (IOException) {
+    Lock l(fdLock);
+    if (fd != -1) {
+        if (fdUseCount == 0) {
+            if (closePending) return;
+            closePending = true;
+            try {
+                //socketPreClose();
                 socketClose();
-                fd = -1;
-                return;
-            } else {
-                if (!closePending) {
-                    closePending = true;
-                    fdUseCount--;
-                    socketPreClose();
-                }
+            } catch(...) {
+                throw;
+            }
+            socketClose();
+            fd = -1;
+            return;
+        } else {
+            if (!closePending) {
+                closePending = true;
+                fdUseCount--;
+                //socketPreClose();
             }
         }
     }
@@ -182,7 +182,7 @@ void AbstractPlainSocketImpl::socketClose() {
     fd = -1;
 }
 
-void AbstractPlainSocketImpl::reset() {
+void AbstractPlainSocketImpl::reset() throw (IOException) {
     if (fd != -1) socketClose();
     fd = -1;
 }
@@ -202,7 +202,8 @@ AbstractPlainSocketImpl::AbstractPlainSocketImpl() {
 void AbstractPlainSocketImpl::shutdownInput() {
     if (fd != -1) {
         socketShutdown(SHUT_RD);
-        if (socketInputStream != NULL) instream->setEOF(true);
+        SocketInputStream *sis = dynamic_cast<SocketInputStream *> (socketInputStream);
+        if (sis != NULL) sis->setEOF(true);
         shut_rd = true;
     }
 }
@@ -217,25 +218,13 @@ void AbstractPlainSocketImpl::shutdownOutput() {
 int AbstractPlainSocketImpl::getFileDescriptor() {
 }
 
-int AbstractPlainSocketImpl::getPort() {
-    return port;
-}
-
-InetAddress* AbstractPlainSocketImpl::getInetAddress() {
-    return address;
-}
-
-int AbstractPlainSocketImpl::getLocalPort() {
-    return localport;
-}
-
 void AbstractPlainSocketImpl::setOption(int opt, int val) {
 }
 
 int AbstractPlainSocketImpl::getOption(int opt) {
 }
 
-void AbstractPlainSocketImpl::sendUrgentData (int data) {
+void AbstractPlainSocketImpl::sendUrgentData (int data) throw (IOException) {
     if (fd == -1) throw IOException("Socket Closed");
     socketSendUrgentData (data);
 }

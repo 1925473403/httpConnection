@@ -3,6 +3,7 @@
 #include <arpa/inet.h>
 #include <sys/types.h>
 #include <netdb.h>
+#include <pthread.h>
 #include "HttpException.h"
 #include "SocketImpl.h"
 #include "InputStream.h"
@@ -22,6 +23,9 @@ int SocketInputStream::read(char *b, int blen, int len) throw (IOException) {
     return read(b, blen, 0, len);
 }
 
+void SocketInputStream::setEOF(bool e) {
+    eof = e;
+}
 void SocketInputStream::init() {
 }
 int SocketInputStream::read(char *b, int blen, int off, int len) throw (IOException) {

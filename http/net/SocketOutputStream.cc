@@ -3,6 +3,7 @@
 #include <arpa/inet.h>
 #include <sys/types.h>
 #include <netdb.h>
+#include <pthread.h>
 #include "HttpException.h"
 #include "SocketImpl.h"
 #include "InputStream.h"

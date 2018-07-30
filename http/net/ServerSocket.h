@@ -5,7 +5,7 @@ class ServerSocket {
     bool created;
     bool bound;
     bool closed;
-    pthread_mutex_lock closeLock;
+    pthread_mutex_t closeLock;
     struct Lock {
         pthread_mutex_t &l;
         Lock(pthread_mutex_t &lo):l(lo) {
@@ -34,12 +34,10 @@ class ServerSocket {
         Socket *accept() throw(IOException);
         void implAccept(Socket *s) throw (IOException) ;
         void close() throw (IOException);
-        ServerSocketChannel* getChannel();
         bool isBound();
         bool isClosed();
         void setSoTimeout(int timeout) throw (SocketException);
         int getSoTimeout() throw (IOException) ;
-        void implAccept(Socket *s) throw (IOException);
         void setReuseAddress(bool on) throw (SocketException);
         bool getReuseAddress() throw (SocketException) ;
         std::string toString();
@@ -48,6 +46,6 @@ class ServerSocket {
         void setSocketFactory(SocketImplFactory *fac) throw(IOException);
         void setReceiveBufferSize (int size) throw(SocketException);
         int getReceiveBufferSize() throw(SocketException);
-        static SocketImplFactory factory;
+        static SocketImplFactory *factory;
 };
 #endif

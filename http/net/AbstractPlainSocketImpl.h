@@ -15,10 +15,6 @@ class AbstractPlainSocketImpl : public SocketImpl {
     private:
         InputStream *socketInputStream;
         OutputStream *socketOutputStream;
-        int fd;
-        int port;
-        int localport;
-        InetAddress *address;
         static int SHUT_RD;
         static int SHUT_WR;
         int CONNECTION_NOT_RESET;
@@ -30,24 +26,26 @@ class AbstractPlainSocketImpl : public SocketImpl {
         int trafficClass;
         int timeout;
     protected:
+        int fd;
         pthread_mutex_t fdLock;
         pthread_mutex_t resetLock;
         bool closePending;
         int fdUseCount;
     public:
+        void reset() throw (IOException);
         void create(bool stream);
-        void connect(std::string &host, int port) throw (UnknownHostException, IOException);
-        void connect(const char* host, int port) throw (UnknownHostException, IOException);
+        void connect(std::string &host, int port) throw (IOException);
+        void connect(const char* host, int port) throw (IOException);
         void connect(InetAddress* addr, int p) throw (IOException) ;
         void connectToAddress(InetAddress* addr, int p, int t) throw (IOException);
-        void bind(InetAddress host, int port);
-        void listen(int baclog);
-        void accept(SocketImpl *s);
-        InputStream *getInputStream();
-        OutputStream *getOutputStream();
+        void bind(InetAddress *host, int port) throw (IOException);
+        void listen(int baclog) throw (IOException);
+        void accept(SocketImpl *s) throw (IOException);
+        InputStream *getInputStream() throw (IOException);
+        OutputStream *getOutputStream() throw (IOException);
         void doConnect(InetAddress* addr, int port, int timeout) throw (IOException) ;
-        int available();
-        void close();
+        int available() throw (IOException);
+        void close() throw (IOException);
         void socketClose();
         AbstractPlainSocketImpl();
         void shutdownInput();
@@ -58,7 +56,7 @@ class AbstractPlainSocketImpl : public SocketImpl {
         int getLocalPort();
         void setOption(int opt, int val);
         int getOption(int opt);
-        void sendUrgentData (int data);
+        void sendUrgentData (int data) throw (IOException);
         int acquireFD();
         void releaseFD();
         int getTimeout();
@@ -80,5 +78,6 @@ class AbstractPlainSocketImpl : public SocketImpl {
         virtual int socketAvailable() throw (IOException) = 0;
         virtual void socketShutdown(int howto) throw (IOException) = 0;
         virtual void socketSendUrgentData(int data) throw (IOException) = 0;
+        //virtual void socketPreClose();
 };
 #endif

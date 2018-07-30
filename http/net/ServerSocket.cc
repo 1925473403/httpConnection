@@ -1,5 +1,20 @@
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/types.h>
+#include <netdb.h>
+#include <pthread.h>
 #include "HttpException.h"
+#include "NameResolver.h"
+#include "InetSocketAddress.h"
 #include "SocketImpl.h"
+#include "SocketImplFactory.h"
+#include "InputStream.h"
+#include "OutputStream.h"
+#include "AbstractPlainSocketImpl.h"
+#include "SocketInputStream.h"
+#include "SocketOutputStream.h"
+#include "DualStackPlainSocketImpl.h"
 #ifndef SERVERSOCKET_H
 #include "ServerSocket.h"
 #endif
@@ -17,17 +32,17 @@ ServerSocket::ServerSocket(int p, int backlog) : ServerSocket(p, backlog, NULL) 
 
 ServerSocket:: ServerSocket(int p, int backlog, InetAddress *bindAddr) {
     setImpl();
-    if (p < 0 || p > 0xffff) throw IllegalArgumentException("Port value out of range: %d"  port);
+    if (p < 0 || p > 0xffff) throw IllegalArgumentException("Port value out of range: %d",  p);
     if (backlog < 1) backlog = 50;
     try {
-        bind(new InetSocketAddress(bindAddr, port), backlog);
+        bind(new InetSocketAddress(bindAddr, p), backlog);
     } catch (const IOException &e) {
         close();
         throw;
     }
 }
 
-SocketImpl* SocketServer::getImpl() throw (SocketException) {
+SocketImpl* ServerSocket::getImpl() throw (SocketException) {
     if (!created) createImpl();
     return impl;
 }
@@ -37,16 +52,16 @@ void ServerSocket::checkOldImpl() {
 }
 
 void ServerSocket::setImpl() {
-    if (factor != NULL) {
+    if (factory != NULL) {
         impl = factory->createSocketImpl();
         checkOldImpl();
     } else {
-        impl = new SocksSocketImpl();
+        impl = new DualStackPlainSocketImpl(true);
     }
     if (impl != NULL) impl->setServerSocket(this);
 }
 
-void ServerSocket::createImpl() thow (SocketException) {
+void ServerSocket::createImpl() throw (SocketException) {
     if (impl == NULL) setImpl();
     try {
         impl->create(true);
@@ -156,23 +171,24 @@ bool ServerSocket::isClosed() {
 
 void ServerSocket::setSoTimeout(int timeout) throw (SocketException) {
     if (isClosed()) throw SocketException("Socket is closed");
-    getImpl()->setOption(SocketOptions::SO_TIMEOUT, timeout);
+    getImpl()->setOption(SO_RCVTIMEO, timeout);
+    getImpl()->setOption(SO_SNDTIMEO, timeout);
 }
 
 int ServerSocket::getSoTimeout() throw (IOException) {
     if (isClosed()) throw SocketException("Socket is closed");
-    int n = getImpl()->getOption(SocketOptions::SO_TIMEOUT);
+    int n = getImpl()->getOption(SO_RCVTIMEO);
     return n;
 }
 
 void ServerSocket::setReuseAddress(bool on) throw (SocketException) {
     if (isClosed()) throw SocketException("Socket is closed");
-    getImpl()->setOption(SocketOptions::SO_REUSEADDR, on);
+    getImpl()->setOption(SO_REUSEADDR, on);
 }
 
 bool ServerSocket::getReuseAddress() throw (SocketException) {
     if (isClosed()) throw SocketException("Socket is closed");
-    return getImpl()->getOption(SocketOptions::SO_REUSEADDR);
+    return getImpl()->getOption(SO_REUSEADDR);
 }
 
 std::string ServerSocket::toString() {
@@ -194,13 +210,13 @@ void ServerSocket::setSocketFactory(SocketImplFactory *fac) throw(IOException) {
 void ServerSocket::setReceiveBufferSize (int size) throw(SocketException) {
     if (!(size > 0))  throw IllegalArgumentException("negative receive size");
     if (isClosed()) throw SocketException("Socket is closed");
-    getImpl()->setOption(SocketOptions::SO_RCVBUF, size);
+    getImpl()->setOption(SO_RCVBUF, size);
 }
 
 int ServerSocket::getReceiveBufferSize() throw(SocketException) {
     if (isClosed()) throw SocketException("Socket is closed");
     int result = 0;
-    result = getImpl()->getOption(SocketOptions::SO_RCVBUF);
+    result = getImpl()->getOption(SO_RCVBUF);
     return result;
 }
 

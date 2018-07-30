@@ -4,11 +4,16 @@
 #include <arpa/inet.h>
 #include <sys/types.h>
 #include <netdb.h>
+#include <pthread.h>
 #include "NameResolver.h"
 #include "InetSocketAddress.h"
 #include "SocketImpl.h"
 #include "OutputStream.h"
 #include "InputStream.h"
+#include "'AbstractPlainSocketImpl.h"
+#include "SocketInputStream.h"
+#include "SocketOutputStream.h"
+#include "DualStackPlainSocketImpl.h"
 #ifndef SOCKET_H
 #include "Socket.h"
 #endif
@@ -65,7 +70,7 @@ void Socket::createImpl(bool stream) {
 }
 
 void Socket::setImpl() {
-    impl = new SocksSocketImpl();
+    impl = new DualStackPlainSocketImpl(true);
     if (impl != NULL) impl->setSocket(this);
 }
 SocketImpl *Socket::getImpl() {

@@ -43,7 +43,7 @@ class Socket {
         InetAddress* getLocalAddress();
         int getPort() ;
         int getLocalPort();
-        boid setConnected();
+        void setConnected();
         void setBound();
         void setCreated();
         SocketAddress* getRemoteSocketAddress();
@@ -51,7 +51,7 @@ class Socket {
         InputStream* getInputStream() throw (IOException);
         OutputStream* getOutputStream() throw (IOException);
         void setTcpNoDelay(bool on) throw (SocketException);
-        bool  getTcpNoDelay() throw(SocketException);
+        bool getTcpNoDelay() throw(SocketException);
         void setSoLinger(bool on, int linger) throw (SocketException);
         int getSoLinger() throw (SocketException);
         void setSoTimeout(int timeout) throw (SocketException);

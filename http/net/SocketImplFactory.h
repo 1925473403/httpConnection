@@ -4,6 +4,6 @@ class SocketImplFactory {
     public:
     SocketImplFactory() { }
     virtual ~SocketImplFactory() { }
-    SocketImpl *createSocketImpl() = 0;
+    virtual SocketImpl *createSocketImpl() = 0;
 };
 #endif
