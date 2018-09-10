@@ -49,6 +49,18 @@ class IOException : public std::exception {
     protected:
         char m_reason[512];
 };
+class HttpHost ;
+class SocketException : public IOException {
+    public:
+    SocketException(const char *str) : IOException(str) { }
+    SocketException() { }
+};
+class ConnectException : public SocketException {
+    public:
+    ConnectException(const char *str) :SocketException(str) { }
+    ConnectException() { }
+};
+/*
 class HttpHostConnectException : public IOException {
     HttpHost *host;
     public:
@@ -58,6 +70,7 @@ class HttpHostConnectException : public IOException {
     }
     HttpHost *getHost() { return host; }
 };
+*/
 class SecurityException : public IOException {
     public:
     SecurityException() : IOException() { }
@@ -319,6 +332,17 @@ class NoSuchElementException : public IOException {
             vsnprintf(m_reason, 511, str, args);
             va_end(args);
         }
+};
+class MalformedCookieException : public IOException {
+    public:
+    MalformedCookieException() : IOException() { }
+    MalformedCookieException(std::string &s):IOException(s) { }
+    MalformedCookieException(const char *str, ...) {
+        va_list args;
+        va_start(args, str);
+        vsnprintf(m_reason, 511, str, args);
+        va_end(args);
+    }
 };
 class IllegalStateException : public IOException {
     public:

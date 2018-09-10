@@ -64,6 +64,14 @@ InetAddress* InetAddress::getByName(std::string host) throw (UnknownHostExceptio
 void InetAddress::getAllByName(std::string host, vector<InetAddress *> &res) throw (UnknownHostException) {
     InetAddress::getAllByName(host, res, NULL);
 }
+
+std::string InetAddress::toString() {
+    std::stringstream ss;
+    std::string h = gethostname();
+    if (h.length() != 0) return h;
+    h = "/" + getipaddr();
+    return h;
+}
 void InetAddress::getAllByName(std::string host, vector<InetAddress *> &res, InetAddress* reqAddr) throw (UnknownHostException) {
     if (host == "") {
         res.push_back(new InetAddress("127.0.0.1"));

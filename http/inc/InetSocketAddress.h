@@ -17,12 +17,13 @@ class InetAddress : public Comparable <InetAddress> {
     void setipaddr(std::string i) { ipaddr = i; }
     std::string gethostname() { return hostname; }
     std::string getipaddr() { return ipaddr; }
+    std::string toString() ;
     static InetAddress* getLocalHost();
     static InetAddress* getByName(std::string name) throw (UnknownHostException);
     static void getAllByName(std::string name, vector<InetAddress *> &res) throw (UnknownHostException);
     static void getAllByName(std::string name, vector<InetAddress *> &res, InetAddress* reqAddr) throw (UnknownHostException);
     bool isAnyLocalAddress() { return false; }
-    bool isLoopbackAddress()() { return false; }
+    bool isLoopbackAddress() { return false; }
     bool isMulticastAddress() { return false; }
     bool isLinkLocalAddress() { return false; }
     bool isSiteLocalAddress() { return false; }

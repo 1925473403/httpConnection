@@ -19,6 +19,7 @@ class AbstractHttpServerConnection : public HttpServerConnection {
         void init(SessionInputBuffer* ibuffer, SessionOutputBuffer *obuffer, HttpParams *params);
     public:
         AbstractHttpServerConnection() ;
+        virtual ~AbstractHttpServerConnection();
         bool isRequestAvailable(int timeout) throw(IOException);
         void sendResponseHeader(HttpResponse* response) throw (HttpException, IOException);
         void sendResponseEntity(HttpResponse *response) throw (HttpException, IOException);
