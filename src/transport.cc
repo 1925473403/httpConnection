@@ -71,6 +71,52 @@ void host::resolve(char* str, vector<string> &v) {
     return;
 }
 
+tcpServer::~tcpServer() {
+    if (fd > 0) ::close(fd);
+}
+
+tcpServer::tcpServer(const char *src, int port) {
+    if (src == nullptr) throw IOException("host name cannot be empty.");
+    if (port < 0) throw IOException("server listen port cannot be negative.");
+
+    if ((fd = socket(AF_INET, SOCK_STREAM, 0)) == -1) throw IOException("unable to open server socket.");
+    bzero(&si_local, sizeof(si_local));
+    si_local.sin_family = AF_INET;
+    si_local.sin_port = htons(port);
+    si_local.sin_addr.s_addr = inet_addr(src);
+    bind_and_listen();
+}
+
+void tcpServer::bind_and_listen() {
+    int flag = 1;
+    if (setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, &flag, sizeof(flag)) != 0) {
+        close(fd);
+        throw IOException("setsockopt failed to SO_KEEPALIVE");
+    }
+    if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &flag, sizeof(flag)) != 0) {
+        close(fd);
+        throw IOException("setsockopt failed to SO_REUSEADDR");
+    }
+    if (setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, &flag, sizeof(flag)) != 0) {
+        close(fd);
+        throw IOException("setsockopt failed to SO_REUSEPORT");
+    }
+
+    int fdFlags;
+    if (bind(fd, (struct sockaddr *)&si_local, sizeof(si_local)) < 0) {
+        close(fd);
+        throw IOException("unable to bind");
+    }
+
+    if (listen(fd, 200) < 0) {
+        close(fd); throw IOException("server listen error");
+    }
+    if ((fdFlags = fcntl(fd, F_GETFL, 0)) == -1 || fcntl(fd, F_SETFL, fdFlags | O_NONBLOCK) == -1) {
+        close(fd);
+        throw IOException("cannot get/set flags");
+    }
+}
+
 tcpClient::tcpClient(long src, int port) {
     isconnected = true;
     if ((fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
@@ -102,10 +148,6 @@ tcpClient::tcpClient(long src, int port) {
         throw IOException("cannot get/set flags");
     }
 
-    if (bind(fd, (struct sockaddr *)&si_local, sizeof(si_local)) < 0) {
-        close(fd);
-        throw IOException("unable to bind");
-    }
 }
 
 tcpClient::tcpClient(char *src, int port, bool block) : DataPipe(block) {
@@ -141,11 +183,12 @@ tcpClient::tcpClient(char *src, int port, bool block) : DataPipe(block) {
         }
     }
 
-
+    /*
     if (bind(fd, (struct sockaddr *)&si_local, sizeof(si_local)) < 0) {
         close(fd);
         throw IOException("unable to bind");
     }
+    */
 }
 void tcpClient::connect(char *remote, int port) {
     std::string errMsg = "unable to connect to: ";

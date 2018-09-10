@@ -3,6 +3,10 @@
 #ifndef INETSOCKETADDRESS_H
 #define INETSOCKETADDRESS_H
 
+class SocketAddress {
+    public:
+    virtual ~SocketAddress() { }
+};
 class InetAddress : public Comparable <InetAddress> {
     std::string ipaddr;
     std::string hostname;
@@ -34,7 +38,7 @@ class InetAddress : public Comparable <InetAddress> {
     bool isMCOrgLocal() { return false; }
 };
 
-class InetSocketAddress {
+class InetSocketAddress : public SocketAddress {
         struct sockaddr_in si_addr;
         std::string hostname;
         int port;
@@ -46,6 +50,7 @@ class InetSocketAddress {
         InetSocketAddress();
         InetSocketAddress(const InetSocketAddress &rhs);
         InetSocketAddress& operator=(const InetSocketAddress& rhs);
+        struct sockaddr_in& getSockAddress();
 };
 ostream& operator<<(ostream &os, InetAddress &rhs) ;
 #endif

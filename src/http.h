@@ -70,7 +70,12 @@ class HTTPHeader {
     }
     public:
     HTTPHeader(const char *str) { 
+        size_t len = strlen(str);
         if (memcmp(str, "HTTP", 4) == 0) {
+            // for response
+            m_header.insert(std::make_pair("", string(str)));
+        } else if (strstr(str, " HTTP/1.1")!=NULL) {
+            // for request
             m_header.insert(std::make_pair("", string(str)));
         } else {
             STokenizer<string, char> s((char *)str, strlen(str), ":");
@@ -142,6 +147,168 @@ static inline void rtrim(std::string &s) {
         return !std::isspace(ch);
     }).base(), s.end());
 }
+
+//
+//POST / HTTP/1.1
+//Host: 192.168.1.84:64001
+//User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:31.0) Gecko/20100101 Firefox/31.0
+//Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+//Accept-Language: en-US,en;q=0.5
+//Accept-Encoding: gzip, deflate
+//Referer: http://192.168.1.84:64001/
+//Connection: keep-alive
+//Content-Type: application/x-www-form-urlencoded
+//Content-Length: 32
+//
+//FirstName=Vikky&LastName=Panchal
+//
+class Message {
+    protected:
+        int extractHeaders(unsigned char *buf, size_t len) {
+            STokenizer<ustring, unsigned char> st(buf, len);
+            while (st.hasnext()) {
+                ustring l = st.getnext();
+                if (l.size() == 0) break;
+                string s;
+                s.assign((const char *)l.data(), l.length());
+                HTTPHeader hdr = HTTPHeader(s.c_str());
+                headers.push_back(hdr);
+                if (s.find("Transfer-Encoding") != string::npos) {
+                    string val = hdr.equals("Transfer-Encoding");
+                    isChuncked = (val == " chunked")? true:false;
+                } else if (s.find("Content-Length") != string::npos) {
+                    string val = hdr.equals("Content-Length");
+                    contentLength = strtoul(val.c_str(), 0, 0);
+                }
+            }
+            st.getnext();
+            return st.getsize() ;
+        }
+     vector<HTTPHeader> headers;
+    bool isChuncked;
+    long chunklength;
+    std::string method;
+    size_t contentLength;
+    ustring _payload;
+   public:
+};
+
+class HttpRequest {
+    int extractHeaders(unsigned char *buf, size_t len) {
+        int i = 0;
+        for (i = 0; i < len; i++) {
+            if (buf[i] != ' ') _method.push_back(buf[i]);
+            else break;
+        }
+        for (i=i+1;i < len; i++) {
+            if (buf[i] != ' ') _path.push_back(buf[i]);
+            else break;
+        }
+        STokenizer<ustring, unsigned char> st(buf, len);
+        while (st.hasnext()) {
+            ustring l = st.getnext();
+            if (l.size() == 0) break;
+            string s;
+            s.assign((const char *)l.data(), l.length());
+            HTTPHeader hdr = HTTPHeader(s.c_str());
+            headers.push_back(hdr);
+            if (s.find("Transfer-Encoding") != string::npos) {
+                string val = hdr.equals("Transfer-Encoding");
+                isChuncked = (val == " chunked")? true:false;
+            } else if (s.find("Content-Length") != string::npos) {
+                string val = hdr.equals("Content-Length");
+                contentLength = strtoul(val.c_str(), 0, 0);
+            }
+        }
+        st.getnext();
+        return st.getsize() ;
+    }
+    vector<HTTPHeader> headers;
+    std::string _path;
+    bool isChuncked;
+    long chunklength;
+    std::string _method;
+    size_t contentLength;
+    ustring _payload;
+    public:
+    HttpRequest() : contentLength(0), isChuncked(false) , chunklength(0) { }
+    HttpRequest(unsigned char *buf, size_t len) :contentLength(0), isChuncked(false), chunklength(0) {
+        size_t l = extractHeaders(buf, len);
+        _payload.append(buf + l, len - l);
+    }
+    std::string path()  { return _path; }
+    ~HttpRequest() { }
+    const unsigned char* payload_data() const { return _payload.data(); }
+    ustring payload() { return _payload; }
+    std::string method() { return _method; }
+    void append(unsigned char *buf, size_t len) {
+        int l = 0;
+        //fprintf(stderr, "1. chunklength: %ld, len: %ld, l = %d\n", chunklength, len, l);
+        //if (len > 0) {
+        //    ofstream ofs ("DEBUG.txt", std::ofstream::binary|std::ofstream::app);
+        //    hexdump::getinstance().dump(ofs, buf, len);
+        //    ofs.close();
+        //}
+        if (strstr((const char *)buf, "HTTP/1.1") != NULL) {
+            l = extractHeaders(buf, len);
+            dump_headers();
+        }
+        len -= l;
+        //fprintf(stderr, "2. chunklength: %ld, len: %ld, l = %d\n", chunklength, len, l);
+        if (isChuncked) {
+            if (isChuncked && chunklength > 0 && len > 0) {
+                size_t minlen = std::min<size_t>(len, (size_t)chunklength);
+                //std::ofstream ofs ("Title.mp3", std::ofstream::binary|std::ofstream::app);
+                //ofs.write((char *)buf, minlen);
+                //ofs.close();
+                //fprintf(stderr, "minlen: %ld, chunklength: %ld, len: %ld, l = %d\n", minlen, chunklength, len, l);
+                //fprintf(stderr, "[%.*s]\n", minlen, buf + l);
+                _payload.append(buf + l, minlen);
+                l+= minlen;
+                chunklength -= minlen;
+                len -= minlen;
+            }
+            if (isChuncked && len > 0) {
+                long chunklen = 0;
+                if (buf[l] == '\r' && buf[l+1] == '\n') { l+=2; len -= 2; }
+                STokenizer<ustring, unsigned char> st(buf + l, len, "\r\n");
+                if (st.hasnext()) {
+                    ustring chunklengthstr = st.getnext();
+                    //fprintf(stderr, "chunklengthstr: %s\n", chunklengthstr.c_str());
+                    for (int i = 0; i < chunklengthstr.length(); i++) chunklen = (chunklen << 4) | hex_chars[chunklengthstr[i]];
+                    std::cout << "chunklength: " << chunklen<< std::endl;
+                    l += chunklengthstr.length() + 2;
+                    len -= (chunklengthstr.length() + 2);
+                }
+                chunklength += chunklen;
+            }
+            if (isChuncked && chunklength > 0 && len > 0) {
+                size_t minlen = std::min<size_t>(len, (size_t)chunklength);
+                //std::ofstream ofs ("Title.mp3", std::ofstream::binary|std::ofstream::app);
+                //ofs.write((char *)buf + l, len);
+                //ofs.close();
+                //fprintf(stderr, "minlen: %ld, chunklength: %ld, len: %ld, l = %d\n", minlen, chunklength, len, l);
+                //fprintf(stderr, "[%.*s]\n", minlen, buf + l);
+                _payload.append(buf + l, minlen);
+                l+= minlen;
+                chunklength -= minlen;
+                len -= minlen;
+            }
+        } else {
+            //std::ofstream ofs ("Title.mp3", std::ofstream::binary|std::ofstream::app);
+            //ofs.write((char *)buf + l, len);
+            //ofs.close();
+            _payload.append(buf + l, len);
+        }
+    }
+    void dump_headers() {
+        for (int i = 0; i <headers.size(); i++)
+            std::cout << headers[i] ;
+    }
+    size_t contentlength() const {
+        return contentLength;
+    }
+};
 class HttpResponse {
    int extractHeaders(unsigned char *buf, size_t len) {
         STokenizer<ustring, unsigned char> st(buf, len);

@@ -20,6 +20,7 @@
 #include <iterator>
 #include <list>
 #include <sstream>
+#include "HttpDateGenerator.h"
 
 /* regex */
 #include <sys/types.h>
@@ -39,6 +40,7 @@
 
 using namespace std;
 #define READSZ (1<<15)
+HttpDateGenerator DEFAULTDATEGENERATOR;
 SSL_CTX* InitCTX(void)
 {   SSL_METHOD *method;
     SSL_CTX *ctx;
@@ -90,7 +92,156 @@ string getIndex() {
     return val;
 }
 
+void spawn_client_thread(int fd, struct sockaddr_in *addr, socklen_t *addrlen) {
+    std::cout << "New connection from " << inet_ntoa(addr->sin_addr) << std::endl;
+    tcpClient tClient(fd);
+/*
+ * HTTP/1.1 301 Moved Permanently
+ * Date: Sat, 08 Sep 2018 16:45:33 GMT
+ * Content-Type: text/html; charset=iso-8859-1
+ * Transfer-Encoding: chunked
+ * Connection: keep-alive
+ * Set-Cookie: __cfduid=d4ace31a2ce982d46e03a5fda6f3f54451536425133; expires=Sun, 08-Sep-19 16:45:33 GMT; path=/; domain=.downloadming.ms; HttpOnly
+ * Location: https://downloadming.live/haadsaa-1983-mp3-songs
+ * CF-Cache-Status: HIT
+ * Cache-Control: private, max-age=86400
+ * Server: cloudflare
+ * CF-RAY: 4572e2dda7975a32-BOS
+ * chunklength: 256
+ */
+
+/*
+ * HTTP/1.1 200 OK
+ * Date: Sat, 08 Sep 2018 17:07:19 GMT
+ * Content-Type: text/html; charset=UTF-8
+ * Transfer-Encoding: chunked
+ * Connection: keep-alive
+ * Set-Cookie: __cfduid=df36614a128888c6b464b1598c6fee56d1536426439; expires=Sun, 08-Sep-19 17:07:19 GMT; path=/; domain=.downloadming.live; HttpOnly
+ * Vary: Accept-Encoding,Cookie
+ * Cache-Control: public, max-age=31536000
+ * CF-Cache-Status: HIT
+ * Expires: Sun, 08 Sep 2019 17:07:19 GMT
+ * Expect-CT: max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+ * Server: cloudflare
+ * CF-RAY: 457302bfebc0472e-EWR
+ *
+ */
+
+// GET / HTTP/1.1
+// Host: 192.168.1.84:64001
+// User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:31.0) Gecko/20100101 Firefox/31.0
+// Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+// Accept-Language: en-US,en;q=0.5
+// Accept-Encoding: gzip, deflate
+// Connection: keep-alive
+
+  
+    const int flags = fcntl(fd, F_GETFL, 0);
+    std::cout << DEFAULTDATEGENERATOR.getCurrentDate() << std::endl;
+    if (flags & O_NONBLOCK) std::cout << "set_blocking_mode(): socket was already in non-blocking mode" << std::endl;
+    fcntl(fd, F_SETFL, flags ^ O_NONBLOCK);
+    std::string name("");
+    HttpRequest httpReq;
+    while (usleep(800)==0) {
+        unsigned char buf[1024] = { 0 };
+        int len = tClient.net_read(buf, 1024);
+        if (len > 0) {
+            httpReq.append(buf, len);
+            if (httpReq.method() == "GET") {
+                stringstream ss ;
+                ss << "HTTP/1.1 200 OK\r\n";
+                ss << "Date: " << DEFAULTDATEGENERATOR.getCurrentDate() <<"\r\n";
+                ss << "Content-Type: text/html; charset=UTF-8\r\n";
+                ss << "Connection: keep-alive\r\n";
+                ss << "Server: rhel71\r\n";
+                ss << "\r\n";
+                ss << "<html><head>GET</head><body><h4>Hello [" << name << "]</h4>";
+                ss << "<form method=\"post\" action=\"\"><textarea name=\"history\" cols=\"150\" rows=\"20\">Enter install history here...</textarea> <br/>";
+                ss << "<button type=\"submit\" class=\"btn btn-success\">Submit</button>";
+                ss << "</form>";
+                ss << "</body></html>";
+                tClient.net_write((unsigned char *)ss.str().c_str(), (size_t )ss.str().length());
+                break;
+            } else if (httpReq.method() == "POST") {
+                stringstream ss ;
+                ss << "HTTP/1.1 200 OK\r\n";
+                ss << "Date: " << DEFAULTDATEGENERATOR.getCurrentDate() <<"\r\n";
+                ss << "Content-Type: text/html; charset=UTF-8\r\n";
+                ss << "Connection: keep-alive\r\n";
+                ss << "Server: rhel71\r\n";
+                ss << "\r\n";
+                ss << "<html><head>POST</head><body><h4>Hello [" << name << "]</h4>";
+                ss << "<form method=\"post\" action=\"\"><textarea name=\"history\" cols=\"150\" rows=\"20\">Enter install history here...</textarea> <br/>";
+                ss << "<button type=\"submit\" class=\"btn btn-success\">Submit</button>";
+                ss << "</form>";
+                ss << "</body></html>";
+                tClient.net_write((unsigned char *)ss.str().c_str(), (size_t )ss.str().length());
+                break;
+            }
+        }
+    }
+    ::close(fd);
+}
+
+class MyServer : public tcpServer {
+    public:
+    MyServer(std::string &name, int port) : tcpServer(name.c_str(), port) { }
+    void incomingCall(int fd, struct sockaddr_in *addr, socklen_t *addrlen) {
+        spawn_client_thread(fd, addr, addrlen);
+    }
+    ~MyServer() {
+    }
+};
+
+
+void* server_thread(void *args) {
+    std::string src; int port;
+    std::cout << "enter server host name and port: " ;
+    cin >> src >> port;
+    struct host h;
+    vector<std::string> res;
+    h.resolve((char *)src.c_str(), res);
+    for (std::string s : res) {
+        std::cout << "[" << s << "]" << std::endl;
+    }
+
+    struct pollfd pfds[2] = { 0 };
+    try {
+        MyServer server(res[0], port);
+        pfds[0].events = 0;
+        pfds[0].events |= POLLIN | POLLPRI;
+        pfds[0].fd = server.getfd();
+        try {
+            while(usleep(800) == 0) {
+                int rc = poll(pfds, 1, 800);
+                for (int count = 0; rc > 0 && count >= 0; count--) {
+                    struct pollfd *p = pfds  + count;
+                    if (p->revents) {
+                        if (p->revents & (POLLIN | POLLPRI)) {
+                            struct sockaddr_in client_addr; socklen_t len;
+                            int clientfd = accept(server.getfd(), (struct sockaddr *)&client_addr, &len);
+                            spawn_client_thread(clientfd, &client_addr, &len);
+                        }
+                    }
+                }
+            }
+        } catch(const IOException &e) {
+        }
+    } catch (const IOException &e) {
+    }
+    return NULL;
+}
+void Test_Server() {
+    pthread_t server_tid;
+    if (pthread_create(&server_tid, NULL, server_thread, NULL) < 0) {
+        throw IOException("cannot create server thread");
+    }
+    pthread_join(server_tid, NULL);
+}
+
 int main() {
+    Test_Server();
+    return 0;
     try {
         string indexStr = getIndex();
         std::cout << indexStr << std::endl;

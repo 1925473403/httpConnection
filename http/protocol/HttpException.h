@@ -49,6 +49,7 @@ class IOException : public std::exception {
     protected:
         char m_reason[512];
 };
+<<<<<<< HEAD
 class HttpHost ;
 class SocketException : public IOException {
     public:
@@ -63,14 +64,39 @@ class ConnectException : public SocketException {
 /*
 class HttpHostConnectException : public IOException {
     HttpHost *host;
+=======
+
+class SocketException : public IOException {
     public:
-    HttpHostConnectException(HttpHost *h, ConnectException &ex) : ConnectException("Connection to host refused") { 
-        host = h;
-        initCause(ex);
-    }
-    HttpHost *getHost() { return host; }
+        SocketException() : IOException() { }
+        SocketException(std::string &s): IOException(s) { }
+        SocketException(const char *s) : IOException(s) { }
 };
+
+class ConnectException : public SocketException {
+    public:
+    ConnectException(std::string &s) : SocketException(s) { }
+    ConnectException(const char *str) : SocketException(str) { }
+    ConnectException() : SocketException() { }
+};
+
+class ConnectionResetException : public IOException {
+>>>>>>> 8f0a1ebc7b17dfa789fa5de46f12b6865dedf9ec
+    public:
+    ConnectionResetException() : IOException() { }
+    ConnectionResetException(std::string s) : IOException(s) { }
+    ConnectionResetException(const char *str, ...) {
+            va_list args;
+            va_start(args, str);
+            vsnprintf(m_reason, 511, str, args);
+            va_end(args);
+    }
+};
+<<<<<<< HEAD
 */
+=======
+
+>>>>>>> 8f0a1ebc7b17dfa789fa5de46f12b6865dedf9ec
 class SecurityException : public IOException {
     public:
     SecurityException() : IOException() { }

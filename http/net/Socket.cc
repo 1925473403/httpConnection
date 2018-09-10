@@ -1,3 +1,19 @@
+#include "HttpException.h"
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/types.h>
+#include <netdb.h>
+#include <pthread.h>
+#include "NameResolver.h"
+#include "InetSocketAddress.h"
+#include "SocketImpl.h"
+#include "OutputStream.h"
+#include "InputStream.h"
+#include "'AbstractPlainSocketImpl.h"
+#include "SocketInputStream.h"
+#include "SocketOutputStream.h"
+#include "DualStackPlainSocketImpl.h"
 #ifndef SOCKET_H
 #include "Socket.h"
 #endif
@@ -11,24 +27,24 @@ Socket::Socket(SocketImpl *i) {
         impl->setSocket(this);
 }
 Socket::Socket(std::string host, int port) :
-    Socket(((host.length() != 0) ? new InetSockAddress(host, port) : new InetSockAddress("localhost", port)), NULL, true) {
+    Socket(((host.length() != 0) ? new InetSocketAddress(host, port) : new InetSocketAddress("localhost", port)), NULL, true) {
 }
 Socket::Socket(InetAddress *addr, int port) :
-    Socket(((addr != NULL)? new InetSockAddress(addr, port) : 0), NULL, true) {
+    Socket(((addr != NULL)? new InetSocketAddress(addr, port) : 0), NULL, true) {
 }
 Socket::Socket(std::string host, int port, InetAddress *localAddr, int localPort) :
     Socket(((host.length() != 0)?new InetSocketAddress(host, port) : new InetSocketAddress("localhost", port)), new InetSocketAddress(localAddr, localPort), true) {
 }
 Socket::Socket(InetAddress* addr, int port, InetAddress *localAddr, int localPort) :
-    Socket(((addr != NULL)? new InetSockAddress(addr, port) : 0), new InetSocketAddress(localAddr, localPort), true) {
+    Socket(((addr != NULL)? new InetSocketAddress(addr, port) : 0), new InetSocketAddress(localAddr, localPort), true) {
 }
 Socket::Socket(std::string host, int port, bool stream) :
-    Socket(((host.length() != 0)?new InetSocketAddress(host, port):new InetSockAddress("localhost", port)), NULL, stream) {
+    Socket(((host.length() != 0)?new InetSocketAddress(host, port):new InetSocketAddress("localhost", port)), NULL, stream) {
 }
 Socket::Socket(InetAddress* addr, int port, bool stream) :
-    Socket(((addr != NULL)? new InetSockAddress(addr, port):0), NULL, stream) {
+    Socket(((addr != NULL)? new InetSocketAddress(addr, port):0), NULL, stream) {
 }
-Socket::Socket(InetSockAddress *addr, InetSockAddr *localaddr, bool stream) {
+Socket::Socket(InetSocketAddress *addr, InetSockAddr *localaddr, bool stream) {
     setImpl();
     if (addr == NULL) throw NullPointerException();
     try {
@@ -54,17 +70,17 @@ void Socket::createImpl(bool stream) {
 }
 
 void Socket::setImpl() {
-    impl = new SocksSocketImpl();
+    impl = new DualStackPlainSocketImpl(true);
     if (impl != NULL) impl->setSocket(this);
 }
 SocketImpl *Socket::getImpl() {
     if (!created) createImpl(true);
     return impl;
 }
-void Socket::connect(InetSockAddress *endpoints) {
+void Socket::connect(InetSocketAddress *endpoints) {
     connect(endpoints, 0);
 }
-void Socket::connect(InetSockAddress *endpoint, int timeout) {
+void Socket::connect(InetSocketAddress *endpoint, int timeout) {
     if (endpoint == NULL) throw IllegalArgumentException("connect: The address can't be null");
     if (timeout < 0) IllegalArgumentException("connect: timeout can't be negative");
     if (isClosed()) throw SocketException("Socket is closed");
@@ -80,7 +96,7 @@ void Socket::connect(InetSockAddress *endpoint, int timeout) {
     bound = true;
 }
 
-void Socket::bind(InetSockAddress *bindpoint) {
+void Socket::bind(InetSocketAddress *bindpoint) {
     if (isClosed()) throw SocketException("Socket is closed");
     if (!oldImpl && isBound()) throw SocketException("Already bound");
     if (bindpoint == NULL) bindpoint = new InetSocketAddress(0);
@@ -130,24 +146,24 @@ int Socket::getLocalPort() {
     } catch (const SocketException &e) { }
     return -1;
 }
-InetSockAddress *Socket::getRemoteSocketAddress() {
+InetSocketAddress *Socket::getRemoteSocketAddress() {
     if (!isConnected()) return NULL;
-    return new InetSockAddress(getInetAddress(), getPort());
+    return new InetSocketAddress(getInetAddress(), getPort());
 }
-InetSockAddress *Socket::getLocalSocketAddress() {
+InetSocketAddress *Socket::getLocalSocketAddress() {
     if (!isBound()) return NULL;
-     return new InetSockAddress(getLocalAddress(), getLocalPort());
+     return new InetSocketAddress(getLocalAddress(), getLocalPort());
 }
-InputStream* Socket::getInputStream() {
+InputStream* Socket::getInputStream() throw (IOException) {
     if (isClosed()) throw SocketException("Socket is closed");
     if (!isConnected()) throw SocketException("Socket is not connected");
     if (isInputShutdown()) throw SocketException("Socket input is shutdown");
     Socket *s = this;
-    InputStream in = NULL;
+    InputStream *in = NULL;
     in = impl->getInputStream();
     return in;
 }
-OutputStream* Socket::getOutputStream() {
+OutputStream* Socket::getOutputStream() throw (IOException){
     if (isClosed()) throw SocketException("Socket is closed");
     if (!isConnected()) throw SocketException("Socket is not connected");
     if (isOutputShutdown()) throw SocketException("Socket output is shutdown");
@@ -164,7 +180,7 @@ bool Socket::getReuseAddress() throw (SocketException){
 
 void Socket::close() throw (IOException) {
     {
-        Lock l(mutex);
+        Lock l(closeLock);
         if (isClosed()) return;
         if (created) impl->close();
         closed = true;
@@ -200,7 +216,7 @@ std::string Socket::toString() {
 }
 
 bool Socket::isClosed() {
-    Lock l(mutex);
+    Lock l(closeLock);
     return closed;
 }
 

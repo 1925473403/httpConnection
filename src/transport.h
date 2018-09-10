@@ -19,6 +19,18 @@ class DataPipe {
         void enableInput(struct pollfd* p);
 };
 
+class tcpServer {
+    int fd;
+    struct sockaddr_in si_local;
+    void bind_and_listen();
+    public:
+    tcpServer(const char *src, int port);
+    //tcpServer(long src, int port);
+    int getfd() const { return fd; }
+    virtual void incomingCall(int fd, struct sockaddr_in *addr, socklen_t *addrlen) = 0;
+    virtual ~tcpServer();
+};
+
 class tcpClient:public DataPipe {
     bool isconnected;
     int fd;
@@ -26,6 +38,7 @@ class tcpClient:public DataPipe {
     struct sockaddr_in si_remote;
     public:
         bool connected() const { return isconnected; }
+        tcpClient(int f) { fd = f; }
         tcpClient(char *src, int port, bool blocking=false);
         tcpClient(long, int port);
         ~tcpClient();

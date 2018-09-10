@@ -1,14 +1,32 @@
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/types.h>
+#include <netdb.h>
+#include <pthread.h>
+#include "HttpException.h"
+#include "SocketImpl.h"
 #include "InputStream.h"
+#include "OutputStream.h"
+#include "NameResolver.h"
+#include "InetSocketAddress.h"
+#include "SocketImpl.h"
 #include "AbstractPlainSocketImpl.h"
-#include "Socket.h"
 #ifndef SOCKETINPUTSTREAM_H
 #include "SocketInputStream.h"
 #endif
+#include "Socket.h"
 SocketInputStream::SocketInputStream(AbstractPlainSocketImpl *_impl) : impl(_impl) {
     socket = impl->getSocket();
 }
 int SocketInputStream::read(char *b, int blen, int len) throw (IOException) {
     return read(b, blen, 0, len);
+}
+
+void SocketInputStream::setEOF(bool e) {
+    eof = e;
+}
+void SocketInputStream::init() {
 }
 int SocketInputStream::read(char *b, int blen, int off, int len) throw (IOException) {
     if (eof) return -1;
@@ -19,10 +37,10 @@ int SocketInputStream::read(char *b, int blen, int off, int len) throw (IOExcept
     }
     int fd = impl->acquireFD();
     try {
-        n = socket->read(b, blen, off, len);
-        return n;
+        int n = socketRead(fd, b, blen, off, len);
+        if (n > 0) return n;
     } catch (ConnectionResetException &e) {
-        gotReset = true;
+        //gotReset = true;
     }
     impl->releaseFD();
     if (impl->isClosedOrPending()) throw SocketException("Socket closed");
@@ -31,8 +49,14 @@ int SocketInputStream::read(char *b, int blen, int off, int len) throw (IOExcept
     eof = true;
     return -1;
 }
+
+int SocketInputStream::socketRead(int fd, char *b, int blen, int off, int len) {
+    int n = -1;
+    n = ::read(fd, b + off, std::min<int>(blen - off, len));
+    return n;
+}
 int SocketInputStream::read() throw (IOException) {
-    temp = new unsigned char[1];
+    temp = new char[1];
     int n = read(temp, 1, 1);
     if (n < 0) {
         delete[] temp;
@@ -46,13 +70,12 @@ long SocketInputStream::skip(long numbytes) throw (IOException) {
     if (numbytes <= 0) return 0;
     long n = numbytes;
     int buflen = std::min<int>(1024, n);
-    unsigned char *data = new unsigned char [buflen];
+    char data[buflen];
     while (n > 0) {
-        int r = read(data, buflen, std::min<int>(buflen, n));
+        int r = read((char *)data, buflen, std::min<int>(buflen, n));
         if (r < 0) break;
-        n-=r;
+        n -=r;
     }
-    delete[] data;
     return numbytes - n;
 }
 int SocketInputStream::available() throw (IOException) {
