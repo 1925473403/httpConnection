@@ -26,7 +26,6 @@ class AbstractPlainSocketImpl : public SocketImpl {
         int trafficClass;
         int timeout;
     protected:
-        int fd;
         pthread_mutex_t fdLock;
         pthread_mutex_t resetLock;
         bool closePending;

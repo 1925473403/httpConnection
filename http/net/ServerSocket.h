@@ -1,22 +1,23 @@
+#include "RefCount.h"
 #ifndef SERVERSOCKET_H
 #define SERVERSOCKET_H
-class ServerSocket {
+class ServerSocket : public RefCount {
     private:
-    bool created;
-    bool bound;
-    bool closed;
-    pthread_mutex_t closeLock;
-    struct Lock {
-        pthread_mutex_t &l;
-        Lock(pthread_mutex_t &lo):l(lo) {
-            pthread_mutex_lock(&l);
-        }
-        ~Lock() {
-            pthread_mutex_unlock(&l);
-        }
-    };
-    SocketImpl *impl;
-    bool oldImpl;
+        bool created;
+        bool bound;
+        bool closed;
+        pthread_mutex_t closeLock;
+        struct Lock {
+            pthread_mutex_t &l;
+            Lock(pthread_mutex_t &lo):l(lo) {
+                pthread_mutex_lock(&l);
+            }
+            ~Lock() {
+                pthread_mutex_unlock(&l);
+            }
+        };
+        SocketImpl *impl;
+        bool oldImpl;
     public:
         ServerSocket(SocketImpl *);
         ServerSocket(int p);

@@ -15,7 +15,7 @@ class DualStackPlainSocketImpl : public AbstractPlainSocketImpl {
         void socketListen(int backlog) throw(IOException);
         void socketAccept(SocketImpl *s) throw(IOException);
         void socketClose0(bool useDeferredClose) throw(IOException);
-        void socketShutdown(int howto) throw(IOException); 
+        void socketShutdown(int howto) throw(IOException);
         void socketSendUrgentData(int data) throw(IOException);
         int socketAvailable() throw (IOException);
 };

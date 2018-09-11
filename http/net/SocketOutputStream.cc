@@ -41,7 +41,10 @@ int SocketOutputStream::write(char *b, int blen, int off, int len) throw (IOExce
     int fd = impl->acquireFD();
     try {
         int n = socketWrite(fd, b, blen, off, len);
-        if (n > 0) return n;
+        if (n > 0) {
+            impl->releaseFD();
+            return n;
+        }
     } catch (const SocketException &e) {
         if (impl->isClosedOrPending()) {
             impl->releaseFD();

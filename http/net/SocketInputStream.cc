@@ -38,7 +38,10 @@ int SocketInputStream::read(char *b, int blen, int off, int len) throw (IOExcept
     int fd = impl->acquireFD();
     try {
         int n = socketRead(fd, b, blen, off, len);
-        if (n > 0) return n;
+        if (n > 0) {
+            impl->releaseFD();
+            return n;
+        }
     } catch (ConnectionResetException &e) {
         //gotReset = true;
     }

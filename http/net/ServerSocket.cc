@@ -19,18 +19,19 @@
 #include "ServerSocket.h"
 #endif
 
+#define DEFAULTCLIENTSIZE 50
 SocketImplFactory *factory = NULL;
 ServerSocket::ServerSocket(SocketImpl *i) : created(false), bound (false), closed(false), impl(i), oldImpl(false) {
     impl->setServerSocket(this);
 }
 
-ServerSocket::ServerSocket(int p) : ServerSocket(p, 50, NULL) {
+ServerSocket::ServerSocket(int p) : ServerSocket(p, DEFAULTCLIENTSIZE, NULL) {
 }
 
 ServerSocket::ServerSocket(int p, int backlog) : ServerSocket(p, backlog, NULL) {
 }
 
-ServerSocket:: ServerSocket(int p, int backlog, InetAddress *bindAddr) {
+ServerSocket::ServerSocket(int p, int backlog, InetAddress *bindAddr) {
     setImpl();
     if (p < 0 || p > 0xffff) throw IllegalArgumentException("Port value out of range: %d",  p);
     if (backlog < 1) backlog = 50;
@@ -99,7 +100,7 @@ InetAddress* ServerSocket::getInetAddress() {
         InetAddress *in = getImpl()->getInetAddress();
         return in;
     } catch (const SocketException &e) {
-        
+
     }
     return NULL;
 }
@@ -159,7 +160,7 @@ ServerSocketChannel* ServerSocket::getChannel() {
 }
 
 bool ServerSocket::isBound() {
-     return bound || oldImpl;
+    return bound || oldImpl;
 }
 
 bool ServerSocket::isClosed() {
