@@ -1,7 +1,8 @@
 #include "HttpException.h"
+#include "RefCount.h"
 #ifndef HTTPENTITY_H
 #define HTTPENTITY_H
-class HttpEntity {
+class HttpEntity : public RefCount {
     public:
         virtual ~HttpEntity() { }
         virtual bool isRepeatable() = 0;

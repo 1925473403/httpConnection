@@ -5,6 +5,7 @@ class BasicHttpRequest : public AbstractHttpMessage, public HttpRequest {
     public:
         BasicHttpRequest(std::string m, std::string u) ;
         BasicHttpRequest(std::string m, std::string u, ProtocolVersion*);
+        virtual ~BasicHttpRequest();
         BasicHttpRequest(RequestLine *);
         ProtocolVersion *getProtocolVersion();
         RequestLine *getRequestLine();

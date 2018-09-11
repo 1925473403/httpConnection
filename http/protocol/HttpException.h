@@ -49,7 +49,6 @@ class IOException : public std::exception {
     protected:
         char m_reason[512];
 };
-<<<<<<< HEAD
 class HttpHost ;
 class SocketException : public IOException {
     public:
@@ -94,9 +93,7 @@ class ConnectionResetException : public IOException {
 };
 <<<<<<< HEAD
 */
-=======
 
->>>>>>> 8f0a1ebc7b17dfa789fa5de46f12b6865dedf9ec
 class SecurityException : public IOException {
     public:
     SecurityException() : IOException() { }

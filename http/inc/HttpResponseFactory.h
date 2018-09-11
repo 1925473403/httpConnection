@@ -1,7 +1,8 @@
 #include "HttpException.h"
+#include "RefCount.h"
 #ifndef HTTPRESPONSEFACTORY_H
 #define HTTPRESPONSEFACTORY_H
-class HttpResponseFactory {
+class HttpResponseFactory : public RefCount {
     public:
     virtual ~HttpResponseFactory() { }
     virtual HttpResponse *newHttpResponse(ProtocolVersion *ver, int status, HttpContext *context) = 0;

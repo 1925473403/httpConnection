@@ -1,7 +1,8 @@
 #include "HttpException.h"
+#include "RefCount.h"
 #ifndef LINEFORMATTER_H
 #define LINEFORMATTER_H
-class LineFormatter {
+class LineFormatter:public RefCount {
     public:
         virtual ~LineFormatter() { }
         virtual CharArrayBuffer appendProtocolVersion(CharArrayBuffer&, ProtocolVersion *) = 0;

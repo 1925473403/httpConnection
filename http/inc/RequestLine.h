@@ -1,7 +1,8 @@
 #include "HttpException.h"
+#include "RefCount.h"
 #ifndef REQUESTLINE_H
 #define REQUESTLINE_H
-class RequestLine {
+class RequestLine : public RefCount {
     public:
     virtual ~RequestLine() { }
     virtual ProtocolVersion* getProtocolVersion() = 0;

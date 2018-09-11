@@ -1,7 +1,8 @@
 #include "HttpException.h"
+#include "RefCount.h"
 #ifndef BUFFERINFO_H
 #define BUFFERINFO_H
-class BufferInfo {
+class BufferInfo : virtual public RefCount {
     public:
         virtual ~BufferInfo() { }
         virtual int length() = 0;

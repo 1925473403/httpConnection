@@ -1,7 +1,8 @@
 #include "HttpException.h"
+#include "RefCount.h"
 #ifndef LINEPARSER_H
 #define LINEPARSER_H
-class LineParser {
+class LineParser : public RefCount {
     public:
         virtual ~LineParser() { }
         virtual ProtocolVersion *parseProtocolVersion(CharArrayBuffer &buffer, ParserCursor *cursor) throw (ParseException) = 0;

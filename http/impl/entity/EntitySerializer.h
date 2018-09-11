@@ -1,7 +1,8 @@
 #include "HttpException.h"
+#include "RefCount.h"
 #ifndef ENTITY_SERIALIZER_H
 #define ENTITY_SERIALIZER_H
-class EntitySerializer {
+class EntitySerializer : public RefCount {
     private:
         ContentLengthStrategy *lenStrategy;
     protected:

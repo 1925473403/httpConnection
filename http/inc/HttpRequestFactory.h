@@ -1,7 +1,8 @@
 #include "HttpException.h"
+#include "RefCount.h"
 #ifndef HTTPREQUESTFACTORY_H
 #define HTTPREQUESTFACTORY_H
-class HttpRequestFactory {
+class HttpRequestFactory : public RefCount {
     public:
     virtual ~HttpRequestFactory() { }
     virtual HttpRequest *newHttpRequest(RequestLine *requestline) throw (MethodNotSupportedException) = 0;

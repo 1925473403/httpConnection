@@ -5,13 +5,12 @@ class BasicHeaderValueParser : public HeaderValueParser {
     static char PARAM_DELIMITER;
     static char ELEM_DELIMITER;
     static char ALL_DELIMITERS[2];
-        ~BasicHeaderValueParser() { }
     protected:
         HeaderElement* createHeaderElement(std::string name, std::string value, vector<NameValuePair*> &params);
         NameValuePair* createNameValuePair(std::string name, std::string value);
     public:
+        ~BasicHeaderValueParser();
         static BasicHeaderValueParser DEFAULT;
-        void unref();
         static void parseElements(std::string &value, HeaderValueParser *parser, vector<HeaderElement*>&) throw (ParseException);
         void parseElements(CharArrayBuffer &buffer, ParserCursor *cursor, vector<HeaderElement*> &) throw (ParseException);
         static HeaderElement* parseHeaderElement(std::string &value, HeaderValueParser *parser) throw (ParseException);

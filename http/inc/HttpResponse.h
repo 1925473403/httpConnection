@@ -1,7 +1,7 @@
 #include "HttpException.h"
 #ifndef HTTPRESPONSE_H
 #define HTTPRESPONSE_H
-class HttpResponse : public HttpMessage {
+class HttpResponse : public virtual HttpMessage {
     public:
     virtual ~HttpResponse() { }
     virtual StatusLine* getStatusLine() = 0;

@@ -1,7 +1,8 @@
 #include "HttpException.h"
+#include "RefCount.h"
 #ifndef HEADERVALUEFORMATTER_H
 #define HEADERVALUEFORMATTER_H
-class HeaderValueFormatter {
+class HeaderValueFormatter: public RefCount {
     public:
         virtual ~HeaderValueFormatter () { }
         virtual CharArrayBuffer& formatElements(CharArrayBuffer&, vector<HeaderElement*> &, bool quote) = 0;

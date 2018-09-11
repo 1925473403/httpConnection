@@ -1,7 +1,8 @@
 #include "HttpException.h"
+#include "RefCount.h"
 #ifdef HTTPREQUESTINTERCEPTOR_H
 #define HTTPREQUESTINTERCEPTOR_H
-class HttpRequestInterceptor {
+class HttpRequestInterceptor : public RefCount {
     public:
     virtual ~HttpRequestInterceptor () { }
     virtual void process(HttpRequest *request, HttpContext *context) throw(HttpException, IOException) = 0;

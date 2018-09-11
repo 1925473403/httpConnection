@@ -22,10 +22,7 @@ NameValuePair* BasicHeaderValueParser::createNameValuePair(std::string name, std
     return new BasicNameValuePair(name, value);
 }
 
-void BasicHeaderValueParser::unref() {
-    if (this == &(BasicHeaderValueParser::DEFAULT)) return;
-    delete this;
-}
+BasicHeaderValueParser::~BasicHeaderValueParser() { }
 
 void BasicHeaderValueParser::parseElements(std::string &value, HeaderValueParser *parser, vector<HeaderElement*> &ret) throw (ParseException) {
     if (value.length() == 0) throw IllegalArgumentException("Value to parse may not be null");
@@ -65,7 +62,11 @@ HeaderElement* BasicHeaderValueParser::parseHeaderElement(CharArrayBuffer &buffe
         if (ch != ELEM_DELIMITER) parseParameters(buffer, cursor, params);
     }
     h = createHeaderElement(nvp->getName(), nvp->getValue(), params);
-    delete nvp;
+    for (NameValuePair* nv: params) {
+        if (nv != NULL) nv->unref();
+    }
+    params.clear();
+    nvp->unref();
     return h;
 }
 

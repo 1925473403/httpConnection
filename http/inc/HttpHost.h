@@ -1,7 +1,8 @@
 #include "HttpException.h"
+#include "RefCount.h"
 #ifndef HTTPHOST_H
 #define HTTPHOST_H
-class HttpHost {
+class HttpHost : public RefCount {
     static std::string DEFAULT_SCHEME_NAME;
     protected:
         std::string hostname;

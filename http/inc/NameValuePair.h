@@ -1,7 +1,8 @@
 #include "HttpException.h"
+#include "RefCount.h"
 #ifndef NAMEVALUEPAIR_H
 #define NAMEVALUEPAIR_H
-class NameValuePair {
+class NameValuePair : public RefCount {
     public:
     virtual ~NameValuePair() { }
     virtual std::string getName() const = 0;

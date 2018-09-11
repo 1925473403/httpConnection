@@ -1,7 +1,8 @@
 #include "HttpException.h"
+#include "RefCount.h"
 #ifndef CONTENTLENGTHSTRATEGY_H
 #define CONTENTLENGTHSTRATEGY_H
-class ContentLengthStrategy {
+class ContentLengthStrategy : public RefCount {
     public:
         static int IDENTITY;
         static int CHUNKED;

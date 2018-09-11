@@ -1,8 +1,9 @@
 #include "HttpException.h"
 #include "HeaderElement.h"
+#include "RefCount.h"
 #ifndef HEADER_H
 #define HEADER_H
-class Header {
+class Header: public RefCount {
     public:
     virtual ~Header() { }
     virtual std::string getName() = 0;

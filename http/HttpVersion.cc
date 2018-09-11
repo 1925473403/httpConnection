@@ -5,9 +5,11 @@ HttpVersion *HttpVersion::HTTP_1_0 = new HttpVersion(1, 0);
 HttpVersion *HttpVersion::HTTP_1_1 = new HttpVersion(1, 1);
 HttpVersion *HttpVersion::HTTP_0_9 = new HttpVersion(0, 9);
 HttpVersion::HttpVersion(int maj, int min):ProtocolVersion(HTTP, maj, min) { }
-HttpVersion::~HttpVersion() { }
-void HttpVersion::unref() {
-    if (this == HTTP_1_0 || this == HTTP_1_1 || this == HTTP_0_9) return;
+HttpVersion::~HttpVersion() {
+    if ((this == HTTP_1_0) || 
+        (this == HTTP_1_1) || 
+        (this == HTTP_0_9)) 
+        return;
     delete this;
 }
 HttpVersion::HttpVersion(const HttpVersion& rhs):ProtocolVersion(rhs) {

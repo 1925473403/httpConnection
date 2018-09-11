@@ -1,7 +1,8 @@
 #include "HttpException.h"
+#include "RefCount.h"
 #ifndef SESSIONOUTPUTBUFFER_H
 #define SESSIONOUTPUTBUFFER_H
-class SessionOutputBuffer {
+class SessionOutputBuffer : virtual RefCount {
     public:
         virtual ~SessionOutputBuffer() { }
         virtual write(char *b, int blen, int off, int len) throw(IOException) = 0;

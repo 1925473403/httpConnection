@@ -1,7 +1,8 @@
 #include "HttpException.h"
+#include "RefCount.h"
 #ifndef HTTPMESSAGE_H
 #define HTTPMESSAGE_H
-class HttpMessage {
+class HttpMessage: public virtual RefCount {
     public:
     virtual ~HttpMessage() { }
     virtual ProtocolVersion* getProtocolVersion() = 0;

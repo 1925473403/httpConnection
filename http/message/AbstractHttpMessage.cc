@@ -17,10 +17,12 @@
 AbstractHttpMessage::AbstractHttpMessage(HttpParams *p) {
     headergroup = new HeaderGroup();
     params = p;
+    if (params) params->ref();
 }
 
 AbstractHttpMessage::~AbstractHttpMessage() {
-    delete headergroup;
+    if (headergroup) headergroup->unref();
+    if (params) params->unref();
 }
 
 AbstractHttpMessage::AbstractHttpMessage() : params(NULL) {
@@ -87,10 +89,12 @@ HeaderIterator* AbstractHttpMessage::headerIterator(std::string name) {
 
 HttpParams* AbstractHttpMessage::getParams()  {
     if (params == NULL) params = new BasicHttpParams();
+    params->ref();
     return params;
 }
 
 void AbstractHttpMessage::setParams(HttpParams* p) {
     if (p = NULL) throw IllegalArgumentException("HTTP parameters may not be null");
     params = p;
+    if (params) params->ref();
 }

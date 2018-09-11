@@ -8,6 +8,6 @@ class HttpRequestParser : public AbstractMessageParser {
     protected:
     public:
         HttpRequestParser(SessionInputBuffer *buffer, LineParser *parser, HttpRequestFactory *factory, HttpParams *params);
-        HttpMessage* parserHead(SessionInputBuffer *buffer) throw( IOException, HttpException, ParseException);
+        HttpMessage* parseHead(SessionInputBuffer *buffer) throw( IOException, HttpException, ParseException);
 };
 #endif

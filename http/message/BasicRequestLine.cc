@@ -14,6 +14,11 @@ BasicRequestLine::BasicRequestLine(std::string m, std::string u, ProtocolVersion
     if (method.length() == 0) throw IllegalArgumentException("Method must not be null.");
     if (u.length() == 0) throw IllegalArgumentException("URI must not be null.");
     if (version == NULL) throw IllegalArgumentException("Protocol version must not be null.");
+    version->ref();
+}
+
+BasicRequestLine::~BasicRequestLine() {
+    if (protoversion != NULL) protoversion->unref();
 }
 
 std::string BasicRequestLine::toString() {

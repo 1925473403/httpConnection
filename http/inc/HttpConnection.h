@@ -1,7 +1,8 @@
 #include "HttpException.h"
+#include "RefCount.h"
 #ifndef HTTPCONNECTION_H
 #define HTTPCONNECTION_H
-class HttpConnection {
+class HttpConnection : public RefCount {
     public:
         virtual ~HttpConnection() { }
         virtual void close() throw (IOException) = 0;

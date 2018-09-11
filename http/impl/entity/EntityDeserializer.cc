@@ -15,10 +15,6 @@
 #ifndef ENTITYDESERIALIZER_H
 #include "EntityDeserializer.h"
 #endif
-class EntityDeserializer  {
-    private:
-        ContentLengthStrategy *lenStrategy;
-    public:
 EntityDeserializer::EntityDeserializer(ContentLengthStrategy *l) lenStrategy(l) {
     if (l == NULL) IllegalArgumentException("Content length strategy may not be null");
 }

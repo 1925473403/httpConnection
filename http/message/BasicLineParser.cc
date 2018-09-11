@@ -20,13 +20,11 @@
 #endif
 BasicLineParser BasicLineParser::DEFAULT;
 ProtocolVersion* BasicLineParser::createProtocolVersion(int major, int minor) {
-    return protocol->forVersion(major, minor);
+    ProtocolVersion* p =  protocol->forVersion(major, minor);
+    if (p) p->ref();
+    return p;
 }
 
-void BasicLineParser::unref() {
-    if (this == &(BasicLineParser::DEFAULT)) return;
-    delete this;
-}
 RequestLine* BasicLineParser::createRequestLine(std::string method, std::string uri, ProtocolVersion *ver) {
     return new BasicRequestLine(method, uri, ver);
 }
@@ -171,6 +169,7 @@ Header* BasicLineParser::parseHeader(std::string value, LineParser *parser) thro
     CharArrayBuffer buffer(value.length());
     buffer.append(value);
     Header *h = parser->parseHeader(buffer);
+    return h;
 }
 Header* BasicLineParser::parseHeader(CharArrayBuffer &buffer) throw (ParseException) {
     return new BufferedHeader(buffer);

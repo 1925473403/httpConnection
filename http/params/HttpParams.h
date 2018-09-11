@@ -1,8 +1,9 @@
 #include "HttpException.h"
 #include "Value.h"
+#include "RefCount.h"
 #ifndef HTTPPARAMS_H
 #define HTTPPARAMS_H
-class HttpParams {
+class HttpParams : public RefCount {
     public:
     virtual ~HttpParams() { }
     virtual ValueBase* getParameter(std::string name) = 0;

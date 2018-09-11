@@ -12,6 +12,10 @@
 BasicStatusLine::BasicStatusLine(ProtocolVersion *version, int sc, std::string r) : protoVersion(version), statusCode(sc), reasonPhrase(r) {
     if (version == NULL) throw IllegalArgumentException("Protocol version may not be null.");
     if (statusCode < 0) throw IllegalArgumentException("Status code may not be negative.");
+    protoVersion->ref();
+}
+BasicStatusLine::~BasicStatusLine() {
+    if (protoVersion != NULL) protoVersion->unref();
 }
 int BasicStatusLine::getStatusCode() { return statusCode; }
 ProtocolVersion *BasicStatusLine::getProtocolVersion() { return protoVersion; }

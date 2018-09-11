@@ -1,4 +1,5 @@
 #include "HttpException.h"
+#include "RefCount.h"
 #ifndef URL_H
 #define URL_H
 
@@ -17,7 +18,7 @@ class Parts {
 };
 class URLStreamHandler;
 class URLStreamHandlerFactory;
-class URL {
+class URL : public RefCount {
     private:
         std::string protocol;
         std::string host;

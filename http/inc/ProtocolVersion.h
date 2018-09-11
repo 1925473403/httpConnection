@@ -1,7 +1,8 @@
 #include "HttpException.h"
+#include "RefCount.h"
 #ifndef PROTOCOLVERSION_H
 #define PROTOCOLvERSION_H
-class ProtocolVersion {
+class ProtocolVersion : public RefCount {
     protected:
         std::string protocol;
         int maj;

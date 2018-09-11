@@ -1,7 +1,8 @@
 #include "HttpException.h"
+#include "RefCount.h"
 #ifndef PARSERCURSOR_H
 #define PARSERCURSOR_H
-class ParserCursor {
+class ParserCursor : public RefCount {
     int lowerBound;
     int upperBound;
     int pos;

@@ -32,6 +32,10 @@ BasicHttpRequest::BasicHttpRequest(std::string m, std::string u, ProtocolVersion
     requestline = new BasicRequestLine(m, u, ver);
 }
 
+BasicHttpRequest::~BasicHttpRequest() {
+    requestline->unref();
+}
+
 BasicHttpRequest::BasicHttpRequest(RequestLine *r) {
     if (requestline == NULL) throw IllegalArgumentException("Request line may not be null");
     requestline = r;

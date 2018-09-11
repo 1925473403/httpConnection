@@ -1,11 +1,13 @@
 #include "HttpException.h"
+#include "RefCount.h"
 #ifndef HEADERGROUP_H
 #define HEADERGROUP_H
-class HeaderGroup {
+class HeaderGroup : public RefCount {
     private:
     vector<Header *> headers;
     public:
         HeaderGroup();
+        ~HeaderGroup();
         void clear();
         void addHeader(Header *);
         void removeHeader(Header *);

@@ -1,8 +1,9 @@
 #include "HttpException.h"
 #include "ParserCursor.h"
+#include "RefCount.h"
 #ifndef HEADERVALUEPARSER_H
 #define HEADERVALUEPARSER_H
-class HeaderValueParser {
+class HeaderValueParser : public RefCount {
     public:
         virtual ~HeaderValueParser() { }
         virtual void parseElements(CharArrayBuffer&, ParserCursor *, vector<HeaderElement *> &) throw (ParseException) =0;

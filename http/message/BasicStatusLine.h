@@ -8,6 +8,7 @@ class BasicStatusLine : public StatusLine {
         std::string reasonPhrase;
     public:
         BasicStatusLine(ProtocolVersion *version, int sc, std::string r);
+        virtual ~BasicStatusLine();
         int getStatusCode();
         ProtocolVersion *getProtocolVersion();
         std::string getReasonPhrase();

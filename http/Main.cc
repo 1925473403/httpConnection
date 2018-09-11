@@ -82,6 +82,7 @@ using namespace std;
 
 int main() {
     HttpVersion *h = HttpVersion::HTTP_1_0;
+    h->ref();
     std::cout << h->toString() << std::endl;
     h->unref();
     std::cout << typeid(h).name() << ": " << h->toString() << std::endl;

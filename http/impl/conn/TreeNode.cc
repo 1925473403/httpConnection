@@ -95,23 +95,54 @@ struct ExpressionNode {
         else ss << value;
         return ss.str();
     }
+
+    std::string toString(bool f) {
+        stringstream ss;
+        if (op != nullptr) {
+            if (op == &DEFAULTEQUALS) {
+                if ((oper[0] != nullptr) && (oper[1] != nullptr)) 
+                    ss <<  oper[0]->get() << " " << DEFAULTNOTEQUALS.toString() << " " << oper[1]->get();
+                else ss << value;
+            } else if (op == &DEFAULTNOTEQUALS) {
+                if ((oper[0] != nullptr) && (oper[1] != nullptr)) 
+                    ss <<  oper[0]->get() << " " << DEFAULTNOTEQUALS.toString() << " " << oper[1]->get();
+                else ss << value;
+            } else if (op == &DEFAULTGREATERTHANEQUALS) {
+                if ((oper[0] != nullptr) && (oper[1] != nullptr)) 
+                    ss <<  oper[0]->get() << " " << DEFAULTLESSTHAN.toString() << " " << oper[1]->get();
+                else ss << value;
+            } else if (op == &DEFAULTLESSTHANEQUALS) {
+                if ((oper[0] != nullptr) && (oper[1] != nullptr)) 
+                    ss <<  oper[0]->get() << " " << DEFAULTGREATERTHAN.toString() << " " << oper[1]->get();
+                else ss << value;
+            } else if (op == &DEFAULTLESSTHAN) {
+                if ((oper[0] != nullptr) && (oper[1] != nullptr)) 
+                    ss <<  oper[0]->get() << " " << DEFAULTGREATERTHANEQUALS.toString() << " " << oper[1]->get();
+                else ss << value;
+            } else if (op == &DEFAULTGREATERTHAN) {
+                if ((oper[0] != nullptr) && (oper[1] != nullptr)) 
+                    ss <<  oper[0]->get() << " " << DEFAULTLESSTHANEQUALS.toString() << " " << oper[1]->get();
+                else ss << value;
+            }
+        } else ss << value;
+        return ss.str();
+    }
 };
 
 
 struct TreeNode {
     TreeNode *left;
     TreeNode *right;
-    TreeNode *parent;
     ExpressionNode *val;
     void indent(int ind) {
         for (int i = 0; i < ind; i++) std::cout << " " ;
     }
     public:
-    TreeNode() : left(nullptr), right(nullptr), parent(nullptr), val(nullptr) { }
+    TreeNode() : left(nullptr), right(nullptr), val(nullptr) { }
     TreeNode(ExpressionNode *e) : TreeNode() { val = e; }
-    void preOrder(int ind=0) {
+    void dumpTree(int ind=0) {
         if (left == nullptr && right == nullptr) {
-            if (parent!=nullptr && (val != nullptr)) std::cout << ": " << val->toString() << std::endl;
+            if (val != nullptr) std::cout << ": " << val->toString() << std::endl;
             return;
         } else {
             std::cout << std::endl;
@@ -119,27 +150,21 @@ struct TreeNode {
         indent(ind);
         if (val != nullptr) std::cout << val->toString() ;
         if (left != nullptr) {
-            left->preOrder(ind + 2);
+            left->dumpTree(ind + 2);
         }
         if (right != nullptr) {
             indent(ind);
-            if (right->parent != nullptr) std::cout << right->parent->toString() ;
-            right->preOrder(ind + 2);
+            if (val != nullptr) std::cout << val->toString(false) ;
+            right->dumpTree(ind + 2);
         }
-    }
-    std::string toString() {
-        if (val != nullptr) return val->toString() ;
     }
     ~TreeNode() {
         if (left != nullptr) {
-            if ((left->parent != nullptr) && (left->parent == this)) left->parent = nullptr;
             delete left;
         }
         if (right != nullptr) {
-            if ((right->parent != nullptr) && (right->parent == this)) right->parent = nullptr;
             delete right;
         }
-        if (parent != nullptr) delete parent;    
         if (val != nullptr) delete val;
     }
 };
@@ -149,37 +174,27 @@ int main () {
     TreeNode root;
     root.val = new ExpressionNode(new Operand(age), new Operand(30), &DEFAULTLESSTHAN);
     root.left = new TreeNode();
-    root.left->parent = &root;
     root.left->val = new ExpressionNode(new Operand(eyeColor), new Operand(4), &DEFAULTEQUALS);
     root.left->left = new TreeNode();
-    root.left->left->parent = root.left;
     root.left->left->val = new ExpressionNode("YES");
     root.left->right = new TreeNode();
-    root.left->right->parent = new TreeNode(new ExpressionNode(new Operand(eyeColor), new Operand(4), &DEFAULTNOTEQUALS));
     root.left->right->val = new ExpressionNode(new Operand(height), new Operand(100), &DEFAULTLESSTHAN);
     root.left->right->left = new TreeNode();
-    root.left->right->left->parent = root.left->right;
     root.left->right->left->val = new ExpressionNode("YES");
     root.left->right->right = new TreeNode();
-    root.left->right->right->parent = new TreeNode(new ExpressionNode(new Operand(height), new Operand(100), &DEFAULTGREATERTHANEQUALS));
     root.left->right->right->val = new ExpressionNode("NO");
 
     root.right = new TreeNode();
-    root.right->parent = new TreeNode(new ExpressionNode(new Operand(age), new Operand(30), &DEFAULTGREATERTHANEQUALS));
     root.right->val = new ExpressionNode(new Operand(height), new Operand(160), &DEFAULTGREATERTHAN);
     root.right->left = new TreeNode();
-    root.right->left->parent = root.right;
     root.right->left->val = new ExpressionNode("NO");
     root.right->right = new TreeNode();
-    root.right->right->parent = new TreeNode(new ExpressionNode(new Operand(height), new Operand(160), &DEFAULTLESSTHANEQUALS));
     root.right->right->val = new ExpressionNode(new Operand(eyeColor), new Operand(3), &DEFAULTEQUALS);
     root.right->right->left = new TreeNode();
-    root.right->right->left->parent = root.right->right;
     root.right->right->left->val = new ExpressionNode("YES");
     root.right->right->right = new TreeNode();
-    root.right->right->right->parent = new TreeNode(new ExpressionNode(new Operand(eyeColor), new Operand(3), &DEFAULTNOTEQUALS));
     root.right->right->right->val = new ExpressionNode("NO");
 
-    root.preOrder();
+    root.dumpTree();
     return 0;
 }

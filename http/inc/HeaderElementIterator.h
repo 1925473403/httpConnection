@@ -1,8 +1,9 @@
 #include "HttpException.h"
 #include "HeaderElement.h"
+#include "RefCount.h"
 #ifndef HEADERELEMENTITERARTOR_H
 #define HEADERELEMENTITERARTOR_H
-class HeaderElementIterator {
+class HeaderElementIterator : public RefCount {
     public:
     virtual ~HeaderElementIterator() { }
     virtual bool hasNext() = 0;

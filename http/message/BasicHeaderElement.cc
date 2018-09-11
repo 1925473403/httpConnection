@@ -5,30 +5,51 @@
 #endif
 BasicHeaderElement::BasicHeaderElement(std::string n, std::string v, std::vector<NameValuePair *> &p) : name(n), value(v){
     if (name.length() == 0) throw IllegalArgumentException("Name may not be null");
-    for (int i = 0; i < p.size(); i++) parameters.push_back(p[i]);
+    for (NameValuePair *nv: p) {
+        if (nv != NULL) {
+            nv->ref();
+            parameters.push_back(nv);
+        }
+    }
 }
 
 BasicHeaderElement::BasicHeaderElement(std::string n, std::string v):name(n), value(v) {
 }
 
 BasicHeaderElement::~BasicHeaderElement() {
+    for (NameValuePair *nvp : parameters) {
+        if (nvp != NULL) nvp->unref();
+    }
     parameters.clear();
 }
 
 void BasicHeaderElement::getParameters(vector<NameValuePair *> &res) {
-    for (int i = 0; i < parameters.size(); i++) res.push_back(parameters[i]);
+    for (int i = 0; i < parameters.size(); i++) {
+        if (parameters[i] != NULL) {
+            parameters[i]->ref();
+            res.push_back(parameters[i]);
+        }
+    }
 }
 
 NameValuePair* BasicHeaderElement::getParameter(int index) {
-    if (index < parameters.size() && index > 0) return parameters[index];
-    return 0;
+    NameValuePair *nv = NULL;
+    if (index < parameters.size() && index > 0) {
+        nv = parameters[index];
+        nv->ref();
+    }
+    return nv;
 }
 
 NameValuePair* BasicHeaderElement::getParameterByName(std::string name) {
     if (name.length() == 0) throw IllegalArgumentException("Name may not be null");
     NameValuePair *found = 0;
     for (int i = 0; i < parameters.size(); i++) {
-        if (parameters[i]->getName() == name) return parameters[i];
+        if (parameters[i]->getName() == name) {
+            found = parameters[i];
+            found->ref();
+            break;
+        }
     }
     return found;
 }

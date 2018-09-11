@@ -20,11 +20,6 @@ int BasicLineFormatter::estimateProtocolVersionLen(ProtocolVersion* version){
     return version->getProtocol().length() + 4; // room for "HTTP/1.1"
 }
 
-void BasicLineFormatter::unref() {
-    if (this == &(BasicLineFormatter::DEFAULT)) return;
-    delete this;
-}
-
 void BasicLineFormatter::doFormatRequestLine(CharArrayBuffer& buffer, RequestLine* reqline){
     std::string method = reqline->getMethod();
     std::string uri = reqline->getUri();
