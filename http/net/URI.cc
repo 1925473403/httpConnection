@@ -251,8 +251,8 @@ std::string URI::toASCIIString() {
     defineString();
     return _string;
 }
-int URI::toLower(char c) { tolower(c); }
-int URI::toUpper(char c) { toupper(c); }
+int URI::toLower(char c) { return tolower(c); }
+int URI::toUpper(char c) { return toupper(c); }
 bool URI::equal(std::string s, std::string t) {
     if (s == t) return true;
     if (s.length() > 0 && t.length() > 0) {
@@ -282,7 +282,7 @@ bool URI::equalIgnoringCase(std::string s, std::string t) {
     if (s == t) return true;
     if (s.length() > 0 && t.length() > 0) {
         int n = s.length();
-        if (t.length() != n) return false;
+        if ((int)t.length() != n) return false;
         for (int i = 0; i < n; i++) {
             if (URI::toLower(s[i]) != URI::toLower(t[i])) return false;
         }
@@ -343,7 +343,7 @@ void URI::appendAuthority(stringstream &sb, std::string auth, std::string _userI
     } else if (auth.length() > 0) {
         sb << "//";
         if (URI::starts_with(auth, "[")) {
-            int end = auth.find("]");
+            size_t end = auth.find("]");
             std::string doquote = auth, dontquote = "";
             if (end != std::string::npos && auth.find(":") != std::string::npos) {
                 if (end == auth.length()) {
@@ -364,7 +364,7 @@ void URI::appendAuthority(stringstream &sb, std::string auth, std::string _userI
 void URI::appendSchemeSpecificPart(stringstream &sb, std::string _opaquePart, std::string auth, std::string _userInfo, std::string _host, int _port, std::string path, std::string _query) {
     if (_opaquePart.length() > 0) {
         if (URI::starts_with(_opaquePart, "//[")) {
-            int end =  _opaquePart.find("]");
+            size_t end =  _opaquePart.find("]");
             if (end != std::string::npos && _opaquePart.find(":") != std::string::npos) {
                 std::string doquote, dontquote;
                 if (end == _opaquePart.length()) {
@@ -672,7 +672,7 @@ int URI::needsNormalization(std::string path) {
 bool URI::starts_with(std::string requestUri, std::string pattern) {
     int to = 0;
     int po = 0;
-    int pc = pattern.length();
+    int pc = (int)pattern.length();
     if (requestUri.length() - pc < 0) return false;
     while (--pc >= 0) {
         if (requestUri[to++] != pattern[po]) return false;
@@ -681,11 +681,11 @@ bool URI::starts_with(std::string requestUri, std::string pattern) {
 }
 
 bool URI::ends_with(std::string requestUri, std::string pattern) {
-    int toffset = requestUri.length() - pattern.length();
+    int toffset = (int)requestUri.length() - (int)pattern.length();
     int to = toffset;
     int po = 0;
-    int pc = pattern.length();
-    if ((toffset < 0) || (toffset > requestUri.length() - pc)) return false;
+    int pc = (int)pattern.length();
+    if ((toffset < 0) || (toffset > (int)requestUri.length() - pc)) return false;
     while (--pc >= 0) {
         if (requestUri[to++] != pattern[po++]) return false;
     }
@@ -715,7 +715,7 @@ long URI::lowMask(int first, int last) {
 }
 
 long URI::lowMask(std::string chars) {
-    int n = chars.length();
+    int n = (int)chars.length();
     long m = 0;
     for (int i = 0; i < n; i++) {
         char c = chars[i];
@@ -725,7 +725,7 @@ long URI::lowMask(std::string chars) {
 }
 
 long URI::highMask(std::string chars) {
-    int n = chars.length();
+    int n = (int)chars.length();
     long m = 0;
     for (int i = 0; i < n; i++) {
         char c = chars[i];
@@ -766,10 +766,10 @@ void URI::appendEncoded(stringstream &ss, char c) {
 }
 
 std::string URI::quote(std::string s, long lMask, long hMask) {
-    int n = s.length();
+    int n = (int)s.length();
     stringstream ss ;
     bool allowNonASCII = ((lMask & L_ESCAPED) != 0);
-    for (int i = 0; i < s.length(); i++) {
+    for (int i = 0; i < (int)s.length(); i++) {
         char c = s[i];
         if (c < 0x0080) {
             if (!URI::match(c, lMask, hMask)) {
@@ -788,7 +788,7 @@ std::string URI::quote(std::string s, long lMask, long hMask) {
 }
 
 std::string URI::encode(std::string s) {
-    int n = s.length();
+    int n = (int)s.length();
     if (n == 0) return s;
     for (int i = 0;;) {
         if (s[i] >= 0x0080) break;
@@ -816,7 +816,7 @@ byte URI::decode(char c1, char c2) {
 
 std::string URI::decode(std::string s) {
     if (s.length() == 0) return s;
-    int n = s.length();
+    int n = (int)s.length();
     if (s.find('%') == std::string::npos) return s;
 
 }
@@ -861,7 +861,7 @@ bool URI::Parser::at(int start, int end, char c) {
 
 bool URI::Parser::at(int start, int end, std::string s) {
     int p = start;
-    int sn = s.length();
+    int sn = (int)s.length();
     if (sn > end - p) return false;
     int i = 0;
     while (i < sn) {
@@ -929,7 +929,7 @@ void URI::Parser::checkChar(int p, long lMask, long hMask, std::string what) thr
 void URI::Parser::parse(bool rsa) throw (URISyntaxException) {
     requireServerAuthority = rsa;
     int ssp; 
-    int n = input.length();
+    int n = (int)input.length();
     int p = scan(0, n, "/?#", ":");
     if ((p >= 0) && at(p, n, ':')) {
         if (p == 0) failExpecting("scheme name", 0);

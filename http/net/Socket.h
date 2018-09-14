@@ -30,9 +30,9 @@ class Socket:public RefCount {
         Socket();
         ~Socket();
         Socket(SocketImpl* impl) ;
-        Socket(std::string &host, int port) ;
-        Socket(const char *host, int port)  ;
-        Socket(InetAddress *addr, int port) ;
+        Socket(std::string &host, int port);
+        Socket(const char *host, int port);
+        Socket(InetAddress *addr, int port);
         Socket(std::string &host, int port, InetAddress *localAddr, int localPort); 
         Socket(const char *host, int port, InetAddress *localAddr, int localPort) ;
         Socket(std::string &host, int port, bool stream) ;

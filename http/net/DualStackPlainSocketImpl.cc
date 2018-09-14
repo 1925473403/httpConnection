@@ -5,9 +5,9 @@
 #include <netdb.h>
 #include <pthread.h>
 #include "HttpException.h"
+#include "InetSocketAddress.h"
 #include "SocketImpl.h"
 #include "NameResolver.h"
-#include "InetSocketAddress.h"
 #include "InputStream.h"
 #include "OutputStream.h"
 #include "AbstractPlainSocketImpl.h"

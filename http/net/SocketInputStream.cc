@@ -5,11 +5,11 @@
 #include <netdb.h>
 #include <pthread.h>
 #include "HttpException.h"
+#include "InetSocketAddress.h"
 #include "SocketImpl.h"
 #include "InputStream.h"
 #include "OutputStream.h"
 #include "NameResolver.h"
-#include "InetSocketAddress.h"
 #include "SocketImpl.h"
 #include "AbstractPlainSocketImpl.h"
 #ifndef SOCKETINPUTSTREAM_H

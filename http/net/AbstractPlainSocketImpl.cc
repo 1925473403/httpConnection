@@ -4,9 +4,9 @@
 #include <sys/types.h>
 #include <netdb.h>
 #include "HttpException.h"
+#include "InetSocketAddress.h"
 #include "SocketImpl.h"
 #include "NameResolver.h"
-#include "InetSocketAddress.h"
 #include "InputStream.h"
 #include "OutputStream.h"
 #include "SocketInputStream.h"
