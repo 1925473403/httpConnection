@@ -25,7 +25,7 @@ Socket::Socket() {
     setImpl();
 }
 Socket::~Socket() { impl->unref(); }
-Socket::Socket(SocketImpl *i)  {
+Socket::Socket(SocketImpl *i):shutOut(false), shutIn(false)  {
     impl = i;
     if (impl != NULL) 
         impl->setSocket(this);
@@ -53,7 +53,7 @@ Socket::Socket(InetAddress* addr, int port, bool stream) :
     Socket(((addr != NULL)? new InetSocketAddress(addr, port):0), NULL, stream) {
 }
 
-Socket::Socket(SocketAddress *addr, SocketAddress *local, bool s) {
+Socket::Socket(SocketAddress *addr, SocketAddress *local, bool s):shutOut(false), shutIn(false), bound(false), created(false), connected(false), closed(false), oldImpl(false) {
     setImpl();
     if (addr == NULL) throw NullPointerException();
     try {

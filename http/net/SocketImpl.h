@@ -38,7 +38,7 @@ class SocketImpl : virtual public RefCount {
         virtual ~SocketImpl() { }
         virtual void shutdownInput() = 0;
         virtual void shutdownOutput() = 0;
-        virtual int getFileDescriptor() = 0;
+        virtual int getFileDescriptor() const = 0;
         virtual void setFileDescriptor(int) = 0;
         virtual int getPort() { return port; }
         virtual InetAddress *getInetAddress() { return address; }

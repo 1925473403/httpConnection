@@ -118,16 +118,20 @@ InetAddress& InetAddress::operator=(const InetAddress &rhs) {
 InetSocketAddress::InetSocketAddress(std::string host, int p) : InetSocketAddress(host.c_str(), port) {
 }
 InetSocketAddress::InetSocketAddress(InetAddress *addr, int p) {
-    if (addr == NULL) throw IllegalArgumentException("InetAddress cannot be NULL");
     bzero(&si_addr, sizeof(si_addr));
     si_addr.sin_family = AF_INET;
     si_addr.sin_port = htons(port);
-    if (addr->gethostname() == "") {
+    if (addr == NULL) {
+        si_addr.sin_addr.s_addr = INADDR_ANY;
+        hostname.assign("0.0.0.0");
+    } else if (addr->gethostname() == "") {
+        hostname.assign(addr->getipaddr().c_str());
         si_addr.sin_addr.s_addr = inet_addr(addr->getipaddr().c_str());
     } else {
         vector<std::string> res;
         NameResolver::resolve(addr->gethostname().c_str(), res);
         addr->setipaddr(res[0]);
+        hostname.assign(res[0].c_str());
         si_addr.sin_addr.s_addr = inet_addr(res[0].c_str());
     }
 }

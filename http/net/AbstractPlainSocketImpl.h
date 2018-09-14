@@ -50,7 +50,7 @@ class AbstractPlainSocketImpl : public SocketImpl {
         AbstractPlainSocketImpl();
         void shutdownInput();
         void shutdownOutput();
-        int getFileDescriptor();
+        int getFileDescriptor() const { return fd; }
         void setOption(int opt, int val);
         int getOption(int opt);
         void sendUrgentData (int data) throw (IOException);

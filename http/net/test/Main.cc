@@ -20,6 +20,15 @@
 #include "ServerSocket.h"
 
 int main() {
-    Socket s("10.1.40.60", 65500);
+    try {
+        ServerSocket s(65500);
+        Socket *clientSocket = s.accept();
+        if (clientSocket) {
+            OutputStream *o = clientSocket->getOutputStream();
+            InputStream *i = clientSocket->getInputStream();
+        }
+    } catch (const IOException &e) {
+        std::cerr << e.what() << std::endl;
+    }
     return 0;
 }
