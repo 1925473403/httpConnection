@@ -61,7 +61,7 @@ void ByteArrayBuffer::append(char ch) {
 }
 void ByteArrayBuffer::append(int l) {
     char pStr[128] = { 0 };
-    snprintf(pStr, 128, "%ld", l);
+    snprintf(pStr, 128, "%d", l);
     int _strlen = strlen(pStr);
     int newlen = len + _strlen;
     if (newlen > _capacity) expand(newlen);

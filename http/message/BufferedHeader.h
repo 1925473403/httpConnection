@@ -14,6 +14,6 @@ class BufferedHeader : public FormattedHeader {
     void getElements(vector<HeaderElement *> &) throw (ParseException);
     int getValuePos() { return valuePos; }
     CharArrayBuffer getBuffer() { return buffer; }
-    std::string toString() { buffer.toString(); }
+    std::string toString() { return buffer.toString(); }
 };
 #endif

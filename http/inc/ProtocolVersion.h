@@ -8,7 +8,8 @@ class ProtocolVersion : public RefCount {
         int maj;
         int min;
     public:
-        ProtocolVersion(std::string p, int ma, int mi) ;
+        ProtocolVersion(std::string &p, int ma, int mi) ;
+        ProtocolVersion(const char *, int, int);
         virtual ~ProtocolVersion() { }
         std::string getProtocol() const ;
         int getMajor() const { return maj; }

@@ -7,7 +7,7 @@ class BasicNameValuePair : public NameValuePair {
     std::string name;
     std::string value;
     BasicNameValuePair(const BasicNameValuePair& rhs){ }
-    BasicNameValuePair& operator= (const BasicNameValuePair& rhs) { }
+    BasicNameValuePair& operator= (const BasicNameValuePair& rhs) ;
     public:
     ~BasicNameValuePair() { }
     BasicNameValuePair(std::string, std::string);

@@ -4,7 +4,7 @@ using namespace std;
 #include "StringUtils.h"
 
 int compareIgnoreCase(std::string &c1, std::string &c2) {
-    int n1 = c1.length(), n2 = c2.length();
+    int n1 = (int)c1.length(), n2 = (int)c2.length();
     int min = std::min<int> (n1, n2);
     for (int i = 0; i < min; i++) {
         char ch1 = c1[i], ch2 = c2[i];
@@ -22,7 +22,7 @@ int compareIgnoreCase(std::string &c1, std::string &c2) {
 }
 
 std::string& trim(std::string &s) {
-    int i = 0, j = s.length() - 1, k;
+    int i = 0, j = (int)s.length() - 1, k;
     while (s[i] == ' ') i++;
     while (s[j] == ' ') j--;
     for (k = 0; i <= j; k++) s[k] = s[i++];
@@ -46,11 +46,11 @@ bool starts_with(std::string requestUri, std::string pattern) {
 }
 
 bool ends_with(std::string requestUri, std::string pattern) {
-    int toffset = requestUri.length() - pattern.length();
+    int toffset = (int)requestUri.length() - (int)pattern.length();
     int to = toffset;
     int po = 0;
-    int pc = pattern.length();
-    if ((toffset < 0) || (toffset > requestUri.length() - pc)) return false;
+    int pc = (int)pattern.length();
+    if ((toffset < 0) || (toffset > (int)requestUri.length() - pc)) return false;
     while (--pc >= 0) {
         if (requestUri[to++] != pattern[po++]) return false;
     }
@@ -58,10 +58,10 @@ bool ends_with(std::string requestUri, std::string pattern) {
 }
 
 void toLowerCase(std::string &s) {
-    for (int i = 0; i < s.length(); i++)
+    for (int i = 0; i < (int)s.length(); i++)
         s[i] = tolower(s[i]);
 }
 
 void toUpperCase(std::string &s) {
-    for (int i = 0; i < s.length(); i++) s[i] = toupper(s[i]);
+    for (int i = 0; i < (int)s.length(); i++) s[i] = toupper(s[i]);
 }

@@ -38,10 +38,12 @@ class Socket:public RefCount {
         Socket(std::string &host, int port, bool stream) ;
         Socket(const char *host, int port, bool stream) ;
         Socket(InetAddress *addr, int port, bool stream) ;
+        Socket(InetAddress *addr, int, InetAddress *, int);
+        Socket(SocketAddress *addr, SocketAddress* localAddr, bool);
         void setImpl();
         SocketImpl* getImpl();
-        void createImpl();
-        bool postAccept();
+        void createImpl(bool);
+        void postAccept();
         InetAddress* getInetAddress();
         InetAddress* getLocalAddress();
         int getPort() ;
@@ -49,6 +51,9 @@ class Socket:public RefCount {
         void setConnected();
         void setBound();
         void setCreated();
+        void connect(SocketAddress *, int);
+        void connect(SocketAddress *);
+        void bind(SocketAddress *);
         SocketAddress* getRemoteSocketAddress();
         SocketAddress* getLocalSocketAddress();
         InputStream* getInputStream() throw (IOException);

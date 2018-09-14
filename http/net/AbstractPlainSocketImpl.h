@@ -36,6 +36,7 @@ class AbstractPlainSocketImpl : public SocketImpl {
         void connect(std::string &host, int port) throw (IOException);
         void connect(const char* host, int port) throw (IOException);
         void connect(InetAddress* addr, int p) throw (IOException) ;
+        void connect(SocketAddress *, int) throw (IOException);
         void connectToAddress(InetAddress* addr, int p, int t) throw (IOException);
         void bind(InetAddress *host, int port) throw (IOException);
         void listen(int baclog) throw (IOException);
@@ -50,9 +51,6 @@ class AbstractPlainSocketImpl : public SocketImpl {
         void shutdownInput();
         void shutdownOutput();
         int getFileDescriptor();
-        int getPort();
-        InetAddress* getInetAddress();
-        int getLocalPort();
         void setOption(int opt, int val);
         int getOption(int opt);
         void sendUrgentData (int data) throw (IOException);

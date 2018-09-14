@@ -20,5 +20,6 @@
 #include "ServerSocket.h"
 
 int main() {
+    Socket s("10.1.40.60", 65500);
     return 0;
 }

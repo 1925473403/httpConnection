@@ -18,6 +18,10 @@
 #include "Socket.h"
 #endif
 Socket::Socket() { 
+    pthread_mutexattr_t attr;
+    pthread_mutexattr_init(&attr);
+    pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+    pthread_mutex_init(&closeLock, &attr);
     setImpl();
 }
 Socket::~Socket() { impl->unref(); }
@@ -26,38 +30,56 @@ Socket::Socket(SocketImpl *i)  {
     if (impl != NULL) 
         impl->setSocket(this);
 }
+
+Socket::Socket(const char *host, int p) : 
+    Socket(((host == NULL)?new InetSocketAddress("0.0.0.0", p):new InetSocketAddress(host, p)), NULL, true) {
+    }
 Socket::Socket(std::string &host, int port) :
-    Socket(((host.length() != 0) ? new InetSocketAddress(host, port) : new InetSocketAddress("localhost", port)), NULL, true)  {
+    Socket(((host.length() != 0) ? new InetSocketAddress(host, port) : new InetSocketAddress("0.0.0.0", port)), NULL, true)  {
 }
 Socket::Socket(InetAddress *addr, int port) :
     Socket(((addr != NULL)? new InetSocketAddress(addr, port) : 0), NULL, true)  {
 }
-Socket::Socket(std::string host, int port, InetAddress *localAddr, int localPort) :
-    Socket(((host.length() != 0)?new InetSocketAddress(host, port) : new InetSocketAddress("localhost", port)), new InetSocketAddress(localAddr, localPort), true)  {
+Socket::Socket(std::string &host, int port, InetAddress *localAddr, int localPort) :
+    Socket(((host.length() != 0)?new InetSocketAddress(host, port) : new InetSocketAddress("0.0.0.0", port)), new InetSocketAddress(localAddr, localPort), true)  {
 }
 Socket::Socket(InetAddress* addr, int port, InetAddress *localAddr, int localPort) :
     Socket(((addr != NULL)? new InetSocketAddress(addr, port) : 0), new InetSocketAddress(localAddr, localPort), true) {
 }
-Socket::Socket(std::string host, int port, bool stream) :
-    Socket(((host.length() != 0)?new InetSocketAddress(host, port):new InetSocketAddress("localhost", port)), NULL, stream) {
+Socket::Socket(std::string &host, int port, bool stream) :
+    Socket(((host.length() != 0)?new InetSocketAddress(host, port):new InetSocketAddress("0.0.0.0", port)), NULL, stream) {
 }
 Socket::Socket(InetAddress* addr, int port, bool stream) :
     Socket(((addr != NULL)? new InetSocketAddress(addr, port):0), NULL, stream) {
 }
-Socket::Socket(InetSocketAddress *addr, InetSockAddr *localaddr, bool stream) {
+
+Socket::Socket(SocketAddress *addr, SocketAddress *local, bool s) {
     setImpl();
     if (addr == NULL) throw NullPointerException();
     try {
-        createImpl(stream);
-        if (localaddr != NULL) bind(localaddr);
+        createImpl(s);
+        if (local != NULL) bind(local);
         connect(addr);
-    } catch (const IOException &e) {
+    } catch (const IOException &ex) {
         try {
             close();
-        } catch (const IOException &ce) {
+        } catch (const IOException &ex) {
         }
-        throw e;
+        throw ex;
     }
+}
+
+void Socket::bind(SocketAddress *bindpoint) {
+    if (isClosed()) throw SocketException("Socket is closed");
+    if (isBound()) throw SocketException("Already bound");
+    if (bindpoint == NULL) IllegalArgumentException("Unsupported address type");
+    InetSocketAddress *epoint = dynamic_cast<InetSocketAddress *>(bindpoint);
+    if (epoint != NULL && epoint->isUnresolved()) throw SocketException("Unresolved address");
+    if (epoint == NULL) epoint = new InetSocketAddress("0.0.0.0", 0);
+    InetAddress *addr = epoint->getAddress();
+    int p = epoint->getPort();
+    getImpl()->bind(addr, p);
+    bound = true;
 }
 void Socket::createImpl(bool stream) {
     if (impl == NULL) setImpl();
@@ -69,12 +91,6 @@ void Socket::createImpl(bool stream) {
     }
 }
 
-void Socket::postAccept() {
-    connected = true;
-    created = true;
-    bound = true;
-}
-
 void Socket::setImpl() {
     impl = new DualStackPlainSocketImpl(true);
     if (impl != NULL) impl->setSocket(this);
@@ -83,31 +99,22 @@ SocketImpl *Socket::getImpl() {
     if (!created) createImpl(true);
     return impl;
 }
-void Socket::connect(InetSocketAddress *endpoints) {
+void Socket::connect(SocketAddress *endpoints) {
     connect(endpoints, 0);
 }
-void Socket::connect(InetSocketAddress *endpoint, int timeout) {
+void Socket::connect(SocketAddress *endpoint, int timeout) {
     if (endpoint == NULL) throw IllegalArgumentException("connect: The address can't be null");
     if (timeout < 0) IllegalArgumentException("connect: timeout can't be negative");
     if (isClosed()) throw SocketException("Socket is closed");
     if (isConnected()) throw SocketException("already connected");
     InetAddress *addr = endpoint->getAddress();
-    int port = endpoint->getPort();
+    int p = endpoint->getPort();
     if (!created) createImpl(true);
-    if (!oldimpl) impl->connect(endpoint, timeout);
+    if (!oldImpl) impl->connect(endpoint, timeout);
     else if (timeout == 0) {
-        impl->connect(addr, port);
+        impl->connect(addr, p);
     } else throw UnsupportedOperationException("SocketImpl.connect(addr, timeout)");
     connected = true;
-    bound = true;
-}
-
-void Socket::bind(InetSocketAddress *bindpoint) {
-    if (isClosed()) throw SocketException("Socket is closed");
-    if (!oldImpl && isBound()) throw SocketException("Already bound");
-    if (bindpoint == NULL) bindpoint = new InetSocketAddress(0);
-    InetAddress *addr = bindpoint->getAddress();
-    getImpl()->bind(addr, port);
     bound = true;
 }
 
@@ -131,8 +138,15 @@ InetAddress* Socket:: getLocalAddress() {
     if (!isBound()) return InetAddress::anyLocalAddress();
     InetAddress* in = NULL;
     try {
-        in = getImpl()->getOption(SocketOptions::SO_BINDADDR);
-        if (in->isAnyLocalAddress()) in = InetAddress::anyLocalAddress();
+        int nativefd = getImpl()->getFileDescriptor();
+        if (nativefd > 0) {
+            struct sockaddr_in localAddress;
+            socklen_t addressLength = sizeof(localAddress);
+            getsockname(nativefd, (struct sockaddr*)&localAddress, &addressLength);
+            char hostnamestr[128];
+            sprintf(hostnamestr, "%s", inet_ntoa( localAddress.sin_addr));
+            in = new InetAddress(hostnamestr);
+        } else throw IOException();
     } catch (...) {
         in = InetAddress::anyLocalAddress();
     }
@@ -152,11 +166,11 @@ int Socket::getLocalPort() {
     } catch (const SocketException &e) { }
     return -1;
 }
-InetSocketAddress *Socket::getRemoteSocketAddress() {
+SocketAddress *Socket::getRemoteSocketAddress() {
     if (!isConnected()) return NULL;
     return new InetSocketAddress(getInetAddress(), getPort());
 }
-InetSocketAddress *Socket::getLocalSocketAddress() {
+SocketAddress *Socket::getLocalSocketAddress() {
     if (!isBound()) return NULL;
      return new InetSocketAddress(getLocalAddress(), getLocalPort());
 }
@@ -181,7 +195,7 @@ OutputStream* Socket::getOutputStream() throw (IOException){
 
 bool Socket::getReuseAddress() throw (SocketException){
     if (isClosed()) throw SocketException("Socket is closed");
-
+    return getImpl()->getOption(SO_REUSEADDR);
 }
 
 void Socket::close() throw (IOException) {

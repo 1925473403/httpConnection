@@ -44,6 +44,10 @@ InetAddress::InetAddress(const char *str) {
     }
 }
 
+InetAddress* InetAddress::anyLocalAddress() {
+    return new InetAddress("0.0.0.0");
+}
+
 InetAddress* InetAddress::getLocalHost() {
     char name[1024];
     memset(name, 0, 1024);

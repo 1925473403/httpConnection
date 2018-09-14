@@ -769,7 +769,7 @@ std::string URI::quote(std::string s, long lMask, long hMask) {
     int n = (int)s.length();
     stringstream ss ;
     bool allowNonASCII = ((lMask & L_ESCAPED) != 0);
-    for (int i = 0; i < (int)s.length(); i++) {
+    for (int i = 0; i < n; i++) {
         char c = s[i];
         if (c < 0x0080) {
             if (!URI::match(c, lMask, hMask)) {
@@ -816,9 +816,8 @@ byte URI::decode(char c1, char c2) {
 
 std::string URI::decode(std::string s) {
     if (s.length() == 0) return s;
-    int n = (int)s.length();
     if (s.find('%') == std::string::npos) return s;
-
+    return s;
 }
 
 URI::Parser::Parser(URI *u, std::string s) : uri(u) {

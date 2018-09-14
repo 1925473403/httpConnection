@@ -1,7 +1,12 @@
 #include "ProtocolVersion.h"
 #include "CharArrayBuffer.h"
-ProtocolVersion::ProtocolVersion(std::string p, int ma, int mi):protocol(p), maj(ma), min(mi) {
+ProtocolVersion::ProtocolVersion(std::string &p, int ma, int mi):protocol(p), maj(ma), min(mi) {
     if (p.length() == 0) throw IllegalArgumentException("Protocol name must not be null.");
+    if (maj < 0) throw IllegalArgumentException("Protocol maj version number must not be negative.");
+    if (min < 0) throw IllegalArgumentException("Protocol min version number may not be negative");
+}
+ProtocolVersion::ProtocolVersion(const char *p, int ma, int mi):protocol(p), maj(ma), min(mi) {
+    if ((p == NULL) || (strlen(p) == 0))  throw IllegalArgumentException("Protocol name must not be null.");
     if (maj < 0) throw IllegalArgumentException("Protocol maj version number must not be negative.");
     if (min < 0) throw IllegalArgumentException("Protocol min version number may not be negative");
 }

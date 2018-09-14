@@ -62,6 +62,25 @@ void AbstractPlainSocketImpl::connect(InetAddress* addr, int p) throw (IOExcepti
     }
 }
 
+void AbstractPlainSocketImpl::connect(SocketAddress *addr, int p) throw (IOException) {
+    bool  connected = false;
+    try {
+        addr = dynamic_cast<InetSocketAddress *>(addr);
+        if (addr == NULL) throw IllegalArgumentException("unsupported address type");
+        if (addr->isUnresolved()) throw UnknownHostException(addr->getHostName());
+        SocketImpl::setPort(addr->getPort());
+        SocketImpl::setAddress(addr->getAddress());
+        connectToAddress(addr->getAddress(), addr->getPort(), p);
+        connected = true;
+    } catch (...) { }
+    if (!connected) {
+        try {
+            close();
+        } catch (const IOException &e) {
+        }
+    }
+}
+
 void AbstractPlainSocketImpl::connectToAddress(InetAddress* addr, int p, int t) throw (IOException) {
     if (addr->isAnyLocalAddress()) doConnect(InetAddress::getLocalHost(), p, t);
     else doConnect(addr, p, t);
@@ -197,6 +216,11 @@ AbstractPlainSocketImpl::AbstractPlainSocketImpl() {
     CONNECTION_NOT_RESET = 0;
     CONNECTION_RESET_PENDING = 1;
     CONNECTION_RESET = 2;
+    pthread_mutexattr_t attr;
+    pthread_mutexattr_init(&attr);
+    pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+    pthread_mutex_init(&fdLock, &attr);
+    pthread_mutex_init(&resetLock, &attr);
 }
 
 void AbstractPlainSocketImpl::shutdownInput() {

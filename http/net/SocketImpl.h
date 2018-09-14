@@ -5,6 +5,7 @@
 #endif
 #ifndef SOCKETIMPL_H
 #define SOCKETIMPL_H
+#define SO_BINDADDR (1<<10)
 class InetAddress;
 class InputStream;
 class OutputStream;
@@ -21,7 +22,9 @@ class SocketImpl : virtual public RefCount {
     public:
         virtual void create(bool stream) = 0;
         virtual void connect(std::string &host, int p) throw (IOException) = 0;
-        virtual void connect(const char *, int p) throw (IOException) = 0;
+        virtual void connect(const char *host, int p) throw (IOException) = 0;
+        virtual void connect(InetAddress *, int p) = 0;
+        virtual void connect(SocketAddress *, int ) = 0;
         virtual void bind(InetAddress *host, int p) throw (IOException) = 0;
         virtual void listen(int baclog) throw (IOException) = 0;
         virtual void accept(SocketImpl *s)throw (IOException)  = 0;

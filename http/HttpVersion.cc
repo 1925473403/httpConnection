@@ -1,3 +1,4 @@
+#include "HttpException.h"
 #include "ProtocolVersion.h"
 #include "HttpVersion.h"
 std::string HttpVersion::HTTP = std::string("HTTP");

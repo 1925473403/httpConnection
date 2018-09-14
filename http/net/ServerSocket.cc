@@ -20,7 +20,7 @@
 #endif
 
 #define DEFAULTCLIENTSIZE 50
-SocketImplFactory *factory = NULL;
+SocketImplFactory *ServerSocket::factory = NULL;
 ServerSocket::ServerSocket(SocketImpl *i) : created(false), bound (false), closed(false), impl(i), oldImpl(false) {
     impl->setServerSocket(this);
 }
@@ -32,6 +32,10 @@ ServerSocket::ServerSocket(int p, int backlog) : ServerSocket(p, backlog, NULL) 
 }
 
 ServerSocket::ServerSocket(int p, int backlog, InetAddress *bindAddr) {
+    pthread_mutexattr_t attr;
+    pthread_mutexattr_init(&attr);
+    pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+    pthread_mutex_init(&closeLock, &attr);
     setImpl();
     if (p < 0 || p > 0xffff) throw IllegalArgumentException("Port value out of range: %d",  p);
     if (backlog < 1) backlog = 50;

@@ -5,7 +5,12 @@
 #include "SyncBasicHttpContext.h"
 #endif
 pthread_mutex_t SyncBasicHttpContext::mutex;
-SyncBasicHttpContext::SyncBasicHttpContext(HttpContext *context): BasicHttpContext(context) { }
+SyncBasicHttpContext::SyncBasicHttpContext(HttpContext *context): BasicHttpContext(context) { 
+    pthread_mutexattr_t attr;
+    pthread_mutexattr_init(&attr);
+    pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+    pthread_mutex_init(&mutex, &attr);
+}
 ValueBase *SyncBasicHttpContext::getAttribute(std::string id) {
     ValueBase *obj = NULL;
     Lock l(mutex);

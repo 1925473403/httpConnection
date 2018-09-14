@@ -38,7 +38,7 @@ Parts& Parts::operator=(const Parts &rhs) {
     return *this;
 }
 bool URL::isValidProtocol(std::string pro) {
-    int len = pro.length();
+    int len = (int)pro.length();
     if (len == 0) return false;
     char c = pro[0];
     if (::isalpha(c) == 0) return false;
@@ -115,10 +115,10 @@ URLStreamHandler *URL::getURLStreamHandler(std::string proto) {
     unordered_map<std::string, URLStreamHandler*>::iterator it = URL::handlers.find(proto);
     if (it != URL::handlers.end()) h = it->second;
     else {
-        bool checkedWithFactory = false;
+        //bool checkedWithFactory = false;
         if (urlStreamHandlerFactory != NULL) {
             h = urlStreamHandlerFactory->createURLStreamHandler(proto);
-            checkedWithFactory = true;
+        //    checkedWithFactory = true;
         }
         if (h == NULL) {
             std::string protolowercase = proto;
@@ -160,11 +160,11 @@ URL::URL(URL &context, std::string &spec, URLStreamHandler *h) throw (MalformedU
     bool aRef=false;
     bool isRelative = false;
     try {
-        limit = spec.length();
+        limit = (int)spec.length();
         while ((limit > 0) && (spec[limit - 1] <= ' ')) limit --;
         while ((start < limit) && (spec[start] <= ' ')) start++;
         if (spec.find("url:", start) != std::string::npos) start += 4;
-        if (start < spec.length() && spec[start] == '#') aRef = true;
+        if (start < (int)spec.length() && spec[start] == '#') aRef = true;
         for (i = start ; !aRef && (i < limit) && ((c = spec[i]) != '/'); i++) {
             if (c == ':') {
                 std::string s = spec.substr(start, i);
