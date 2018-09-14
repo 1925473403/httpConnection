@@ -10,7 +10,7 @@
 #include "SocketImpl.h"
 #include "OutputStream.h"
 #include "InputStream.h"
-#include "'AbstractPlainSocketImpl.h"
+#include "AbstractPlainSocketImpl.h"
 #include "SocketInputStream.h"
 #include "SocketOutputStream.h"
 #include "DualStackPlainSocketImpl.h"
@@ -20,20 +20,20 @@
 Socket::Socket() { 
     setImpl();
 }
-Socket::~Socket() { delete impl; }
-Socket::Socket(SocketImpl *i) {
+Socket::~Socket() { impl->unref(); }
+Socket::Socket(SocketImpl *i)  {
     impl = i;
     if (impl != NULL) 
         impl->setSocket(this);
 }
-Socket::Socket(std::string host, int port) :
-    Socket(((host.length() != 0) ? new InetSocketAddress(host, port) : new InetSocketAddress("localhost", port)), NULL, true) {
+Socket::Socket(std::string &host, int port) :
+    Socket(((host.length() != 0) ? new InetSocketAddress(host, port) : new InetSocketAddress("localhost", port)), NULL, true)  {
 }
 Socket::Socket(InetAddress *addr, int port) :
-    Socket(((addr != NULL)? new InetSocketAddress(addr, port) : 0), NULL, true) {
+    Socket(((addr != NULL)? new InetSocketAddress(addr, port) : 0), NULL, true)  {
 }
 Socket::Socket(std::string host, int port, InetAddress *localAddr, int localPort) :
-    Socket(((host.length() != 0)?new InetSocketAddress(host, port) : new InetSocketAddress("localhost", port)), new InetSocketAddress(localAddr, localPort), true) {
+    Socket(((host.length() != 0)?new InetSocketAddress(host, port) : new InetSocketAddress("localhost", port)), new InetSocketAddress(localAddr, localPort), true)  {
 }
 Socket::Socket(InetAddress* addr, int port, InetAddress *localAddr, int localPort) :
     Socket(((addr != NULL)? new InetSocketAddress(addr, port) : 0), new InetSocketAddress(localAddr, localPort), true) {
@@ -67,6 +67,12 @@ void Socket::createImpl(bool stream) {
     } catch (const IOException &e) {
         throw SocketException(e.what());
     }
+}
+
+void Socket::postAccept() {
+    connected = true;
+    created = true;
+    bound = true;
 }
 
 void Socket::setImpl() {

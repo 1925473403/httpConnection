@@ -43,6 +43,7 @@ InetAddress::InetAddress(const char *str) {
         ipaddr = res[0];
     }
 }
+
 InetAddress* InetAddress::getLocalHost() {
     char name[1024];
     memset(name, 0, 1024);
@@ -57,7 +58,9 @@ InetAddress* InetAddress::getByName(std::string host) throw (UnknownHostExceptio
     vector<InetAddress *> res;
     InetAddress::getAllByName(host, res);
     InetAddress *r = res[0];
-    for (int i = 1; i < res.size(); i++) delete res[i];
+    for (size_t i = 1; i < res.size(); i++) 
+        res[i]->unref();
+    res.clear();
     return r;
 }
 
@@ -80,8 +83,8 @@ void InetAddress::getAllByName(std::string host, vector<InetAddress *> &res, Ine
     vector<std::string> ips;
     NameResolver::resolve(host.c_str(), ips);
     assert(ips.size() > 0);
-    int i = 0;
-    for (int i = 0; reqAddr && i < ips.size(); i++) {
+    size_t i = 0;
+    for (i = 0; reqAddr && i < ips.size(); i++) {
         if (reqAddr->getipaddr() == ips[i]) break;
     }
     if (reqAddr && (i < ips.size()|| i == ips.size())) {
@@ -108,9 +111,9 @@ InetAddress& InetAddress::operator=(const InetAddress &rhs) {
     }
     return *this;
 }
-InetSocketAddress::InetSocketAddress(std::string host, int port) : InetSocketAddress(host.c_str(), port) {
+InetSocketAddress::InetSocketAddress(std::string host, int p) : InetSocketAddress(host.c_str(), port) {
 }
-InetSocketAddress::InetSocketAddress(InetAddress *addr, int port) {
+InetSocketAddress::InetSocketAddress(InetAddress *addr, int p) {
     if (addr == NULL) throw IllegalArgumentException("InetAddress cannot be NULL");
     bzero(&si_addr, sizeof(si_addr));
     si_addr.sin_family = AF_INET;
@@ -125,8 +128,32 @@ InetSocketAddress::InetSocketAddress(InetAddress *addr, int port) {
     }
 }
 
+bool InetSocketAddress::isUnresolved() {
+    struct sockaddr_in tmp;
+    bzero(&tmp, sizeof(tmp));
+    return memcmp((void *)&tmp, (void *)&si_addr, sizeof(tmp)) == 0;
+}
+
 struct sockaddr_in& InetSocketAddress::getSockAddress() {
     return si_addr;
+}
+
+InetAddress* InetSocketAddress::getAddress() {
+    return new InetAddress(hostname);
+}
+
+int InetSocketAddress::getPort() {
+    return port;
+}
+
+std::string InetSocketAddress::getHostName() {
+    return hostname;
+}
+
+std::string InetSocketAddress::toString() {
+    std::stringstream ss;
+    ss << hostname << ":" << port;
+    return ss.str();
 }
 
 InetSocketAddress::InetSocketAddress(const char *host, int p) : hostname(host), port(htons(p)) {

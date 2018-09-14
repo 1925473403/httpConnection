@@ -1,12 +1,15 @@
 #include "HttpException.h"
+#include "RefCount.h"
+#ifndef SOCKET_H
+#include "Socket.h"
+#endif
 #ifndef SOCKETIMPL_H
 #define SOCKETIMPL_H
-class Socket;
 class InetAddress;
 class InputStream;
 class OutputStream;
 class ServerSocket;
-class SocketImpl {
+class SocketImpl : virtual public RefCount {
     private:
     protected:
         Socket *socket;
@@ -33,6 +36,7 @@ class SocketImpl {
         virtual void shutdownInput() = 0;
         virtual void shutdownOutput() = 0;
         virtual int getFileDescriptor() = 0;
+        virtual void setFileDescriptor(int) = 0;
         virtual int getPort() { return port; }
         virtual InetAddress *getInetAddress() { return address; }
         void setPort(int p) { port = p; }
@@ -45,17 +49,13 @@ class SocketImpl {
         virtual int getOption(int opt) = 0;
         virtual void socketCreate(bool isServer) throw(IOException) ;
         virtual void socketConnect(InetAddress *address, int port, int timeout) throw (IOException) ;
-        virtual void socketBind(InetAddress *address, int port) throw (IOException) ;
-        virtual void socketListen(int count) throw (IOException) ;
-        virtual void socketAccept(SocketImpl *s) throw (IOException) ;
-        virtual int socketAvailable() throw (IOException) ;
-        virtual void socketShutdown(int howto) throw (IOException) ;
-        virtual void socketSendUrgentData(int data) throw (IOException) ;
+        virtual void socketBind(InetAddress *address, int port) throw (IOException)  = 0;
+        virtual void socketListen(int count) throw (IOException) =0;
+        virtual void socketAccept(SocketImpl *s) throw (IOException)=0 ;
+        virtual int socketAvailable() throw (IOException) =0;
+        virtual void socketShutdown(int howto) throw (IOException) =0;
+        virtual void socketSendUrgentData(int data) throw (IOException)=0 ;
         virtual void reset() throw (IOException);
-        virtual std::string toString() {
-            std::stringstream ss;
-            ss << "Socket[addr= " << getInetAddress() << ", port: " << port << ", localport: " << localport << "]";
-            return ss.str();
-        }
+        virtual std::string toString(); 
 };
 #endif

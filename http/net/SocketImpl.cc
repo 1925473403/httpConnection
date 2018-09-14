@@ -28,19 +28,14 @@ void SocketImpl::socketConnect(InetAddress *address, int port, int timeout) thro
 }
 
 void SocketImpl::reset() throw (IOException) {
-    address = NULL;
+    address->unref();
     port = 0;
     localport = 0;
 }
-void SocketImpl::socketBind(InetAddress *address, int port) throw (IOException) {
+
+std::string SocketImpl::toString() {
+    std::stringstream ss;
+    ss << "Socket[addr= " << getInetAddress() << ", port: " << port << ", localport: " << localport << "]";
+    return ss.str();
 }
-void SocketImpl::socketListen(int count) throw (IOException) {
-}
-void SocketImpl::socketAccept(SocketImpl *s) throw (IOException) {
-}
-int SocketImpl::socketAvailable() throw (IOException) {
-}
-void SocketImpl::socketShutdown(int howto) throw (IOException) {
-}
-void SocketImpl::socketSendUrgentData(int data) throw (IOException) {
-}
+

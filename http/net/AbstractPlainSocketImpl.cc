@@ -226,7 +226,7 @@ void AbstractPlainSocketImpl::setOption(int opt, int val) {
 
 int AbstractPlainSocketImpl::getOption(int opt) {
     int option_value;
-    int option_len;
+    socklen_t option_len;
     struct linger l;
     int rc = getsockopt(fd, SOL_SOCKET, opt, (char *)&option_value, &option_len);
     if (rc == 0) {

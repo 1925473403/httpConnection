@@ -1,4 +1,4 @@
-SRC_HOME=/home/vikkyp/httpConnection/http
+SRC_HOME=/home/fworks/httpConnection/http
 g++ -g -m64 -std="c++11" -o main \
                         -I${SRC_HOME}/inc -I${SRC_HOME}/protocol -I${SRC_HOME}/util \
                         -I${SRC_HOME}/params -I${SRC_HOME}/message -I${SRC_HOME}/client/params \

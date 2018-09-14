@@ -1,11 +1,12 @@
 #include "HttpException.h"
+#include "RefCount.h"
 #ifndef SOCKET_H
 #define SOCKET_H
 class SocketImpl;
 class InputStream;
 class OutputStream;
 class SocketAddress;
-class Socket {
+class Socket:public RefCount {
     struct Lock {
         pthread_mutex_t &mutex;
         Lock(pthread_mutex_t& m):mutex(m) {
@@ -24,21 +25,23 @@ class Socket {
         bool shutIn;
         bool shutOut;
         bool oldImpl;
-        SocketImpl *impl;
     public:
+        SocketImpl *impl;
         Socket();
-        Socket(SocketImpl* impl) throw (SocketException);
-        Socket(std::string &host, int port) throw (SocketException);
-        Socket(const char *host, int port)  throw (SocketException, IOException);
-        Socket(InetAddress *addr, int port)  throw (SocketException, IOException);
-        Socket(std::string &host, int port, InetAddress *localAddr, int localPort) throw (SocketException, IOException);
-        Socket(const char *host, int port, InetAddress *localAddr, int localPort) throw (SocketException, IOException);
-        Socket(std::string &host, int port, bool stream) throw (SocketException, IOException);
-        Socket(const char *host, int port, bool stream) throw (SocketException, IOException);
-        Socket(InetAddress *addr, int port, bool stream) throw (SocketException, IOException);
+        ~Socket();
+        Socket(SocketImpl* impl) ;
+        Socket(std::string &host, int port) ;
+        Socket(const char *host, int port)  ;
+        Socket(InetAddress *addr, int port) ;
+        Socket(std::string &host, int port, InetAddress *localAddr, int localPort); 
+        Socket(const char *host, int port, InetAddress *localAddr, int localPort) ;
+        Socket(std::string &host, int port, bool stream) ;
+        Socket(const char *host, int port, bool stream) ;
+        Socket(InetAddress *addr, int port, bool stream) ;
         void setImpl();
         SocketImpl* getImpl();
         void createImpl();
+        bool postAccept();
         InetAddress* getInetAddress();
         InetAddress* getLocalAddress();
         int getPort() ;

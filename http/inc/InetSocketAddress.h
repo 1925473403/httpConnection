@@ -1,13 +1,14 @@
 #include "HttpException.h"
+#include "RefCount.h"
 #include "Comparable.h"
 #ifndef INETSOCKETADDRESS_H
 #define INETSOCKETADDRESS_H
 
-class SocketAddress {
+class SocketAddress:public RefCount {
     public:
     virtual ~SocketAddress() { }
 };
-class InetAddress : public Comparable <InetAddress> {
+class InetAddress : public RefCount {
     std::string ipaddr;
     std::string hostname;
     public:
@@ -50,6 +51,11 @@ class InetSocketAddress : public SocketAddress {
         InetSocketAddress();
         InetSocketAddress(const InetSocketAddress &rhs);
         InetSocketAddress& operator=(const InetSocketAddress& rhs);
+        InetAddress* getAddress();
+        int getPort();
+        string getHostName();
+        bool isUnresolved();
+        std::string toString();
         struct sockaddr_in& getSockAddress();
 };
 ostream& operator<<(ostream &os, InetAddress &rhs) ;

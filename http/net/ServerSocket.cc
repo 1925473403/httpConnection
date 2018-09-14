@@ -79,13 +79,13 @@ void ServerSocket::bind(SocketAddress* endpoint) throw(IOException) {
 void ServerSocket::bind(SocketAddress *endpoint, int backlog) throw (IOException) {
     if (isClosed()) throw SocketException("Socket is closed");
     if (!oldImpl && isBound()) throw SocketException("Already Bound");
-    if (endpoint == NULL) endpoint = new InetSocketAddress(0);
+    if (endpoint == NULL) endpoint = new InetSocketAddress((const char *)"0.0.0.0", 0);
     InetSocketAddress *ep = dynamic_cast<InetSocketAddress *>(endpoint);
     if (ep == NULL) throw IllegalArgumentException("Unsupported address type");
-    if (ep.isUnresolved()) throw SocketException("Unresolved address");
+    if (ep->isUnresolved()) throw SocketException("Unresolved address");
     if (backlog < 1) backlog = 50;
     try {
-        getImpl()->bind(ep.getAddress(), ep.getPort());
+        getImpl()->bind(ep->getAddress(), ep->getPort());
         getImpl()->listen(backlog);
         bound = true;
     } catch (const IOException &e) {
@@ -122,7 +122,7 @@ SocketAddress* ServerSocket::getLocalSocketAddress() {
 Socket *ServerSocket::accept() throw (IOException) {
     if (isClosed()) throw SocketException("Socket is closed");
     if (!isBound()) throw SocketException("Socket is not bound yet");
-    Socket *s = new Socket(NULL);
+    Socket *s = new Socket((SocketImpl *)NULL);
     implAccept(s);
     return s;
 }
@@ -130,20 +130,20 @@ Socket *ServerSocket::accept() throw (IOException) {
 void ServerSocket::implAccept(Socket *s) throw (IOException) {
     SocketImpl *si = NULL;
     try {
-        if (s.impl == NULL) s.setImpl();
-        else s.impl.reset();
-        si = s.impl;
-        s.impl = NULL;
-        si.address = new InetAddress();
-        si.fd = -1;
+        if (s->getImpl() == NULL) s->setImpl();
+        else s->getImpl()->reset();
+        si = s->getImpl();
+        s->impl = NULL;
+        si->setAddress(new InetAddress());
+        si->setFileDescriptor(-1);
         getImpl()->accept(si);
     } catch (const IOException &e) {
         if (si != NULL) si->reset();
-        s.impl = si;
+        s->impl = si;
         throw;
     }
-    s.impl = si;
-    s.postAccept();
+    s->impl = si;
+    s->postAccept();
 }
 
 void ServerSocket::close() throw (IOException) {
@@ -151,13 +151,13 @@ void ServerSocket::close() throw (IOException) {
         Lock l (closeLock);
         if (isClosed()) return;
         if (created) impl->close();
-        close = true;
+        closed = true;
     }
 }
 
-ServerSocketChannel* ServerSocket::getChannel() {
-    return NULL;
-}
+//ServerSocketChannel* ServerSocket::getChannel() {
+//    return NULL;
+//}
 
 bool ServerSocket::isBound() {
     return bound || oldImpl;
@@ -221,5 +221,4 @@ int ServerSocket::getReceiveBufferSize() throw(SocketException) {
     return result;
 }
 
-void ServerSocket::setPerformancePreferences(int connectionTime, int latency, int bandwidth) {
-}
+//void ServerSocket::setPerformancePreferences(int connectionTime, int latency, int bandwidth) { }

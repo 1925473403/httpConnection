@@ -52,8 +52,13 @@ class IOException : public std::exception {
 class HttpHost ;
 class SocketException : public IOException {
     public:
-    SocketException(const char *str) : IOException(str) { }
     SocketException() { }
+    SocketException(const char *str, ...) {
+            va_list args;
+            va_start(args, str);
+            vsnprintf(m_reason, 511, str, args);
+            va_end(args);
+    }
 };
 class ConnectException : public SocketException {
     public:
@@ -63,7 +68,6 @@ class ConnectException : public SocketException {
 /*
 class HttpHostConnectException : public IOException {
     HttpHost *host;
-=======
 
 class SocketException : public IOException {
     public:
@@ -78,12 +82,11 @@ class ConnectException : public SocketException {
     ConnectException(const char *str) : SocketException(str) { }
     ConnectException() : SocketException() { }
 };
-
-class ConnectionResetException : public IOException {
->>>>>>> 8f0a1ebc7b17dfa789fa5de46f12b6865dedf9ec
+*/
+class ConnectionResetException : public SocketException {
     public:
-    ConnectionResetException() : IOException() { }
-    ConnectionResetException(std::string s) : IOException(s) { }
+    ConnectionResetException() : SocketException() { }
+    ConnectionResetException(std::string s) : SocketException(s.c_str()) { }
     ConnectionResetException(const char *str, ...) {
             va_list args;
             va_start(args, str);
@@ -91,8 +94,7 @@ class ConnectionResetException : public IOException {
             va_end(args);
     }
 };
-<<<<<<< HEAD
-*/
+
 
 class SecurityException : public IOException {
     public:

@@ -82,7 +82,7 @@ void DualStackPlainSocketImpl::socketClose0(bool useDeferredClose) throw(IOExcep
 }
 
 void DualStackPlainSocketImpl::socketShutdown(int howto) throw(IOException) {
-    int nativefd = getFileDescritor();
+    int nativefd = getFileDescriptor();
     if (nativefd == -1) throw SocketException("Socket closed");
     if (::shutdown(nativefd, howto) < 0) throw SocketException("Socket shutdown exception");
 }
