@@ -60,6 +60,7 @@ class InetSocketAddress : public SocketAddress {
         InetSocketAddress();
         InetSocketAddress(const InetSocketAddress &rhs);
         InetSocketAddress& operator=(const InetSocketAddress& rhs);
+        ~InetSocketAddress();
         InetAddress* getAddress();
         int getPort();
         string getHostName();

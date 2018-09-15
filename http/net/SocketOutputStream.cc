@@ -15,7 +15,7 @@
 #include "SocketOutputStream.h"
 #endif
 #include "Socket.h"
-SocketOutputStream::SocketOutputStream(AbstractPlainSocketImpl *_impl): impl(_impl) {
+SocketOutputStream::SocketOutputStream(AbstractPlainSocketImpl *_impl): impl(_impl), closing(false), temp(NULL), socket(NULL) {
     socket = impl->getSocket();
     temp = new char [1];
     closing = false;

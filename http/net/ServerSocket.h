@@ -20,6 +20,7 @@ class ServerSocket : public RefCount {
         bool oldImpl;
     public:
         ServerSocket(SocketImpl *);
+        ~ServerSocket();
         ServerSocket(int p);
         ServerSocket(int port, int backlog);
         ServerSocket(int p, int backlog, InetAddress *bindAddr);

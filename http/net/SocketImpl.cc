@@ -12,6 +12,8 @@
 #ifndef SOCKETIMPL_H
 #include "SocketImpl.h"
 #endif
+
+SocketImpl::SocketImpl() : socket(NULL), serverSocket(NULL), address(NULL), fd(-1), port(-1), localport(-1) { }
 void SocketImpl::socketCreate(bool isServer) throw(IOException) {
     if (isServer) fd = ::socket(AF_INET, SOCK_STREAM, 0);
     else fd = ::socket(AF_INET, SOCK_DGRAM, 0);

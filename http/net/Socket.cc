@@ -24,8 +24,14 @@ Socket::Socket() {
     pthread_mutex_init(&closeLock, &attr);
     setImpl();
 }
-Socket::~Socket() { impl->unref(); }
-Socket::Socket(SocketImpl *i):shutOut(false), shutIn(false)  {
+Socket::~Socket() { 
+    if (impl != NULL) impl->unref(); 
+}
+Socket::Socket(SocketImpl *i):shutOut(false), shutIn(false), bound(false), created(false), connected(false), closed(false), oldImpl(false)  {
+    pthread_mutexattr_t attr;
+    pthread_mutexattr_init(&attr);
+    pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+    pthread_mutex_init(&closeLock, &attr);
     impl = i;
     if (impl != NULL) 
         impl->setSocket(this);
@@ -54,6 +60,10 @@ Socket::Socket(InetAddress* addr, int port, bool stream) :
 }
 
 Socket::Socket(SocketAddress *addr, SocketAddress *local, bool s):shutOut(false), shutIn(false), bound(false), created(false), connected(false), closed(false), oldImpl(false) {
+    pthread_mutexattr_t attr;
+    pthread_mutexattr_init(&attr);
+    pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+    pthread_mutex_init(&closeLock, &attr);
     setImpl();
     if (addr == NULL) throw NullPointerException();
     try {

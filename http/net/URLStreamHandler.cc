@@ -79,7 +79,7 @@ void URLStreamHandler::parseURL(URL &u, std::string spec, int start, int limit) 
         if (port < -1) throw IllegalArgumentException("Invalid port number :%d", port);
         start = i;
     }
-    if (host == "") host = "";
+    if (host.empty()) host = "";
     if (start < limit) {
         if (spec[start] == '/') path = spec.substr(start, limit);
         else if (path != "" && path.length() > 0) {
@@ -172,7 +172,7 @@ void URLStreamHandler::setURL(URL &u, std::string protocol, std::string host, in
 InetAddress* URLStreamHandler::getHostAddress(URL &u) {
     if (u.hostAddress != NULL) return u.hostAddress;
     std::string host = u.getHost();
-    if (host == "") return NULL;
+    if (host.empty()) return NULL;
     else {
         try {
             u.hostAddress = InetAddress::getByName(host);

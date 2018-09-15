@@ -16,7 +16,7 @@
 #include "SocketInputStream.h"
 #endif
 #include "Socket.h"
-SocketInputStream::SocketInputStream(AbstractPlainSocketImpl *_impl) : impl(_impl) {
+SocketInputStream::SocketInputStream(AbstractPlainSocketImpl *_impl) : eof(false), impl(_impl), temp(NULL), closing(false) {
     socket = impl->getSocket();
 }
 int SocketInputStream::read(char *b, int blen, int len) throw (IOException) {

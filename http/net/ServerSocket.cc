@@ -31,6 +31,10 @@ ServerSocket::ServerSocket(int p) : ServerSocket(p, DEFAULTCLIENTSIZE, NULL) {
 ServerSocket::ServerSocket(int p, int backlog) : ServerSocket(p, backlog, NULL) {
 }
 
+ServerSocket::~ServerSocket() {
+    if (impl != NULL) impl->unref();
+}
+
 ServerSocket::ServerSocket(int p, int backlog, InetAddress *bindAddr) : created(false), bound (false), closed(false), oldImpl(false), impl(NULL) {
     pthread_mutexattr_t attr;
     pthread_mutexattr_init(&attr);

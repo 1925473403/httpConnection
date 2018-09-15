@@ -22,6 +22,8 @@ int AbstractPlainSocketImpl::SHUT_RD = 0;
 int AbstractPlainSocketImpl::SHUT_WR = 1;
 void AbstractPlainSocketImpl::create(bool stream) {
     socketCreate(stream);
+    if (socket != NULL) socket->setCreated();
+    if (serverSocket != NULL) serverSocket->setCreated();
 }
 
 void AbstractPlainSocketImpl::connect(std::string &host, int p) throw (IOException) {
@@ -82,11 +84,16 @@ void AbstractPlainSocketImpl::connect(SocketAddress *addr, int p) throw (IOExcep
 }
 
 void AbstractPlainSocketImpl::connectToAddress(InetAddress* addr, int p, int t) throw (IOException) {
-    if (addr->isAnyLocalAddress()) {
-        InetAddress *r = InetAddress::getLocalHost();
-        doConnect(r, p, t);
-        r->unref();
-    } else doConnect(addr, p, t);
+    try {
+        if (addr->isAnyLocalAddress()) {
+            InetAddress *r = InetAddress::getLocalHost();
+            doConnect(r, p, t);
+            r->unref();
+        } else doConnect(addr, p, t);
+    }catch (...) {
+        addr->unref();
+        throw;
+    }
 }
 
 void AbstractPlainSocketImpl::doConnect(InetAddress* addr, int p, int timeout) throw (IOException) {

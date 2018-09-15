@@ -52,6 +52,8 @@ void DualStackPlainSocketImpl::socketBind(InetAddress *address, int port) throw(
     addr.sin_port = port;
     addr.sin_addr.s_addr = inet_addr(address->getipaddr().c_str());
     */
+    setOption(SO_REUSEADDR, 1);
+    setOption(SO_REUSEPORT, 1);
     if (::bind(nativefd, (struct sockaddr *)&addr, sizeof( struct sockaddr_in)) < 0) throw SocketException("Error binding");
 }
 

@@ -35,7 +35,10 @@ class SocketImpl : virtual public RefCount {
         virtual void sendUrgentData (int data) throw (IOException) = 0;
         void setSocket(Socket *s) { socket = s; }
         Socket* getSocket() { return socket; }
-        virtual ~SocketImpl() { }
+        SocketImpl();
+        virtual ~SocketImpl() {
+            if (address) address->unref();
+        }
         virtual void shutdownInput() = 0;
         virtual void shutdownOutput() = 0;
         virtual int getFileDescriptor() const = 0;

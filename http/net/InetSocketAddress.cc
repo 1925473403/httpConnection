@@ -20,12 +20,14 @@ InetAddress::InetAddress() { }
 InetAddress::InetAddress(std::string &src) : InetAddress(src.c_str()) { }
 InetAddress::InetAddress(const char *str) {
     vector<std::string> res;
-    if (std::regex_match(std::string(str), std::regex("([0-9]+).([0-9]+).([0-9]+).([0-9]+)"))) {
-        ipaddr = str;
+    assert(str != NULL);
+    std::string sstr(str);
+    if (std::regex_match(sstr, std::regex("([0-9]+).([0-9]+).([0-9]+).([0-9]+)"))) {
+        ipaddr.assign(str);
         NameResolver::getnameinfo(str, res);
         if (res.size()) hostname = res[0];
     } else {
-        hostname = str;
+        hostname.assign(str);
         NameResolver::resolve(str, res);
         assert(res.size() > 0);
         ipaddr = res[0];
@@ -71,7 +73,7 @@ std::string InetAddress::toString() {
     return h;
 }
 void InetAddress::getAllByName(const char* host, vector<InetAddress *> &res, InetAddress* reqAddr) throw (UnknownHostException) {
-    if (host == "") {
+    if (host == NULL) {
         res.push_back(new InetAddress("127.0.0.1"));
         return;
     }
@@ -116,19 +118,24 @@ InetSocketAddress::InetSocketAddress(InetAddress *addr, int p) {
     si_addr.sin_family = AF_INET;
     si_addr.sin_port = p;//htons(p);
     printf("%x:%x:%x:%x\n", p, htons(p), si_addr.sin_port, htons(htons(p)));
-    port = htons(p);
+    port = p;
     if (addr == NULL) {
         si_addr.sin_addr.s_addr = INADDR_ANY;
         hostname.assign("0.0.0.0");
+        this->addr = new InetAddress("0.0.0.0");
     } else if (addr->gethostname() == "") {
         hostname.assign(addr->getipaddr().c_str());
         si_addr.sin_addr.s_addr = inet_addr(addr->getipaddr().c_str());
+        this->addr = addr;
+        this->addr->ref();
     } else {
         vector<std::string> res;
         NameResolver::resolve(addr->gethostname().c_str(), res);
         addr->setipaddr(res[0]);
         hostname.assign(res[0].c_str());
         si_addr.sin_addr.s_addr = inet_addr(res[0].c_str());
+        this->addr = addr;
+        this->addr->ref();
     }
 }
 
@@ -143,7 +150,8 @@ struct sockaddr_in& InetSocketAddress::getSockAddress() {
 }
 
 InetAddress* InetSocketAddress::getAddress() {
-    return new InetAddress(hostname);
+    if (addr) addr->ref();
+    return addr;
 }
 
 int InetSocketAddress::getPort() {
@@ -160,11 +168,38 @@ std::string InetSocketAddress::toString() {
     return ss.str();
 }
 
-InetSocketAddress::InetSocketAddress(const char *host, int p) : hostname(host), port(htons(p)) {
-    bzero(&si_addr, sizeof(si_addr));
-    si_addr.sin_family = AF_INET;
-    si_addr.sin_addr.s_addr = inet_addr(host);
-    si_addr.sin_port = port;
+InetSocketAddress::~InetSocketAddress() {
+    if (addr) addr->unref();
+}
+
+InetSocketAddress::InetSocketAddress(const char *host, int p) : hostname(host), port(p) {
+    vector<std::string> res;
+    const char *ipaddr = NULL;
+    if (host != NULL) {
+        std::string sstr(host);
+        if (std::regex_match(sstr, std::regex("([0-9]+).([0-9]+).([0-9]+).([0-9]+)"))) {
+            NameResolver::getnameinfo(host, res);
+            if (res.size()) hostname = res[0];
+            ipaddr = host;
+        } else {
+            hostname.assign(host);
+            NameResolver::resolve(host, res);
+            ipaddr = res[0].c_str();
+        }
+        assert(ipaddr != NULL);
+        bzero(&si_addr, sizeof(si_addr));
+        si_addr.sin_family = AF_INET;
+        si_addr.sin_addr.s_addr = inet_addr(ipaddr);
+        si_addr.sin_port = port;
+        addr = new InetAddress(ipaddr);
+    } else {
+        hostname.assign("localhost");
+        bzero(&si_addr, sizeof(si_addr));
+        si_addr.sin_family = AF_INET;
+        si_addr.sin_addr.s_addr = inet_addr("0.0.0.0");
+        si_addr.sin_port = port;
+        addr = new InetAddress("0.0.0.0");
+    }
 }
 InetSocketAddress::InetSocketAddress() { }
 InetSocketAddress::InetSocketAddress(const InetSocketAddress &rhs) {
