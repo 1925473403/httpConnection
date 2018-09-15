@@ -50,7 +50,8 @@ bool URL::isValidProtocol(std::string pro) {
 }
 
 URL::~URL() {
-    if (hostAddress) delete hostAddress;
+    if (hostAddress) hostAddress->unref();
+    if (handler) handler->unref();
 }
 
 URL::URL(const URL& rhs) {

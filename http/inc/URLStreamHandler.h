@@ -1,9 +1,10 @@
 #include "HttpException.h"
+#include "RefCount.h"
 class URL;
 class InetAddress;
 #ifndef URLSTREAMHANDLER_H
 #define URLSTREAMHANDLER_H
-class URLStreamHandler {
+class URLStreamHandler : public RefCount {
     public:
         virtual void parseURL(URL &u, std::string spec, int start, int limit);
         virtual int getDefaultPort() { return -1; }

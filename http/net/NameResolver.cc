@@ -23,3 +23,16 @@ void NameResolver::resolve(const char *str, vector<std::string> &v) {
     }
     return;
 }
+
+void NameResolver::getnameinfo(const char *ip, vector<std::string> &v) {
+
+    struct sockaddr_in sa;    /* input */
+    char hbuf[NI_MAXHOST] = { 0 };
+
+    bzero(&sa, sizeof(sa));
+    sa.sin_family = AF_INET;
+    sa.sin_addr.s_addr = inet_addr(ip);
+    if (::getnameinfo((struct sockaddr *)&sa, sizeof(sa), hbuf, sizeof(hbuf), NULL, 0, NI_NAMEREQD)) v.push_back(ip);
+    else v.push_back(hbuf);
+    return;
+}

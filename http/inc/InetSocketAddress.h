@@ -8,22 +8,24 @@ class InetAddress : public RefCount {
     std::string ipaddr;
     std::string hostname;
     public:
-    InetAddress(std::string host);
+    InetAddress(std::string &host);
     InetAddress(const char *str);
     InetAddress();
     InetAddress(const InetAddress &rhs);
     InetAddress& operator=(const InetAddress &rhs);
     int compareTo(InetAddress &rhs);
-    void sethostname(std::string h) { hostname = h; }
-    void setipaddr(std::string i) { ipaddr = i; }
+    void sethostname(std::string &h) { hostname = h; }
+    void setipaddr(std::string &i) { ipaddr = i; }
     std::string gethostname() { return hostname; }
     std::string getipaddr() { return ipaddr; }
     std::string toString() ;
     static InetAddress* getLocalHost();
-    static InetAddress* getByName(std::string name) throw (UnknownHostException);
+    static InetAddress* getByName(std::string &name) throw (UnknownHostException);
+    static InetAddress* getByName(const char *host) throw (UnknownHostException);
     static InetAddress* anyLocalAddress();
-    static void getAllByName(std::string name, vector<InetAddress *> &res) throw (UnknownHostException);
-    static void getAllByName(std::string name, vector<InetAddress *> &res, InetAddress* reqAddr) throw (UnknownHostException);
+    static void getAllByName(std::string &name, vector<InetAddress *> &res) throw (UnknownHostException);
+    static void getAllByName(const char *host, vector<InetAddress *> &res) throw (UnknownHostException);
+    static void getAllByName(const char*, vector<InetAddress *> &res, InetAddress* reqAddr) throw (UnknownHostException);
     bool isAnyLocalAddress() { return false; }
     bool isLoopbackAddress() { return false; }
     bool isMulticastAddress() { return false; }
@@ -47,11 +49,12 @@ class SocketAddress:public RefCount {
 
 class InetSocketAddress : public SocketAddress {
         struct sockaddr_in si_addr;
+        InetAddress *addr;
         std::string hostname;
         int port;
         bool isResolved(const char *str);
     public:
-        InetSocketAddress(std::string host, int port);
+        InetSocketAddress(std::string &host, int port);
         InetSocketAddress(const char *str, int port);
         InetSocketAddress(InetAddress *addr, int port);
         InetSocketAddress();

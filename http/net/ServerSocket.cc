@@ -94,8 +94,10 @@ void ServerSocket::bind(SocketAddress *endpoint, int backlog) throw (IOException
         bound = true;
     } catch (const IOException &e) {
         bound = false;
+        endpoint->unref();
         throw;
     }
+    endpoint->unref();
 }
 
 InetAddress* ServerSocket::getInetAddress() {

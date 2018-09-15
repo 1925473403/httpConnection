@@ -18,10 +18,15 @@
 #include "SocketImplFactory.h"
 #include "Socket.h"
 #include "ServerSocket.h"
+#include <regex>
+using namespace std;
 
 int main() {
+    int port = 0;
     try {
-        ServerSocket s(65500);
+        std::cout << "Enter server port: ";
+        cin >> port ;
+        ServerSocket s(port);
         Socket *clientSocket = s.accept();
         if (clientSocket) {
             OutputStream *o = clientSocket->getOutputStream();

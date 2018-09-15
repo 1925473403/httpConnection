@@ -1,5 +1,5 @@
 CXX=g++
-CXXFLAGS=-Wall -g -m64 -std=c++11 $(INCLUDEDIRS)
+CXXFLAGS= -Wall -g -m64 -std=c++11 $(INCLUDEDIRS)
 LDFLAGS=-lpthread -lnsl -lresolv
 INCLUDEDIRS = -I${SRC_HOME}/inc -I${SRC_HOME}/protocol -I${SRC_HOME}/util -I${SRC_HOME}/params -I${SRC_HOME}/net 
 SRC_HOME=/home/fworks/httpConnection/http

@@ -31,16 +31,17 @@ int SocketOutputStream::socketWrite(int fd, char *b, int blen, int off, int len)
     return n;
 }
 int SocketOutputStream::write(char *b, int blen, int len) throw (IOException) {
-    write(b, blen, 0, len);
+    return write(b, blen, 0, len);
 }
 int SocketOutputStream::write(char *b, int blen, int off, int len) throw (IOException) {
+    int n = -1;
     if (len <= 0 || off < 0 || len > blen - off) {
         if (len == 0) return len;
         throw ArrayIndexOutOfBoundsException("len == %s off == %d buffer length == %d", len, off, blen);
     }
     int fd = impl->acquireFD();
     try {
-        int n = socketWrite(fd, b, blen, off, len);
+        n = socketWrite(fd, b, blen, off, len);
         if (n > 0) {
             impl->releaseFD();
             return n;
@@ -55,10 +56,11 @@ int SocketOutputStream::write(char *b, int blen, int off, int len) throw (IOExce
         }
     }
     impl->releaseFD();
+    return n;
 }
 int SocketOutputStream::write(int b) throw (IOException) {
     temp[0] = (unsigned char) b;
-    write(temp, 1, 1);
+    return write(temp, 1, 1);
 }
 void SocketOutputStream::close() throw (IOException) {
     if (closing) return;

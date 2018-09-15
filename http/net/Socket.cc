@@ -60,7 +60,11 @@ Socket::Socket(SocketAddress *addr, SocketAddress *local, bool s):shutOut(false)
         createImpl(s);
         if (local != NULL) bind(local);
         connect(addr);
+        addr->unref();
+        if (local) local->unref();
     } catch (const IOException &ex) {
+        if (addr != NULL) addr->unref();
+        if (local != NULL) local->unref();
         try {
             close();
         } catch (const IOException &ex) {
@@ -172,7 +176,10 @@ SocketAddress *Socket::getRemoteSocketAddress() {
 }
 SocketAddress *Socket::getLocalSocketAddress() {
     if (!isBound()) return NULL;
-     return new InetSocketAddress(getLocalAddress(), getLocalPort());
+    InetAddress *tempAddr = getLocalAddress();
+    SocketAddress *sockAddr = new InetSocketAddress(tempAddr, getLocalPort());
+    tempAddr->unref();
+    return sockAddr;
 }
 InputStream* Socket::getInputStream() throw (IOException) {
     if (isClosed()) throw SocketException("Socket is closed");

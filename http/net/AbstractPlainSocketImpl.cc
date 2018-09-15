@@ -82,8 +82,11 @@ void AbstractPlainSocketImpl::connect(SocketAddress *addr, int p) throw (IOExcep
 }
 
 void AbstractPlainSocketImpl::connectToAddress(InetAddress* addr, int p, int t) throw (IOException) {
-    if (addr->isAnyLocalAddress()) doConnect(InetAddress::getLocalHost(), p, t);
-    else doConnect(addr, p, t);
+    if (addr->isAnyLocalAddress()) {
+        InetAddress *r = InetAddress::getLocalHost();
+        doConnect(r, p, t);
+        r->unref();
+    } else doConnect(addr, p, t);
 }
 
 void AbstractPlainSocketImpl::doConnect(InetAddress* addr, int p, int timeout) throw (IOException) {
@@ -115,6 +118,7 @@ void AbstractPlainSocketImpl::bind(InetAddress *host, int p)  throw (IOException
     socketBind(host, p);
     if (socket != NULL) socket->setBound();
     if (serverSocket != NULL) serverSocket->setBound();
+    host->unref();
 }
 
 void AbstractPlainSocketImpl::listen(int baclog) throw (IOException) {
@@ -204,6 +208,11 @@ void AbstractPlainSocketImpl::socketClose() {
 void AbstractPlainSocketImpl::reset() throw (IOException) {
     if (fd != -1) socketClose();
     fd = -1;
+}
+
+AbstractPlainSocketImpl::~AbstractPlainSocketImpl() {
+    if (socketInputStream) socketInputStream->unref();
+    if (socketOutputStream) socketOutputStream->unref();
 }
 
 AbstractPlainSocketImpl::AbstractPlainSocketImpl() {

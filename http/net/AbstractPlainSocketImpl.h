@@ -48,6 +48,7 @@ class AbstractPlainSocketImpl : public SocketImpl {
         void close() throw (IOException);
         void socketClose();
         AbstractPlainSocketImpl();
+        virtual ~AbstractPlainSocketImpl();
         void shutdownInput();
         void shutdownOutput();
         int getFileDescriptor() const { return fd; }
@@ -59,7 +60,7 @@ class AbstractPlainSocketImpl : public SocketImpl {
         int getTimeout();
         void setInputStream(InputStream *in) { socketInputStream = in; }
         void setFileDescriptor(int f) { fd = f; }
-        void setAddress(InetAddress *addr) { address = addr; }
+        //void setAddress(InetAddress *addr) { address = addr; }
         void setPort(int p) { port = p; }
         void setLocalPort(int l) { localport = l; }
         bool isConnectionReset();

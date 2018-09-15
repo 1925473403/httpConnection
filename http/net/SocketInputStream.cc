@@ -59,14 +59,12 @@ int SocketInputStream::socketRead(int fd, char *b, int blen, int off, int len) {
     return n;
 }
 int SocketInputStream::read() throw (IOException) {
-    temp = new char[1];
-    int n = read(temp, 1, 1);
+    char tchar;
+    int n = read(&tchar, 1, 1);
     if (n < 0) {
-        delete[] temp;
         return -1;
     }
-    unsigned char t = temp[0] & 0xff;
-    delete[] temp;
+    unsigned char t = tchar & 0xff;
     return t;
 }
 long SocketInputStream::skip(long numbytes) throw (IOException) {

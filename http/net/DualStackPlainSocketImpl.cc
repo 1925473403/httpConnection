@@ -45,7 +45,13 @@ void DualStackPlainSocketImpl::socketConnect(InetAddress *address, int port, int
 void DualStackPlainSocketImpl::socketBind(InetAddress *address, int port) throw(IOException) {
     int nativefd = getFileDescriptor();
     InetSocketAddress isa(address, port);
-    sockaddr_in addr = isa.getSockAddress();
+    struct sockaddr_in &addr = isa.getSockAddress();
+    /*struct sockaddr_in addr ;
+    bzero(&addr, sizeof(addr));
+    addr.sin_family = AF_INET;
+    addr.sin_port = port;
+    addr.sin_addr.s_addr = inet_addr(address->getipaddr().c_str());
+    */
     if (::bind(nativefd, (struct sockaddr *)&addr, sizeof( struct sockaddr_in)) < 0) throw SocketException("Error binding");
 }
 

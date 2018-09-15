@@ -1,7 +1,8 @@
 #include "HttpException.h"
+#include "RefCount.h"
 #ifndef OUTPUTSTREAM_H
 #define OUTPUTSTREAM_H
-class OutputStream {
+class OutputStream: public RefCount {
     public:
     virtual ~OutputStream() { }
     virtual int write(char *b, int blen, int len) throw (IOException) = 0;

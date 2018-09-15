@@ -190,7 +190,7 @@ bool URLStreamHandler::hostsEqual(URL &u1, URL &u2) {
     InetAddress *a2 = getHostAddress(u2);
     if (a1 != NULL && a2 != NULL) return (a1->compareTo(*a2) == 0);
     else if (u1.getHost() != "" && u2.getHost() != "") return equalsIgnoreCase(u1.getHost(), u2.getHost());
-    else u1.getHost() == "" && u2.getHost() == "";
+    return (u1.getHost() == "" && u2.getHost() == "");
 }
 
 bool URLStreamHandler::sameFile(URL &u1, URL &u2) {

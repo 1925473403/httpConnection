@@ -1,7 +1,8 @@
 #include "HttpException.h"
+#include "RefCount.h"
 #ifndef INPUTSTREAM_H
 #define INPUTSTREAM_H
-class InputStream {
+class InputStream: public RefCount {
     public:
     virtual ~InputStream() { }
     virtual int read(char *b, int blen, int len) throw (IOException) = 0;

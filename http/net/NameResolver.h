@@ -9,5 +9,6 @@ class NameResolver {
     public:
     static void resolve(std::string &str, vector<std::string> &v);
     static void resolve(const char *str, vector<std::string> &v);
+    static void getnameinfo(const char *, vector<std::string> &);
 };
 #endif
