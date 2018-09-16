@@ -13,7 +13,9 @@ long AbstractHttpParams::getLongParameter(std::string name, long defaultValue) {
     return defaultValue;
 }
 HttpParams* AbstractHttpParams::setLongParameter(std::string name, long defaultValue) {
-    setParameter(name, new Value<long>(defaultValue));
+    ValueBase *v = new Value<long>(defaultValue);
+    setParameter(name, v);
+    v->unref();
     return this;
 }
 int AbstractHttpParams::getIntParameter(std::string name, int defaultValue) {
@@ -26,7 +28,9 @@ int AbstractHttpParams::getIntParameter(std::string name, int defaultValue) {
     return defaultValue;
 }
 HttpParams* AbstractHttpParams::setIntParameter(std::string name, int defaultValue) {
-    setParameter(name, new Value<int>(defaultValue));
+    ValueBase *v = new Value<int>(defaultValue);
+    setParameter(name, v);
+    v->unref();
     return this;
 }
 double AbstractHttpParams::getDoubleParameter(std::string name, double defaultValue) {
@@ -39,7 +43,9 @@ double AbstractHttpParams::getDoubleParameter(std::string name, double defaultVa
     return defaultValue;
 }
 HttpParams* AbstractHttpParams::setDoubleParameter(std::string name, double defaultValue) {
-    setParameter(name, new Value<double>(defaultValue));
+    ValueBase *v = new Value<double>(defaultValue);
+    setParameter(name, v);
+    v->unref();
     return this;
 }
 bool AbstractHttpParams::getBooleanParameter(std::string name, bool defaultValue) {
@@ -53,7 +59,9 @@ bool AbstractHttpParams::getBooleanParameter(std::string name, bool defaultValue
 }
 
 HttpParams* AbstractHttpParams::setBooleanParameter(std::string name, bool defaultValue) {
-    setParameter(name, new Value<bool>(defaultValue));
+    ValueBase *v = new Value<bool>(defaultValue);
+    setParameter(name, v);
+    v->unref();
     return this;
 }
 bool AbstractHttpParams::isParameterTrue(std::string name) {

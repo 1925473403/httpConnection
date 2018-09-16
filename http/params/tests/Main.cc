@@ -33,7 +33,7 @@ int main() {
     for (unordered_map<int, ValueBase *>::iterator it = m.begin(); it != m.end(); it++) {
         ValueBase *v = it->second;
         std::cout << it->first << " " << *v << std::endl;
-        delete v;
+        v->unref();
     }
     m.clear();
     HttpParams *params = new BasicHttpParams();
@@ -67,7 +67,7 @@ int main() {
     }
     */
     HttpParams *httpParams = new DefaultedHttpParams(params, params);
-    delete httpParams;
-    delete params;
+    httpParams->unref();
+    params->unref();
     return 0;
 }

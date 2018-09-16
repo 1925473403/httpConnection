@@ -1,7 +1,8 @@
 #include "HttpException.h"
+#include "RefCount.h"
 #ifndef VALUE_H
 #define VALUE_H
-class ValueBase {
+class ValueBase : public RefCount {
     public:
     ValueBase() {}
     virtual ~ValueBase() { }
@@ -13,7 +14,8 @@ class Value : public ValueBase {
     private:
     T m_value;
     public:
-    Value(T val) : m_value(val) { }
+    Value(T val) : m_value(val) { 
+    }
     ~Value() { }
     T value() { return m_value; }
     void output(std::ostream &os) {

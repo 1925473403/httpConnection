@@ -7,6 +7,13 @@
 #endif
 DefaultedHttpParams::DefaultedHttpParams(HttpParams* l,  HttpParams* d) :local(l), defaults(d) {
     if (local == NULL) throw IllegalArgumentException("HTTP parameters may not be null");
+    if (l != NULL) l->ref();
+    if (d != NULL) d->ref();
+}
+
+DefaultedHttpParams::~DefaultedHttpParams() {
+    if (local != NULL) local->unref();
+    if (defaults != NULL) defaults->unref();
 }
 
 HttpParams* DefaultedHttpParams::copy() {

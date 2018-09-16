@@ -6,7 +6,7 @@ class BasicHttpParams : public AbstractHttpParams {
         unordered_map<std::string, ValueBase *> parameters;
     public:
         BasicHttpParams();
-        ~BasicHttpParams() { parameters.clear(); }
+        ~BasicHttpParams();
         ValueBase *getParameter(std::string name);
         HttpParams* setParameter(std::string name, ValueBase *value);
         void setParameters(vector<std::string> &names, ValueBase *value);

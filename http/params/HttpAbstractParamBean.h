@@ -1,7 +1,8 @@
 #include "HttpException.h"
+#include "RefCount.h"
 #ifndef HTTPABSTRACTPARAMBEAN_H
 #define HTTPABSTRACTPARAMBEAN_H
-class HttpAbstractParamBean {
+class HttpAbstractParamBean: public RefCount {
     protected:
     HttpParams *params;
     public:

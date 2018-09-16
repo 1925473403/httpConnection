@@ -6,6 +6,7 @@ class DefaultedHttpParams : public AbstractHttpParams {
     HttpParams *defaults;
     public:
     DefaultedHttpParams(HttpParams* local,  HttpParams* defaults);
+    ~DefaultedHttpParams();
     HttpParams* copy();
     ValueBase *getParameter(std::string name);
     bool removeParameter(std::string name);
