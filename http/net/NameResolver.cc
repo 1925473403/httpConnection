@@ -18,8 +18,10 @@ void NameResolver::resolve(const char *str, vector<std::string> &v) {
             char *s = h->h_addr_list[i];
             stringstream ss;
             ss << (int)(s[0] &0xff) << "." << ((int)(s[1]&0xff)) << "." << ((int)(s[2]&0xff)) << "." << ((int)(s[3]&0xff));
+            std::cout << ss.str() << " ";
             v.push_back(ss.str());
         }
+        std::cout << std::endl;
     }
     return;
 }

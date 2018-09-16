@@ -39,6 +39,8 @@ void DualStackPlainSocketImpl::socketConnect(InetAddress *address, int port, int
     int nativefd = getFileDescriptor();
     InetSocketAddress isa(address, port);
     sockaddr_in addr = isa.getSockAddress();
+    setOption(SO_REUSEADDR, 1);
+    setOption(SO_REUSEPORT, 1);
     if (::connect(nativefd, (struct sockaddr *)&addr, sizeof(struct sockaddr_in)) < 0) throw SocketException("Error connecting");
 }
 
@@ -46,12 +48,6 @@ void DualStackPlainSocketImpl::socketBind(InetAddress *address, int port) throw(
     int nativefd = getFileDescriptor();
     InetSocketAddress isa(address, port);
     struct sockaddr_in &addr = isa.getSockAddress();
-    /*struct sockaddr_in addr ;
-    bzero(&addr, sizeof(addr));
-    addr.sin_family = AF_INET;
-    addr.sin_port = port;
-    addr.sin_addr.s_addr = inet_addr(address->getipaddr().c_str());
-    */
     setOption(SO_REUSEADDR, 1);
     setOption(SO_REUSEPORT, 1);
     if (::bind(nativefd, (struct sockaddr *)&addr, sizeof( struct sockaddr_in)) < 0) throw SocketException("Error binding");

@@ -123,7 +123,7 @@ InetSocketAddress::InetSocketAddress(InetAddress *addr, int p) {
         si_addr.sin_addr.s_addr = INADDR_ANY;
         hostname.assign("0.0.0.0");
         this->addr = new InetAddress("0.0.0.0");
-    } else if (addr->gethostname() == "") {
+    } else if (addr->gethostname().empty()) {
         hostname.assign(addr->getipaddr().c_str());
         si_addr.sin_addr.s_addr = inet_addr(addr->getipaddr().c_str());
         this->addr = addr;
@@ -132,7 +132,8 @@ InetSocketAddress::InetSocketAddress(InetAddress *addr, int p) {
         vector<std::string> res;
         NameResolver::resolve(addr->gethostname().c_str(), res);
         addr->setipaddr(res[0]);
-        hostname.assign(res[0].c_str());
+        if (!addr->gethostname().empty()) hostname.assign(addr->gethostname());
+        else hostname.assign(res[0].c_str());
         si_addr.sin_addr.s_addr = inet_addr(res[0].c_str());
         this->addr = addr;
         this->addr->ref();

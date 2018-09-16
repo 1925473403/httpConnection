@@ -19,28 +19,33 @@
 #include "Socket.h"
 #include "ServerSocket.h"
 #include <regex>
+#include <string>
+#include <algorithm>
+#include <sstream>
+#include <iterator>
 using namespace std;
 
 int main() {
     int port = 0;
     try {
         cin >> port ;
-        Socket s("localhost", port);
+        Socket s("www.google.com", htons(port));
         OutputStream *o = s.getOutputStream();
         InputStream *i = s.getInputStream();
         char buf[512] = { 0 };
-        size_t len;
         int n = 0;
         char *line = NULL;
-        o->write("hi...", 512, 5);
+        stringstream ss;
+        ss << "GET / HTTP/1.1\r\n";
+        ss << "Host: www.google.com\r\n";
+        ss << "Accept: */*\r\n";
+        ss << "\r\n";
+        o->write((char *)ss.str().c_str(), ss.str().length(), ss.str().length());
+        //cin.tie(NULL);
         while ((n = i->read(buf, 512, 512)) > 0) {
             printf("{%d}[%.*s]", n, n, buf);
-            if (memcmp(buf, "quit", 4) == 0) break;
-            getline(&line, &len, stdin);
-            o->write(line, len, len);
-            if (memcmp(buf, "quit", 4) == 0) break;
+            if (strstr(buf, "</html>") != NULL) break;
         }
-        free(line);
     } catch (const IOException &e) {
         std::cerr << e.what() << std::endl;
     }

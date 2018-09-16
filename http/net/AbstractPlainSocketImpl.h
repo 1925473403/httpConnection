@@ -59,7 +59,11 @@ class AbstractPlainSocketImpl : public SocketImpl {
         void releaseFD();
         int getTimeout();
         void setInputStream(InputStream *in) { socketInputStream = in; }
-        void setFileDescriptor(int f) { fd = f; }
+        void setFileDescriptor(int f) { 
+            fd = f; 
+            printf("(0x%p)", this);
+            std::cout << "AbstractSocketImpl::setFileDescriptor(" << fd << "); " << std::endl;
+        }
         //void setAddress(InetAddress *addr) { address = addr; }
         void setPort(int p) { port = p; }
         void setLocalPort(int l) { localport = l; }

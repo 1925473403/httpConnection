@@ -49,7 +49,7 @@ class SocketImpl : virtual public RefCount {
         void setServerSocket(ServerSocket *s) { serverSocket = s; }
         ServerSocket* getServerSocket() { return serverSocket; }
         void setLocalPort(int p) { localport = p; }
-        void setAddress(InetAddress *addr) { address = addr; }
+        void setAddress(InetAddress *addr) { address = addr; if (addr) addr->ref(); }
         virtual int getLocalPort() { return localport; }
         virtual void setOption(int opt, int val) = 0;
         virtual int getOption(int opt) = 0;

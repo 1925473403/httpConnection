@@ -37,6 +37,7 @@ void AbstractPlainSocketImpl::connect(const char* host, int p) throw (IOExceptio
         SocketImpl::setPort(p);
         SocketImpl::setAddress(addr);
         connectToAddress(addr, p, timeout);
+        if (addr != NULL) addr->unref();
         connected = true;
     } catch (...) {
         if (!connected) {
@@ -70,9 +71,11 @@ void AbstractPlainSocketImpl::connect(SocketAddress *addr, int p) throw (IOExcep
         addr = dynamic_cast<InetSocketAddress *>(addr);
         if (addr == NULL) throw IllegalArgumentException("unsupported address type");
         if (addr->isUnresolved()) throw UnknownHostException(addr->getHostName());
+        InetAddress *inetaddr = addr->getAddress();
         SocketImpl::setPort(addr->getPort());
-        SocketImpl::setAddress(addr->getAddress());
-        connectToAddress(addr->getAddress(), addr->getPort(), p);
+        SocketImpl::setAddress(inetaddr);
+        connectToAddress(inetaddr, addr->getPort(), p);
+        if (inetaddr) inetaddr->unref();
         connected = true;
     } catch (...) { }
     if (!connected) {

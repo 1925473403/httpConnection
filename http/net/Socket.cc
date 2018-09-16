@@ -124,12 +124,18 @@ void Socket::connect(SocketAddress *endpoint, int timeout) {
     InetAddress *addr = endpoint->getAddress();
     int p = endpoint->getPort();
     if (!created) createImpl(true);
-    if (!oldImpl) impl->connect(endpoint, timeout);
-    else if (timeout == 0) {
-        impl->connect(addr, p);
-    } else throw UnsupportedOperationException("SocketImpl.connect(addr, timeout)");
-    connected = true;
-    bound = true;
+    try {
+        if (!oldImpl) impl->connect(endpoint, timeout);
+        else if (timeout == 0) {
+            impl->connect(addr, p);
+        } else throw UnsupportedOperationException("SocketImpl.connect(addr, timeout)");
+        if(addr) addr->unref();
+        connected = true;
+        bound = true;
+    } catch (...) {
+        if (addr) addr->unref();
+        throw;
+    }
 }
 
 void Socket::postAccept() {

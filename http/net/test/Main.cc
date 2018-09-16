@@ -22,6 +22,7 @@
 using namespace std;
 
 void reverse(char *buf, int n) {
+    return;
     int i = 0, j = 0;
     if (n > 0 && (strstr(buf, " ") != NULL)) {
         while (i < n) {
@@ -47,7 +48,7 @@ int main() {
         else std::cout << hostIp << " is not ip address" << std::endl;
         std::cout << "Enter server port: ";
         cin >> port ;
-        ServerSocket s(port);
+        ServerSocket s(htons(port));
         Socket *clientSocket = s.accept();
         if (clientSocket) {
             OutputStream *o = clientSocket->getOutputStream();
