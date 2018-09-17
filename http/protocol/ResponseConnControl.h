@@ -3,8 +3,6 @@
 #define RESPONSECONNCONTROL_H
 class ResponseConnControl : public HttpResponseInterceptor {
     public:
-        ResponseConnControl() { }
-        ~ResponseConnControl() { }
-        void process(HttpResponse *response, HttpContext *context) throw (HttpException, IOException);
+        void process(HttpResponse *response, HttpContext *context) throw(HttpException, IOException) ;
 };
 #endif

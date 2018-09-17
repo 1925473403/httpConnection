@@ -281,7 +281,7 @@ class HttpException : std::exception {
     public:
     HttpException() { }
     virtual ~HttpException() { }
-    HttpException(std::string str) { snprintf(m_reason, 511, "%s", str.c_str()); }
+    HttpException(std::string &str) { snprintf(m_reason, 511, "%s", str.c_str()); }
     HttpException(const HttpException &rhs) {
         strcpy(m_reason, rhs.m_reason);
     }
@@ -291,17 +291,27 @@ class HttpException : std::exception {
         }
         return *this;
     }
-    HttpException(std::string str, std::exception &e) {
+    HttpException(std::string &str, std::exception &e) {
         snprintf(m_reason, 511, "%s", str.c_str());
         char errMsg[512] = { 0 };
         snprintf(errMsg, 511, "%s", e.what());
         snprintf(m_reason + strlen(m_reason), 511, " %s", errMsg);
+    }
+    HttpException(const char *str) {
+        if (str) snprintf(m_reason, 511, "%s", str);
     }
     const char *what() const throw() { return m_reason; }
     int describe(char *apStr, int len) {
         if (apStr && (len > 1)) return snprintf(apStr, len -1, "%s", m_reason);
         return 0;
     }
+};
+class ProtocolException : public HttpException {
+    public:
+    ProtocolException() : HttpException() { }
+    ProtocolException(std::string &str) : HttpException(str) { }
+    ProtocolException(std::string &str, std::exception &e):HttpException(str, e) { }
+    ProtocolException(const char* str):HttpException(str) { }
 };
 class MethodNotSupportedException : public HttpException {
     public:

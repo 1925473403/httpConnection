@@ -3,12 +3,12 @@
 #ifndef URIPATTERNMATCHER_H
 #include "UriPatternMatcher.h"
 #endif
-void UriPatternMatcher::registerUri(std::string pattern, ValueBase *handler) {
+void UriPatternMatcher::registerUri(std::string &pattern, ValueBase *handler) {
     if (pattern.length() == 0) throw IllegalArgumentException("URI request pattern may not be null");
     if (handler == NULL) throw IllegalArgumentException("HTTP request handelr may not be null");
     handlerMap.insert(std::make_pair(pattern, handler));
 }
-void UriPatternMatcher::unregister(std::string pattern) {
+void UriPatternMatcher::unregister(std::string &pattern) {
     if (pattern.length() == 0) throw IllegalArgumentException("URI request pattern may not be null");
     unordered_map<std::string, ValueBase *>::iterator it = handlerMap.find(pattern);
     if (it != handlerMap.end()) {
@@ -27,13 +27,13 @@ void UriPatternMatcher::setHandlers(unordered_map<std::string, ValueBase *> &map
     for (unordered_map<std::string, ValueBase *>::iterator it = map.begin(); it != map.end(); it++)
         handlerMap.insert(std::make_pair(it->first, it->second));
 }
-ValueBase* UriPatternMatcher::lookup(std::string requestURI) {
+ValueBase* UriPatternMatcher::lookup(std::string &requestURI) {
     if (requestURI.length() == 0) throw IllegalArgumentException("URI request pattern may not be null");
     int index = requestURI.find("?");
     if (index != std::string::npos) {
         requestURI = requestURI.substr(0, index);
     }
-    ValueBase *handler;
+    ValueBase *handler = NULL;
     unordered_map<std::string, ValueBase *>::iterator it = handlerMap.find(requestURI);
     if (it == handlerMap.end()) {
         std::string bestMatch = "";
@@ -53,15 +53,17 @@ ValueBase* UriPatternMatcher::lookup(std::string requestURI) {
     return handler;
 }
 
-bool UriPatternMatcher::matchUriRequestPattern(std::string pattern, std::string requestUri) {
+bool UriPatternMatcher::matchUriRequestPattern(std::string &pattern, std::string &requestUri) {
     if (pattern == "*") return true;
     else {
-        return (pattern[pattern.length() - 1] == '*' && starts_with(requestUri, pattern.substr(0, pattern.length() - 1))) ||
-        (pattern[0] == '*' && ends_with(requestUri, pattern.substr(1, pattern.length())));
+        std::string patternSub = pattern.substr(0, pattern.length() - 1);
+        std::string pattern_sub = pattern.substr(1, pattern.length());
+        return (pattern[pattern.length() - 1] == '*' && starts_with(requestUri, patternSub)) ||
+        (pattern[0] == '*' && ends_with(requestUri, pattern_sub));
     }
 }
 
-bool UriPatternMatcher::starts_with(std::string requestUri, std::string pattern) {
+bool UriPatternMatcher::starts_with(std::string &requestUri, std::string &pattern) {
     int to = 0;
     int po = 0;
     int pc = pattern.length();
@@ -72,7 +74,7 @@ bool UriPatternMatcher::starts_with(std::string requestUri, std::string pattern)
     return true;
 }
 
-bool UriPatternMatcher::ends_with(std::string requestUri, std::string pattern) {
+bool UriPatternMatcher::ends_with(std::string &requestUri, std::string &pattern) {
     int toffset = requestUri.length() - pattern.length();
     int to = toffset;
     int po = 0;

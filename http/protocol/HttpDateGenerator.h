@@ -1,7 +1,8 @@
 #include "HttpException.h"
+#include "RefCount.h"
 #ifndef HTTPDATEGENERATOR_H
 #define HTTPDATEGENERATOR_H
-class HttpDateGenerator {
+class HttpDateGenerator : public RefCount {
     long dateAsLong;
     std::string dateAsText;
     public:

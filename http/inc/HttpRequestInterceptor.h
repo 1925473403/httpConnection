@@ -1,6 +1,6 @@
 #include "HttpException.h"
 #include "RefCount.h"
-#ifdef HTTPREQUESTINTERCEPTOR_H
+#ifndef HTTPREQUESTINTERCEPTOR_H
 #define HTTPREQUESTINTERCEPTOR_H
 class HttpRequestInterceptor : public RefCount {
     public:

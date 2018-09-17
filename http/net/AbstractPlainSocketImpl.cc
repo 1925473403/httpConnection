@@ -93,7 +93,12 @@ void AbstractPlainSocketImpl::connectToAddress(InetAddress* addr, int p, int t) 
             doConnect(r, p, t);
             r->unref();
         } else doConnect(addr, p, t);
-    }catch (...) {
+    } catch (const IOException &ex) {
+        std::cerr << ex.what() <<  addr->toString() << std::endl;
+        addr->unref();
+        throw;
+    } catch (...) {
+        std::cerr << "Unknown error when connecting to: " <<  addr->toString() << std::endl;
         addr->unref();
         throw;
     }

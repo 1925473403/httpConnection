@@ -4,14 +4,13 @@
 class HttpRequestHandlerRegistry : public HttpRequestHandlerResolver {
     private :
         UriPatternMatcher matcher;
-    protected:
-        bool matchUriRequestPattern(std::string pattern, std::string requestUri);
     public:
+        bool matchUriRequestPattern(std::string &pattern, std::string &requestUri);
         HttpRequestHandlerRegistry();
         ~HttpRequestHandlerRegistry() { }
-        void registerHandler(std::string pattern, HttpRequestHandler *handler);
-        void unregister(std::string pattern);
+        void registerHandler(std::string &pattern, HttpRequestHandler *handler);
+        void unregister(std::string &pattern);
         void setHandlers(unordered_map<std::string, ValueBase *> &map);
-        HttpRequestHandler *lookup(std::string requestURI);
+        HttpRequestHandler *lookup(std::string &requestURI);
 };
 #endif

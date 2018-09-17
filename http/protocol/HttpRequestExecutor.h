@@ -1,7 +1,8 @@
 #include "HttpException.h"
+#include "RefCount.h"
 #ifndef HTTPREQUESTEXECUTOR_H
 #define HTTPREQUESTEXECUTOR_H
-class HttpRequestExecutor {
+class HttpRequestExecutor : public RefCount {
     private:
     public:
         HttpRequestExecutor() { }

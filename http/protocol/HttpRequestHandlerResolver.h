@@ -1,9 +1,10 @@
 #include "HttpException.h"
+#include "RefCount.h"
 #ifndef HTTPREQUESTHANDLERRESOLVER_H
 #define HTTPREQUESTHANDLERRESOLVER_H
-class HttpRequestHandlerResolver {
+class HttpRequestHandlerResolver : public RefCount {
     public:
         virtual ~HttpRequestHandlerResolver () { }
-        HttpRequestHandler *lookup(std::string requestURI) = 0;
+        virtual HttpRequestHandler *lookup(std::string &requestURI) = 0;
 };
 #endif

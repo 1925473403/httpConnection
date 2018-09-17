@@ -59,6 +59,10 @@ int main() {
         std::cout << p->toString() << std::endl;
         std::cout << "cast success " << std::endl;
     } else std::cout << "cast failure" << std::endl;
+
+    v = params->getParameter("String");
+    std::string t = type_cast<std::string>(v, "");
+    std::cout << t << std::endl;
     /*
     Value<ProtocolVersion*> *v1 = dynamic_cast<Value <ProtocolVersion *> *> (v);
     if (v1 != NULL) {
@@ -69,5 +73,8 @@ int main() {
     HttpParams *httpParams = new DefaultedHttpParams(params, params);
     httpParams->unref();
     params->unref();
+    HttpVersion::HTTP_1_0->unref();
+    HttpVersion::HTTP_1_1->unref();
+    HttpVersion::HTTP_0_9->unref();
     return 0;
 }

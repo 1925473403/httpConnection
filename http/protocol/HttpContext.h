@@ -1,7 +1,9 @@
 #include "HttpException.h"
+#include "RefCount.h"
+#include "Value.h"
 #ifndef HTTPCONTEXT_H
 #define HTTPCONTEXT_H
-class HttpContext {
+class HttpContext : public RefCount {
     public:
         static std::string RESERVED_PREFIX;
         virtual ~HttpContext() { }

@@ -12,7 +12,7 @@ class HttpResponse : public virtual HttpMessage {
     virtual void setReasonPhrase(std::string *reason) throw (IllegalStateException) = 0;
     virtual HttpEntity* getEntity() = 0;
     virtual void setEntity(HttpEntity *entity) = 0;
-    virtual Locale* getLocale() = 0;
-    virtual void setLocale(Locale *loc) = 0;
+    //virtual Locale* getLocale() = 0;
+    //virtual void setLocale(Locale *loc) = 0;
 };
 #endif

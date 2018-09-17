@@ -3,8 +3,6 @@
 #define RESPONSESERVER_H
 class ResponseServer : public HttpResponseInterceptor {
     public :
-        ResponseServer() { }
-        ~ResponseServer() { }
-        void process(HttpResponse *response, HttpContext *context) throw (HttpException, IOException);
+        void process(HttpResponse *response, HttpContext *context) throw(HttpException, IOException);
 };
 #endif
