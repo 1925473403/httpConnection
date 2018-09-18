@@ -3,7 +3,7 @@
 #define URLENCODEDFORMENTITY_H
 class UrlEncodedFormEntity : public StringEntity {
     public:
-        UrlEncodedFormEntity(vector<NameValuePair *> &parameters, std::string encoding) throw (UnsupportedEncodingException);
-        UrlEncodedFormEntity(vector<NameValuePair *> &parameters) throw (UnsupportedEncodingException);
+        UrlEncodedFormEntity(vector<NameValuePair *> &parameters, std::string encoding) ;
+        UrlEncodedFormEntity(vector<NameValuePair *> &parameters) ;
 };
 #endif
