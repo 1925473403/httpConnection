@@ -1,4 +1,8 @@
 #include "HttpException.h"
+#include "ByteArrayBuffer.h"
+#include "CharArrayBuffer.h"
+#include "Integer.h"
+#include "StringUtils.h"
 #include "HTTP.h"
 #include "HttpStatus.h"
 #include "Value.h"
@@ -126,7 +130,8 @@ void HttpService::handleException(HttpException *ex, HttpResponse *response) {
     else if (uhve != NULL) response->setStatusCode(HttpStatus::SC_HTTP_VERSION_NOT_SUPPORTED);
     else if (pe != NULL) response->setStatusCode(HttpStatus::SC_BAD_REQUEST);
     else response->setStatusCode(HttpStatus::SC_INTERNAL_SERVER_ERROR);
-    char *msg = EncodingUtils.getAsciiBytes(ex->getMessage());
+    char msg[512];
+    ex->describe(msg, 512);
     ByteArrayEntity *entity = new ByteArrayEntity(msg);
     entity->setContentType("text/plain; charset=US-ASCII");
     response->setEntity(entity);

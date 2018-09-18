@@ -65,6 +65,7 @@ clean:
 	${SRC_HOME}/protocol/HttpService.o \
 	${SRC_HOME}/protocol/HttpRequestHandlerRegistry.o \
 	${SRC_HOME}/protocol/HttpRequestExecutor.o \
-	${SRC_HOME}/protocol/ResponseServer.o 
+	${SRC_HOME}/protocol/ResponseServer.o \
+	${SRC_HOME}/libs/libprotocol.so
 install:
 	$(CP) libprotocol.so ${SRC_HOME}/libs/

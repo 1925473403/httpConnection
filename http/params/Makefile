@@ -35,6 +35,7 @@ clean:
     ${SRC_HOME}/params/CoreConnectionPNames.o \
     ${SRC_HOME}/params/HttpConnectionParams.o \
     ${SRC_HOME}/params/HttpAbstractParamBean.o \
-    ${SRC_HOME}/params/HttpConnectionParamBean.o
+    ${SRC_HOME}/params/HttpConnectionParamBean.o \
+	${SRC_HOME}/libs/libparams.so
 install:
 	$(CP) libparams.so ${SRC_HOME}/libs/

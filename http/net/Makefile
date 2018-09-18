@@ -14,6 +14,7 @@ libnet.so:	${SRC_HOME}/protocol/HTTP.o \
 	${SRC_HOME}/net/InetSocketAddress.o \
 	${SRC_HOME}/net/URLStreamHandler.o \
 	${SRC_HOME}/net/HttpHandler.o \
+	${SRC_HOME}/net/ByteArrayInputStream.o \
 	${SRC_HOME}/net/HttpsHandler.o \
 	${SRC_HOME}/net/FtpHandler.o \
 	${SRC_HOME}/net/SocketInputStream.o \
@@ -33,6 +34,7 @@ libnet.so:	${SRC_HOME}/protocol/HTTP.o \
 	${SRC_HOME}/net/InetSocketAddress.o \
 	${SRC_HOME}/net/URLStreamHandler.o \
 	${SRC_HOME}/net/HttpHandler.o \
+	${SRC_HOME}/net/ByteArrayInputStream.o \
 	${SRC_HOME}/net/HttpsHandler.o \
 	${SRC_HOME}/net/FtpHandler.o \
 	${SRC_HOME}/net/SocketInputStream.o \
@@ -55,10 +57,12 @@ clean:
 	${SRC_HOME}/net/SocketInputStream.o \
 	${SRC_HOME}/net/SocketOutputStream.o \
 	${SRC_HOME}/net/AbstractPlainSocketImpl.o \
+	${SRC_HOME}/net/ByteArrayInputStream.o \
 	${SRC_HOME}/net/DualStackPlainSocketImpl.o \
 	${SRC_HOME}/net/ServerSocket.o \
 	${SRC_HOME}/net/SocketImpl.o \
 	${SRC_HOME}/net/URL.o \
-	${SRC_HOME}/net/Socket.o 
+	${SRC_HOME}/net/Socket.o \
+	${SRC_HOME}/libs/libnet.so
 install:
 	$(CP) libnet.so ${SRC_HOME}/libs

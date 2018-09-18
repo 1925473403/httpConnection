@@ -1,7 +1,8 @@
 #include "HttpException.h"
+#include "RefCount.h"
 #ifndef HTTPSERVICE_H
 #define HTTPSERVICE_H
-class HttpService {
+class HttpService : public RefCount {
     private:
         HttpParams *params;
         HttpProcessor *processor;

@@ -1,8 +1,9 @@
 #include "HttpException.h"
+#include "RefCount.h"
 #ifndef CHARARRAYBUFFER_H
 #define CHARARRAYBUFFER_H
 class ByteArrayBuffer;
-class CharArrayBuffer {
+class CharArrayBuffer : public RefCount {
     typedef char byte;
     char *_buffer;
     long _capacity;

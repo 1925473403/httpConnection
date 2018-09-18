@@ -2,6 +2,7 @@
 #include "HTTP.h"
 #include "HttpStatus.h"
 #include "Value.h"
+#include "Integer.h"
 #include "HttpParams.h"
 #include "ProtocolVersion.h"
 #include "HttpVersion.h"
@@ -39,13 +40,15 @@ void RequestContent::process(HttpRequest *request, HttpContext *context) throw (
         }
         if (entity->isChunked() || entity->getContentLength() < 0) {
             if (ver->lessEquals(*HttpVersion::HTTP_1_0)) {
-                throw ProtocolException("Chunked transfer encoding not allowed for %s" + ver->toString().c_str());
+                char errMsg[512] = {  0 };
+                snprintf(errMsg, 511, "Chunked transfer encoding not allowed for %s", ver->toString().c_str());
+                throw ProtocolException((const char *)errMsg);
             }
             request->addHeader(HTTP::TRANSFER_ENCODING, HTTP::CHUNK_CODING);
         } else {
             request->addHeader(HTTP::CONTENT_LEN, Integer::toString(entity->getContentLength()));
         }
         if (entity->getContentType() != NULL && !request->containsHeader(HTTP::CONTENT_TYPE)) request->addHeader(entity->getContentType());
-        if (entity->getContentEncoding() != NULL !request->containsHeader(HTTP::CONTENT_ENCODING)) request->addHeader(entity->getContentEncoding()); 
+        if (entity->getContentEncoding() != NULL && !request->containsHeader(HTTP::CONTENT_ENCODING)) request->addHeader(entity->getContentEncoding()); 
     }
 }
