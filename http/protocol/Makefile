@@ -3,7 +3,7 @@ CP = cp
 SRC_HOME=/home/fworks/httpConnection/http
 CXXFLAGS= -Wall -fPIC -g -m64 -std=c++11 $(INCLUDEDIRS)
 LDFLAGS=-shared -lpthread -lnsl -lresolv -L${SRC_HOME}/util -lutil -L${SRC_HOME}/params -lparams
-INCLUDEDIRS = -I${SRC_HOME}/inc -I${SRC_HOME}/protocol -I${SRC_HOME}/util -I${SRC_HOME}/params -I${SRC_HOME}/net
+INCLUDEDIRS = -I${SRC_HOME}/inc -I${SRC_HOME}/protocol -I${SRC_HOME}/util -I${SRC_HOME}/params -I${SRC_HOME}/net -I${SRC_HOME}/entity -I${SRC_HOME}/entity/params
 all:	libprotocol.so
 libprotocol.so:	${SRC_HOME}/protocol/HttpHost.o \
 	${SRC_HOME}/protocol/HttpDateGenerator.o \

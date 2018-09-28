@@ -26,7 +26,8 @@ void ResponseServer::process(HttpResponse *response, HttpContext *context) throw
     if (response == NULL) throw IllegalArgumentException("HTTP request may not be null");
     if (!response->containsHeader(HTTP::SERVER_HEADER)) {
         ValueBase *base = response->getParams()->getParameter(CoreProtocolPNames::ORIGIN_SERVER);
-        std::string s  = type_cast<std::string>(base, "");
+        std::string s("");
+        s  = type_cast<std::string>(base, s);
         if (s.length() != 0) response->addHeader(HTTP::SERVER_HEADER, s);
     }
 }

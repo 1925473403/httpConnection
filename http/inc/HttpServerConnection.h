@@ -1,7 +1,11 @@
 #include "HttpException.h"
 #ifndef HTTPSERVERCONNECTION_H
 #define HTTPSERVERCONNECTION_H
-class HttpServerConnection : public HttpConnection , public RefCount {
+class HttpEntityEnclosingRequest;
+class HttpResponse;
+class HttpRequest;
+class HttpConnection;
+class HttpServerConnection : public HttpConnection {
     public:
         virtual ~HttpServerConnection() { }
         virtual HttpRequest* receiveRequestHeader() throw (HttpException, IOException) = 0;

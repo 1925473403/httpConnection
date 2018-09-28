@@ -12,6 +12,7 @@ class BasicHeader : public Header {
         std::string getValue() { return value; }
         std::string toString();
         void getElements(vector<HeaderElement *> &) throw (ParseException) ;
-        BasicHeader(std::string n, std::string v);
+        BasicHeader(std::string &n, std::string &v);
+        BasicHeader(std::string &n, std::string &&v);
 };
 #endif

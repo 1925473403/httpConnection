@@ -1,10 +1,39 @@
-#include "Value.h"
-#include "CoreProtocolPNames.h"
+#include "HttpException.h"
+#include "ByteArrayBuffer.h"
+#include "CharArrayBuffer.h"
+#include "Integer.h"
+#include "StringUtils.h"
+#include "HTTP.h"
 #include "ProtocolVersion.h"
 #include "HttpVersion.h"
+#include "Value.h"
+#include "HttpParams.h"
+#include "AbstractHttpParams.h"
+#include "BasicHttpParams.h"
+#include "CoreProtocolPNames.h"
+#include "HttpProtocolParams.h"
+#include "DefaultedHttpParams.h"
+#include "RequestLine.h"
 #include "HttpStatus.h"
+#include "NameValuePair.h"
+#include "HeaderElement.h"
+#include "Header.h"
+#include "HeaderIterator.h"
+#include "InputStream.h"
+#include "OutputStream.h"
+#include "StatusLine.h"
+#include "HttpEntity.h"
+#include "AbstractHttpEntity.h"
+#include "ByteArrayEntity.h"
+#include "ExecutionContext.h"
+#include "HttpMessage.h"
+#include "HttpContext.h"
 #include "HttpResponse.h"
 #include "HttpRequest.h"
+#include "HttpResponseInterceptor.h"
+#include "HttpRequestInterceptor.h"
+#include "HttpProcessor.h"
+#include "HttpConnection.h"
 #include "HttpEntityEnclosingRequest.h"
 #include "HttpClientConnection.h"
 #ifndef HTTPREQUESTEXECUTOR_H
@@ -46,12 +75,13 @@ HttpResponse* HttpRequestExecutor::doSendRequest(HttpRequest* request, HttpClien
     if (conn == NULL) throw IllegalArgumentException("Client connection may not be null");
     if (context == NULL) throw IllegalArgumentException("HTTP context may not be null");
     HttpResponse* response = NULL;
-    context->setAttribute(ExecutionContext::HTTP_REQ_SENT, false);
+    Value<bool> *v = new Value<bool>(false);
+    context->setAttribute(ExecutionContext::HTTP_REQ_SENT, v);
     conn->sendRequestHeader(request);
     if (HttpEntityEnclosingRequest* v = dynamic_cast<HttpEntityEnclosingRequest *>(request)) {
         bool sendentity = true;
-        ProtocolVersion *ver = v->getRequestLine().getProtocolVersion();
-        if (v->expectContinue() && !ver.lessEquals(HttpVersion::HTTP_1_0)) {
+        ProtocolVersion *ver = v->getRequestLine()->getProtocolVersion();
+        if (v->expectContinue() && !ver->lessEquals(*HttpVersion::HTTP_1_0)) {
             conn->flush();
             int tms = request->getParams()->getIntParameter(CoreProtocolPNames::WAIT_FOR_CONTINUE, 2000);
             if (conn->isResponseAvailable(tms)) {
@@ -63,7 +93,9 @@ HttpResponse* HttpRequestExecutor::doSendRequest(HttpRequest* request, HttpClien
                 if (status < 200) {
                     if (status != HttpStatus::SC_CONTINUE) {
                         delete response;
-                        throw ProtocolException("Unexpected response: %s", response->getStatusLine());
+                        std::string err("Unexpected response: ");
+                        //err += response->getStatusLine();
+                        throw ProtocolException(err);
                     }
                     delete response;
                     response = NULL;
@@ -73,7 +105,8 @@ HttpResponse* HttpRequestExecutor::doSendRequest(HttpRequest* request, HttpClien
         if (sendentity) conn->sendRequestEntity(v);
     }
     conn->flush();
-    context->setAttribute(ExecutionContext::HTTP_REQ_SENT, true);
+    Value<bool> *v1 = new Value<bool>(true);
+    context->setAttribute(ExecutionContext::HTTP_REQ_SENT, v1);
     return response;
 }
 HttpResponse* HttpRequestExecutor::doReceiveResponse(HttpRequest *request, HttpClientConnection* conn, HttpContext* context) throw (IOException, HttpException) {
@@ -87,11 +120,11 @@ HttpResponse* HttpRequestExecutor::doReceiveResponse(HttpRequest *request, HttpC
         if (canResponseHaveBody(request, response)) {
             conn->receiveResponseEntity(response);
         }
-        statuscode = response->getStatusLine().getStatusCode();
+        statuscode = response->getStatusLine()->getStatusCode();
     }
     return response;
 }
-void HttpRequestExecutor::postProcess(HttpRequest* request, HttpProcessor* processor, HttpContext* context)  throw (IOException, HttpException) {
+void HttpRequestExecutor::postProcess(HttpResponse* response, HttpProcessor* processor, HttpContext* context)  throw (IOException, HttpException) {
     if (response == NULL) throw IllegalArgumentException("HTTP response may not be null");
     if (processor == NULL) throw IllegalArgumentException("HTTP processor may not be null");
     if (context == NULL) throw IllegalArgumentException("HTTP context may not be null");

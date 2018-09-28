@@ -313,6 +313,14 @@ class ProtocolException : public HttpException {
     ProtocolException(std::string &str, std::exception &e):HttpException(str, e) { }
     ProtocolException(const char* str):HttpException(str) { }
 };
+
+class UnsupportedHttpVersionException : public ProtocolException {
+    public:
+    UnsupportedHttpVersionException(): ProtocolException() { }
+    UnsupportedHttpVersionException(std::string &str) : ProtocolException(str) { }
+    UnsupportedHttpVersionException(std::string &str, std::exception &e): ProtocolException(str, e) { }
+    UnsupportedHttpVersionException(const char* str):ProtocolException(str) { }
+};
 class MethodNotSupportedException : public HttpException {
     public:
     MethodNotSupportedException(std::string str):HttpException(str) { }

@@ -21,8 +21,10 @@ void BasicHeader::getElements(vector<HeaderElement*> &res) throw (ParseException
     if (value.length() > 0) BasicHeaderValueParser::parseElements(value, NULL, res);
     return ;
 }
-BasicHeader::BasicHeader(std::string n, std::string v) {
+BasicHeader::BasicHeader(std::string &n, std::string &v) : name(n), value(v) {
     if (name.length() == 0) throw IllegalArgumentException("Name may not be null");
-    name = n;
-    value = v;
+}
+
+BasicHeader::BasicHeader(std::string &n, std::string &&v) : name(n), value(std::move(v)) {
+    if (name.length() == 0) throw IllegalArgumentException("Name may not be null");
 }

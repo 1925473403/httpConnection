@@ -7,10 +7,12 @@ void RequestTargetHost::process(HttpRequest *request, HttpContext *context) thro
     if (context == NULL) throw IllegalArgumentException("HTTP context may not be null");
     if (!request->containsHeader(HTTP::TARGET_HOST)) {
         ValueBase *obj = context->getAttribute(ExecutionContext::HTTP_TARGET_HOST);
-        HttpHost *targethost = type_cast<HttpHost *>(obj, NULL);
+        HttpHost *targethost = nullptr;
+        targethost = type_cast<HttpHost *>(obj, targethost);
         if (targethost == NULL) {
             obj = context->getAttribute(ExecutionContext::HTTP_CONNECTION);
-            HttpConnection *conn = type_cast<HttpConnection *>(obj, NULL);
+            HttpConnection *conn = nullptr;
+            conn = type_cast<HttpConnection *>(obj, conn);
             HttpInetConnection *httpConn = dynamic_cast<HttpInetConnection *>(conn);
             if (httpConn != NULL) {
                 InetAddress *address = httpConn->getRemoteAddress();

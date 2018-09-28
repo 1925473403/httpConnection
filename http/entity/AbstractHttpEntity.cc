@@ -37,6 +37,12 @@ void AbstractHttpEntity::setContentType(std::string &s) {
     if (s.empty() == false) h = new BasicHeader(HTTP::CONTENT_ENCODING, s);
     setContentType(h);
 }
+void AbstractHttpEntity::setContentType(const char *s) {
+    if (s != NULL) {
+        std::string t(s);
+        setContentType(t);
+    }
+}
 
 void AbstractHttpEntity::setContentEncoding(Header *h) {
     contentEncoding = h;
@@ -46,6 +52,12 @@ void AbstractHttpEntity::setContentEncoding(std::string &s) {
     Header *h = NULL;
     if (s.empty() == false) h = new BasicHeader(HTTP::CONTENT_ENCODING, s);
     setContentEncoding(h);
+}
+void AbstractHttpEntity::setContentEncoding(const char *s) {
+    if (s != NULL) {
+        std::string t(s);
+        setContentEncoding(t);
+    }
 }
 void AbstractHttpEntity::setChunked(bool b) {
     chunked = b;

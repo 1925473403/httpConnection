@@ -14,8 +14,10 @@ class AbstractHttpEntity : public HttpEntity {
     bool isChunked();
     void setContentType(Header *h);
     void setContentType(std::string &s);
+    void setContentType(const char *s);
     void setContentEncoding(Header *h);
     void setContentEncoding(std::string &s);
+    void setContentEncoding(const char *s);
     void setChunked(bool b);
     void consumeContent() throw (IOException);
 };

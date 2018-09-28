@@ -4,10 +4,17 @@
 #include "Integer.h"
 #include "StringUtils.h"
 #include "HTTP.h"
+#include "ProtocolVersion.h"
+#include "HttpVersion.h"
+#include "HttpHost.h"
 #include "HttpStatus.h"
 #include "Value.h"
 #include "HttpParams.h"
-#include "ProtocolVersion.h"
+#include "AbstractHttpParams.h"
+#include "BasicHttpParams.h"
+#include "CoreProtocolPNames.h"
+#include "HttpProtocolParams.h"
+#include "DefaultedHttpParams.h"
 #include "RequestLine.h"
 #include "NameValuePair.h"
 #include "HeaderElement.h"
@@ -16,11 +23,25 @@
 #include "InputStream.h"
 #include "OutputStream.h"
 #include "StatusLine.h"
-#include "HttpContext.h"
 #include "HttpEntity.h"
+#include "AbstractHttpEntity.h"
+#include "ByteArrayEntity.h"
+#include "ExecutionContext.h"
 #include "HttpMessage.h"
+#include "HttpContext.h"
 #include "HttpRequest.h"
 #include "HttpResponse.h"
+#include "HttpRequestHandler.h"
+#include "HttpResponseFactory.h"
+#include "HttpExpectationVerifier.h"
+#include "HttpResponseInterceptor.h"
+#include "HttpRequestInterceptor.h"
+#include "HttpEntityEnclosingRequest.h"
+#include "HttpRequestHandlerResolver.h"
+#include "HttpProcessor.h"
+#include "ConnectionReuseStrategy.h"
+#include "HttpConnection.h"
+#include "HttpServerConnection.h"
 #include "CoreProtocolPNames.h"
 #ifndef HTTPSERVICE_H
 #include "HttpService.h"
@@ -32,7 +53,7 @@ void HttpService::doService(HttpRequest *request, HttpResponse *response, HttpCo
         handler = handlerResolver->lookup(requestUri);
     }
     if (handler != NULL) {
-        handler->handle((request, response, context);
+        handler->handle(request, response, context);
     } else response->setStatusCode(HttpStatus::SC_NOT_IMPLEMENTED);
 }
 HttpService::HttpService(HttpProcessor *p, ConnectionReuseStrategy *c, HttpResponseFactory *r) {
@@ -48,7 +69,7 @@ void HttpService::setConnReuseStrategy(ConnectionReuseStrategy *c) {
     if (c == NULL) throw IllegalArgumentException("Connection reuse strategy may not be null");
     connStrategy = c;
 }
-HttpService::setResponseFactory(HttpResponseFactory *r) {
+void HttpService::setResponseFactory(HttpResponseFactory *r) {
     if (r == NULL) throw IllegalArgumentException("Response factory may not be null");
     responseFactory = r;
 }
@@ -65,13 +86,13 @@ void HttpService::setParams(HttpParams *p) {
     params = p;
 }
 void HttpService::handleRequest(HttpServerConnection *conn, HttpContext *context) throw(IOException, HttpException) {
-    conn->setAttribute(ExecutionContext::HTTP_CONNECTION, Value<HttpServerConnection *>(conn));
+    context->setAttribute(ExecutionContext::HTTP_CONNECTION, new Value<HttpServerConnection *>(conn));
     HttpResponse* response = NULL;
     try {
         HttpRequest *request = conn->receiveRequestHeader();
-        request->setParams(new DefaultedHttpParams(request.getParams(), params));
+        request->setParams(new DefaultedHttpParams(request->getParams(), params));
         ProtocolVersion *ver = request->getRequestLine()->getProtocolVersion();
-        if (!ver->lessEquals(HttpVersion::HTTP_1_1)) ver = HttpVersion::HTTP_1_1;
+        if (!ver->lessEquals(*HttpVersion::HTTP_1_1)) ver = HttpVersion::HTTP_1_1;
         HttpEntityEnclosingRequest* httpreq = dynamic_cast<HttpEntityEnclosingRequest *>(request);
         if (httpreq != NULL) {
             if (httpreq->expectContinue()) {
@@ -83,7 +104,7 @@ void HttpService::handleRequest(HttpServerConnection *conn, HttpContext *context
                     } catch (const HttpException &ex) {
                         response = responseFactory->newHttpResponse(HttpVersion::HTTP_1_0, HttpStatus::SC_INTERNAL_SERVER_ERROR, context);
                         response->setParams(new DefaultedHttpParams(response->getParams(), params));
-                        handleException(&ex, response);
+                        handleException(const_cast<HttpException *>(&ex), response);
                     }
                 }
                 if (response->getStatusLine()->getStatusCode() < 200) {
@@ -101,8 +122,8 @@ void HttpService::handleRequest(HttpServerConnection *conn, HttpContext *context
             response->setParams(new DefaultedHttpParams(response->getParams(), params));
             context->setAttribute(ExecutionContext::HTTP_REQUEST, new Value<HttpRequest *>(request));
             context->setAttribute(ExecutionContext::HTTP_RESPONSE, new Value<HttpResponse *>(response));
-            processor->process(request, response);
-            doService((request, response, context);
+            processor->process(request, context);
+            doService(request, response, context);
         }
         httpreq = dynamic_cast<HttpEntityEnclosingRequest *>(request);
         if (httpreq != NULL) {
@@ -112,14 +133,14 @@ void HttpService::handleRequest(HttpServerConnection *conn, HttpContext *context
     } catch (const HttpException &ex) {
         response = responseFactory->newHttpResponse(HttpVersion::HTTP_1_0, HttpStatus::SC_INTERNAL_SERVER_ERROR, context);
         response->setParams(new DefaultedHttpParams(response->getParams(), params));
-        handleException(&ex, response);
+        handleException(const_cast<HttpException *>(&ex), response);
     }
     processor->process(response, context);
     conn->sendResponseHeader(response);
     conn->sendResponseEntity(response);
     conn->flush();
     if (!connStrategy->keepAlive(response, context)) {
-        conn.close();
+        conn->close();
     }
 }
 void HttpService::handleException(HttpException *ex, HttpResponse *response) {
@@ -132,7 +153,7 @@ void HttpService::handleException(HttpException *ex, HttpResponse *response) {
     else response->setStatusCode(HttpStatus::SC_INTERNAL_SERVER_ERROR);
     char msg[512];
     ex->describe(msg, 512);
-    ByteArrayEntity *entity = new ByteArrayEntity(msg);
+    ByteArrayEntity *entity = new ByteArrayEntity((unsigned char *)msg, 512);
     entity->setContentType("text/plain; charset=US-ASCII");
     response->setEntity(entity);
 }

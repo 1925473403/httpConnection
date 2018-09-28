@@ -76,7 +76,8 @@ Header* HeaderGroup::getCondensedHeader(std::string name) {
             h->unref();
         }
         res.clear();
-        return new BasicHeader(HttpHost::toLowerCase(name), valueBuffer.toString());
+        std::string lowerCaseName = HttpHost::toLowerCase(name);
+        return new BasicHeader(lowerCaseName, valueBuffer.toString());
     }
 }
 

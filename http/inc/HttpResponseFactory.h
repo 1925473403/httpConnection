@@ -2,6 +2,10 @@
 #include "RefCount.h"
 #ifndef HTTPRESPONSEFACTORY_H
 #define HTTPRESPONSEFACTORY_H
+class ProtocolVersion;
+class HttpContext;
+class StatusLine;
+class HttpResponse;
 class HttpResponseFactory : public RefCount {
     public:
     virtual ~HttpResponseFactory() { }

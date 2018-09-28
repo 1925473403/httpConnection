@@ -1,7 +1,7 @@
 #include "HttpException.h"
 #ifndef HTTPREQUESTINTERCEPTORLIST_H
 #define HTTPREQUESTINTERCEPTORLIST_H
-class HttpRequestInterceptorList {
+class HttpRequestInterceptorList : public virtual RefCount {
     public:
     virtual ~HttpRequestInterceptorList() { }
     virtual void addRequestInterceptor(HttpRequestInterceptor* itcp) = 0;
