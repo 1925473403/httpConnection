@@ -30,7 +30,8 @@ std::string HttpClientParams::getCookiePolicy(HttpParams *params) {
     if (params == NULL) throw IllegalArgumentException("HTTP parameters may not be null");
     ValueBase *obj = params->getParameter(ClientPNames::COOKIE_POLICY);
     if (obj == NULL) return CookiePolicy::BEST_MATCH;
-    std::string cookiePolicy = type_cast<std::string>(obj, "");
+    std::string cookiePolicy("");
+    cookiePolicy = type_cast<std::string>(obj, cookiePolicy);
     if (cookiePolicy.length() == 0) return CookiePolicy::BEST_MATCH;
     return cookiePolicy;
 }

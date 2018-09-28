@@ -1,7 +1,8 @@
 #include "HttpException.h"
+#include "RefCount.h"
 #ifndef COOKIESPECFACTORY_H
 #define COOKIESPECFACTORY_H
-class CookieSpecFactory {
+class CookieSpecFactory : public RefCount {
     public:
     CookieSpecFactory();
     virtual ~CookieSpecFactory();

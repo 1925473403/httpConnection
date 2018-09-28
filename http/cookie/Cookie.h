@@ -1,7 +1,8 @@
 #include "HttpException.h"
-#ifndef "COOKIE_H"
-#define "COOKIE_H"
-class Cookie {
+#include "RefCount.h"
+#ifndef COOKIE_H
+#define COOKIE_H
+class Cookie : public RefCount {
     public:
     virtual std::string getName() = 0;
     virtual std::string getValue() = 0;

@@ -10,7 +10,7 @@ std::string CookiePathComparator::normalizePath(Cookie &cookie) {
     if (path.length() == 0) {
         path = "/";
     }
-    if (!endsWith(path, "/")) path += "/";
+    if (!ends_with(path, "/")) path += "/";
     return path;
 }
 int CookiePathComparator::compare(Cookie &c1, Cookie &c2) {
@@ -18,7 +18,7 @@ int CookiePathComparator::compare(Cookie &c1, Cookie &c2) {
     std::string path2 = normalizePath(c2);
     if (path1 == path2) {
         return 0;
-    } else if (startsWith(path1, path2)) return -1;
-    else if (startsWith(path2, path1)) return 1;
+    } else if (starts_with(path1, path2)) return -1;
+    else if (starts_with(path2, path1)) return 1;
     return 0;
 }

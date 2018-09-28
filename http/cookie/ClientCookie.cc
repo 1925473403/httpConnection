@@ -1,4 +1,5 @@
 #include "HttpException.h"
+#include "Cookie.h"
 #ifndef CLIENTCOOKIE_H
 #include "ClientCookie.h"
 #endif

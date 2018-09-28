@@ -17,13 +17,13 @@ class Value : public ValueBase {
     Value(T val) : m_value(val) { 
     }
     ~Value() { }
-    T value() { return m_value; }
+    T& value() { return m_value; }
     void output(std::ostream &os) {
         os << m_value;
     }
 };
 template<class T>
-T type_cast(ValueBase *object, T d) {
+T& type_cast(ValueBase *object, T& d) {
     if (object == NULL) return d;
     Value<T> *obj = dynamic_cast<Value<T> *>(object);
     if (obj) return obj->value();

@@ -1,5 +1,6 @@
 #include "HttpException.h"
 #include "StringUtils.h"
+#include "Cookie.h"
 #ifndef COOKIEORIGIN_H
 #include "CookieOrigin.h"
 #endif
@@ -47,6 +48,6 @@ std::string CookieOrigin::toString() const {
     std::stringstream ss;
     ss << "[" ;
     if (secure) ss << "(secure)";
-    ss << host << ":" < port << path<<"]";
+    ss << host << ":" << port << path<<"]";
     return ss.str();
 }

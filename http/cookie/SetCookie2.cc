@@ -1,6 +1,7 @@
 #include "HttpException.h"
+#include "Cookie.h"
 #include "SetCookie.h"
 #ifndef SETCOOKIE2_H
 #include "SetCookie2.h"
 #endif
-SetCookie1::~SetCookie2() { }
+SetCookie2::~SetCookie2() { }

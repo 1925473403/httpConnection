@@ -1,6 +1,9 @@
-#ifndef "HttpException.h"
+#include "HttpException.h"
 #ifndef COOKIESPEC_H
 #define COOKIESPEC_H
+class Header;
+class Cookie;
+class CookieOrigin;
 class CookieSpec {
     public:
     CookieSpec();

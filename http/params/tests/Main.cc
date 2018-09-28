@@ -54,14 +54,16 @@ int main() {
     params->setParameter("ProtocolVersion", &vpv);
     std::cout << "BOOLEAN: " << params->getBooleanParameter("BOOLEAN", true) << std::endl;
     ValueBase *v = params->getParameter("ProtocolVersion");
-    ProtocolVersion *p = type_cast<ProtocolVersion *>(v, NULL);
+    ProtocolVersion *p = nullptr;
+    p = type_cast<ProtocolVersion *>(v, p);
     if (p) {
         std::cout << p->toString() << std::endl;
         std::cout << "cast success " << std::endl;
     } else std::cout << "cast failure" << std::endl;
 
     v = params->getParameter("String");
-    std::string t = type_cast<std::string>(v, "");
+    std::string t("");
+    t  = type_cast<std::string>(v, t);
     std::cout << t << std::endl;
     /*
     Value<ProtocolVersion*> *v1 = dynamic_cast<Value <ProtocolVersion *> *> (v);
