@@ -25,6 +25,7 @@ class AbstractPlainSocketImpl : public SocketImpl {
         bool shut_wr;
         int trafficClass;
         int timeout;
+        int so_timeout;
     protected:
         pthread_mutex_t fdLock;
         pthread_mutex_t resetLock;
@@ -54,6 +55,8 @@ class AbstractPlainSocketImpl : public SocketImpl {
         int getFileDescriptor() const { return fd; }
         void setOption(int opt, int val);
         int getOption(int opt);
+        void setSoTimeout(int tout);
+        int getSoTimeout();
         void sendUrgentData (int data) throw (IOException);
         int acquireFD();
         void releaseFD();

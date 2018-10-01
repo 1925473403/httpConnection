@@ -146,6 +146,82 @@ void Socket::postAccept() {
 void Socket::setCreated() { created = true; }
 void Socket::setBound() { bound = true; }
 void Socket::setConnected() { connected = true; }
+void Socket::setSoLinger(bool on, int linger) throw (SocketException) {
+    if (isClosed()) throw SocketException("Socket is closed");
+    int nativefd = getImpl()->getFileDescriptor();
+    if (nativefd != -1) {
+        struct linger so_linger;
+        so_linger.l_onoff = on;
+        so_linger.l_linger = linger;
+        if (setsockopt(nativefd, SOL_SOCKET, SO_LINGER, &so_linger, sizeof(so_linger)) < 0) {
+            throw SocketException("setOption(SO_LINGER, %d, %d) failed", on, linger);
+        }
+    }
+}
+
+int Socket::getSoLinger() throw (SocketException) {
+    if (isClosed()) throw SocketException("Socket is closed");
+    return -1;
+
+}
+void Socket::setSoTimeout(int timeout) throw (SocketException) {
+    if (isClosed()) throw SocketException("Socket is closed");
+    getImpl()->setSoTimeout(timeout);
+}
+
+int Socket::getSoTimeout() throw (SocketException) {
+    if (isClosed()) throw SocketException("Socket is closed");
+    int t = -1;
+    t = getImpl()->getSoTimeout();
+    return t;
+}
+
+void Socket::setSendBufferSize(int size) throw (SocketException) {
+    if (isClosed()) throw SocketException("Socket is closed");
+    getImpl()->setOption(SO_SNDBUF, size);
+}
+
+int Socket::getSendBufferSize() throw (SocketException) {
+    if (isClosed()) throw SocketException("Socket is closed");
+    int t = -1;
+    t = getImpl()->getOption(SO_RCVTIMEO);
+    return t;
+}
+
+void Socket::setReceiveBufferSize(int size)throw (SocketException) {
+    if (isClosed()) throw SocketException("Socket is closed");
+    getImpl()->setOption(SO_RCVBUF, size);
+}
+
+int Socket::getReceiveBufferSize() throw (SocketException) {
+    if (isClosed()) throw SocketException("Socket is closed");
+    int t = -1;
+    t = getImpl()->getOption(SO_RCVBUF);
+    return t;
+}
+
+void Socket::setKeepAlive(bool on) throw (SocketException) {
+    if (isClosed()) throw SocketException("Socket is closed");
+    getImpl()->setOption(SO_KEEPALIVE, on);
+}
+
+bool Socket::getKeepAlive() throw (SocketException) {
+    if (isClosed()) throw SocketException("Socket is closed");
+    int t = -1;
+    t = getImpl()->getOption(SO_KEEPALIVE);
+    return t;
+}
+
+void Socket::setReuseAddress(bool on) throw (SocketException) {
+    if (isClosed()) throw SocketException("Socket is closed");
+    getImpl()->setOption(SO_REUSEADDR, on);
+}
+bool Socket::getReuseAddress() throw (SocketException) {
+    if (isClosed()) throw SocketException("Socket is closed");
+    int t = -1;
+    t = getImpl()->getOption(SO_REUSEADDR);
+    return t;
+}
 int Socket::getPort() {
     if (!isConnected()) return 0;
     try {
@@ -214,11 +290,6 @@ OutputStream* Socket::getOutputStream() throw (IOException){
     OutputStream *on = NULL;
     on = impl->getOutputStream();
     return on;
-}
-
-bool Socket::getReuseAddress() throw (SocketException){
-    if (isClosed()) throw SocketException("Socket is closed");
-    return getImpl()->getOption(SO_REUSEADDR);
 }
 
 void Socket::close() throw (IOException) {

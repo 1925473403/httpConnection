@@ -53,6 +53,8 @@ class SocketImpl : virtual public RefCount {
         virtual int getLocalPort() { return localport; }
         virtual void setOption(int opt, int val) = 0;
         virtual int getOption(int opt) = 0;
+        virtual void setSoTimeout(int) = 0;
+        virtual int getSoTimeout() = 0;
         virtual void socketCreate(bool isServer) throw(IOException) ;
         virtual void socketConnect(InetAddress *address, int port, int timeout) throw (IOException) ;
         virtual void socketBind(InetAddress *address, int port) throw (IOException)  = 0;

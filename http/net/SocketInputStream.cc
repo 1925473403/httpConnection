@@ -55,6 +55,27 @@ int SocketInputStream::read(char *b, int blen, int off, int len) throw (IOExcept
 
 int SocketInputStream::socketRead(int fd, char *b, int blen, int off, int len) {
     int n = -1;
+    /*
+     * int timeout = impl->getOption(SO_RCVTIMEO);
+     * if (timeout <= 0) {
+     *     n = ::read(fd, b + off, std::min<int>(blen - off, len));
+     * } else {
+     *     struct pollfd pfds[2] = { 0 };
+     *     pfds[0].events = 0;
+     *     pfds[0].events |= POLLIN | POLLPRI;
+     *     pfds[0].fd = fd;
+     *     int rc = poll(pfds, 1, timeout);
+     *     for (int count  = 0; rc > 0 && count >= 0; count --) {
+     *         struct pollfd *p = pfds + count;
+     *         if (p->revents) {
+     *             if (p->revents & (POLLIN | POLLPRI)) {
+     *                 n = ::read(fd, b + off, std::min<int>(blen - off, len));
+     *             }
+     *         }
+     *     }
+     * }
+     * return n;
+     */
     n = ::read(fd, b + off, std::min<int>(blen - off, len));
     return n;
 }

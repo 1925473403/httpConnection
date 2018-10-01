@@ -5,11 +5,7 @@ LDFLAGS=-lpthread -shared -lnsl -lresolv -L${SRC_HOME}/util -lutil -L${SRC_HOME}
 INCLUDEDIRS = -I${SRC_HOME}/inc -I${SRC_HOME}/protocol -I${SRC_HOME}/util -I${SRC_HOME}/params -I${SRC_HOME}/net 
 SRC_HOME=/home/fworks/httpConnection/http
 all:	libnet.so
-libnet.so:	${SRC_HOME}/protocol/HTTP.o \
-	${SRC_HOME}/protocol/HttpVersion.o \
-	${SRC_HOME}/protocol/ProtocolVersion.o \
-	${SRC_HOME}/protocol/HttpHost.o \
-	${SRC_HOME}/net/URI.o \
+libnet.so:	${SRC_HOME}/net/URI.o \
 	${SRC_HOME}/net/NameResolver.o \
 	${SRC_HOME}/net/InetSocketAddress.o \
 	${SRC_HOME}/net/URLStreamHandler.o \
@@ -25,11 +21,7 @@ libnet.so:	${SRC_HOME}/protocol/HTTP.o \
 	${SRC_HOME}/net/SocketImpl.o \
 	${SRC_HOME}/net/URL.o \
 	${SRC_HOME}/net/Socket.o 
-	$(CXX) $(CXXFLAGS) -o libnet.so ${SRC_HOME}/protocol/HTTP.o \
-	${SRC_HOME}/protocol/HttpVersion.o \
-	${SRC_HOME}/protocol/ProtocolVersion.o \
-	${SRC_HOME}/protocol/HttpHost.o \
-	${SRC_HOME}/net/URI.o \
+	$(CXX) $(CXXFLAGS) -o libnet.so ${SRC_HOME}/net/URI.o \
 	${SRC_HOME}/net/NameResolver.o \
 	${SRC_HOME}/net/InetSocketAddress.o \
 	${SRC_HOME}/net/URLStreamHandler.o \

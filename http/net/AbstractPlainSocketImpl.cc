@@ -233,6 +233,7 @@ AbstractPlainSocketImpl::~AbstractPlainSocketImpl() {
 AbstractPlainSocketImpl::AbstractPlainSocketImpl() {
     socketInputStream = NULL;
     socketOutputStream = NULL;
+    so_timeout = -1;
     fdUseCount = 0;
     closePending = false;
     shut_rd = false;
@@ -267,6 +268,14 @@ void AbstractPlainSocketImpl::setOption(int opt, int val) {
     int rc = setsockopt(fd, SOL_SOCKET, opt, &val, sizeof(val));
     if (rc == 0) return;
     throw SocketException("setOption(%d, %d) failed", opt, val);
+}
+
+void AbstractPlainSocketImpl::setSoTimeout(int tout) {
+    so_timeout = tout;
+}
+
+int AbstractPlainSocketImpl::getSoTimeout() {
+    return so_timeout;
 }
 
 int AbstractPlainSocketImpl::getOption(int opt) {
