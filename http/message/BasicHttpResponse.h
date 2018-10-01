@@ -5,6 +5,7 @@ class BasicHttpResponse : public AbstractHttpMessage , public HttpResponse {
         BasicHttpResponse(StatusLine *s, ReasonPhraseCatalog *e, Locale *l);
         BasicHttpResponse(StatusLine *s);
         BasicHttpResponse(ProtocolVersion *p, int code, std::string reason);
+        ~BasicHttpResponse();
         ProtocolVersion* getProtocolVersion();
         StatusLine* getStatusLine();
         HttpEntity* getEntity();

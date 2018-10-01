@@ -37,8 +37,9 @@ BasicHttpRequest::~BasicHttpRequest() {
 }
 
 BasicHttpRequest::BasicHttpRequest(RequestLine *r) {
-    if (requestline == NULL) throw IllegalArgumentException("Request line may not be null");
+    if (r == NULL) throw IllegalArgumentException("Request line may not be null");
     requestline = r;
+    requestline->ref();
     method = requestline->getMethod();
     uri = requestline->getUri();
 }
@@ -49,7 +50,11 @@ ProtocolVersion* BasicHttpRequest::getProtocolVersion() {
 }
 
 RequestLine* BasicHttpRequest::getRequestLine() {
-    if (requestline != NULL) return requestline;
+    if (requestline != NULL) {
+        requestline->ref();
+        return requestline;
+    }
     ProtocolVersion *ver = HttpProtocolParams::getVersion(AbstractHttpMessage::getParams());
+    ver->unref();
     return new BasicRequestLine(method, uri, ver);
 }

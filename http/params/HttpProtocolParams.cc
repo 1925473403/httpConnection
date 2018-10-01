@@ -42,7 +42,8 @@ ProtocolVersion* HttpProtocolParams::getVersion(HttpParams *params) {
         Value<ProtocolVersion *> *vObj = dynamic_cast<Value <ProtocolVersion *> *> (v);
         if (vObj != NULL) p = vObj->value();
     }
-    if (p == NULL) return (HttpVersion::HTTP_1_1);
+    if (p == NULL) p = HttpVersion::HTTP_1_1;
+    p->ref();
     return p;
 }
 void HttpProtocolParams::setVersion(HttpParams *params,  ProtocolVersion* version) {

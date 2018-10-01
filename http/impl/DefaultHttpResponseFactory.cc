@@ -4,9 +4,13 @@
 #endif
 DefaultHttpResponseFactory::DefaultHttpResponseFactory() : DefaultHttpResponseFactory(EnglishReasonPhraseCatalog::INSTANCE) {
 }
+DefaultHttpResponseFactory::~DefaultHttpResponseFactory() {
+    if (reasonCatalog) reasonCatalog->unref();
+}
 DefaultHttpResponseFactory::DefaultHttpResponseFactory(ReasonPhraseCatalog *catalog) {
     if (catalog == NULL) throw IllegalArgumentException("HTTP version may not be null");
     reasonCatalog = catalog;
+    if (catalog) catalog->ref();
 }
 HttpResponse* DefaultHttpResponseFactory::newHttpResponse(StatusLine* statusline, HttpContext *context) {
     if (statusline == NULL) throw IllegalArgumentException("Status line may not be null");
@@ -19,7 +23,7 @@ HttpResponse* DefaultHttpResponseFactory::newHttpResponse(ProtocolVersion *ver, 
     std::string reason = reasonCatalog->getReason(status, loc);
     StatusLine *statusline = new BasicStatusLine(ver, status, reason);
     HttpResponse* res= new BasicHttpResponse(statusline, reasonCatalog, loc);
-    delete statusline;
+    statusline->unref();
     return res;
 }
 Locale* DefaultHttpResponseFactory::determineLocale(HttpContext *context) {

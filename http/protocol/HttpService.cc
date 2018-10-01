@@ -49,7 +49,9 @@
 void HttpService::doService(HttpRequest *request, HttpResponse *response, HttpContext *context) throw(HttpException, IOException) {
     HttpRequestHandler *handler = NULL;
     if (handlerResolver != NULL) {
-        std::string requestUri = request->getRequestLine()->getUri();
+        RequestLine *requestline = request->getRequestLine();
+        std::string requestUri = requestline->getUri();
+        requestline->unref();
         handler = handlerResolver->lookup(requestUri);
     }
     if (handler != NULL) {
@@ -90,20 +92,35 @@ void HttpService::handleRequest(HttpServerConnection *conn, HttpContext *context
     HttpResponse* response = NULL;
     try {
         HttpRequest *request = conn->receiveRequestHeader();
-        request->setParams(new DefaultedHttpParams(request->getParams(), params));
-        ProtocolVersion *ver = request->getRequestLine()->getProtocolVersion();
-        if (!ver->lessEquals(*HttpVersion::HTTP_1_1)) ver = HttpVersion::HTTP_1_1;
+
+        DefaultedHttpParams *_params = new DefaultedHttpParams(request->getParams(), params);
+        request->setParams(_params);
+        _params->unref();
+
+        RequestLine *requestline = request->getRequestLine();
+        ProtocolVersion *ver = requestline->getProtocolVersion();
+        requestline->unref();
+        if (!ver->lessEquals(*HttpVersion::HTTP_1_1)) {
+            ver->unref();
+            ver = HttpVersion::HTTP_1_1;
+            ver->ref();
+        }
+
         HttpEntityEnclosingRequest* httpreq = dynamic_cast<HttpEntityEnclosingRequest *>(request);
         if (httpreq != NULL) {
             if (httpreq->expectContinue()) {
                 response = responseFactory->newHttpResponse(ver, HttpStatus::SC_CONTINUE, context);
-                response->setParams(new DefaultedHttpParams(response->getParams(), params));
+                DefaultedHttpParams *_params = new DefaultedHttpParams(response->getParams(), params);
+                response->setParams(_params);
+                _params->unref();
                 if (expectationVerifier != NULL) {
                     try {
                         expectationVerifier->verify(request, response, context);
                     } catch (const HttpException &ex) {
                         response = responseFactory->newHttpResponse(HttpVersion::HTTP_1_0, HttpStatus::SC_INTERNAL_SERVER_ERROR, context);
-                        response->setParams(new DefaultedHttpParams(response->getParams(), params));
+                        DefaultedHttpParams *_params =new DefaultedHttpParams(response->getParams(), params);
+                        response->setParams(_params);
+                        _params->unref();
                         handleException(const_cast<HttpException *>(&ex), response);
                     }
                 }
@@ -119,7 +136,9 @@ void HttpService::handleRequest(HttpServerConnection *conn, HttpContext *context
         }
         if (response == NULL) {
             response = responseFactory->newHttpResponse(ver, HttpStatus::SC_OK, context);
-            response->setParams(new DefaultedHttpParams(response->getParams(), params));
+            DefaultedHttpParams *_params = new DefaultedHttpParams(response->getParams(), params);
+            response->setParams(_params);
+            _params->unref();
             context->setAttribute(ExecutionContext::HTTP_REQUEST, new Value<HttpRequest *>(request));
             context->setAttribute(ExecutionContext::HTTP_RESPONSE, new Value<HttpResponse *>(response));
             processor->process(request, context);
@@ -132,7 +151,9 @@ void HttpService::handleRequest(HttpServerConnection *conn, HttpContext *context
         }
     } catch (const HttpException &ex) {
         response = responseFactory->newHttpResponse(HttpVersion::HTTP_1_0, HttpStatus::SC_INTERNAL_SERVER_ERROR, context);
-        response->setParams(new DefaultedHttpParams(response->getParams(), params));
+        DefaultedHttpParams *_params = new DefaultedHttpParams(response->getParams(), params);
+        response->setParams(_params);
+        _params->unref();
         handleException(const_cast<HttpException *>(&ex), response);
     }
     processor->process(response, context);
@@ -142,6 +163,9 @@ void HttpService::handleRequest(HttpServerConnection *conn, HttpContext *context
     if (!connStrategy->keepAlive(response, context)) {
         conn->close();
     }
+    request->unref();
+    response->unref();
+    ver->unref();
 }
 void HttpService::handleException(HttpException *ex, HttpResponse *response) {
     MethodNotSupportedException *mnse = dynamic_cast<MethodNotSupportedException *>(ex);

@@ -10,7 +10,7 @@ class BasicRequestLine : public RequestLine {
     BasicRequestLine(std::string m, std::string u, ProtocolVersion *version);
     virtual ~BasicRequestLine();
     std::string getMethod() const { return method; }
-    ProtocolVersion* getProtocolVersion() { return protoversion; }
+    ProtocolVersion* getProtocolVersion() { protoversion->ref(); return protoversion; }
     std::string getUri() const { return uri; }
     std::string toString();
 };

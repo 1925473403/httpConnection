@@ -32,7 +32,9 @@ void RequestContent::process(HttpRequest *request, HttpContext *context) throw (
     if (r != NULL) {
         if (request->containsHeader(HTTP::TRANSFER_ENCODING)) throw ProtocolException("Transfer-encoding header already present");
         if (request->containsHeader(HTTP::CONTENT_LEN)) throw ProtocolException("Content-Length header already present");
-        ProtocolVersion *ver = request->getRequestLine()->getProtocolVersion();
+        RequestLine *requestline = request->getRequestLine();
+        ProtocolVersion *ver = requestline->getProtocolVersion();
+        requestline->unref();
         HttpEntity* entity = r->getEntity();
         if (entity == NULL) {
             request->addHeader(HTTP::CONTENT_LEN, "0"); 
@@ -42,6 +44,7 @@ void RequestContent::process(HttpRequest *request, HttpContext *context) throw (
             if (ver->lessEquals(*HttpVersion::HTTP_1_0)) {
                 char errMsg[512] = {  0 };
                 snprintf(errMsg, 511, "Chunked transfer encoding not allowed for %s", ver->toString().c_str());
+                ver->unref();
                 throw ProtocolException((const char *)errMsg);
             }
             request->addHeader(HTTP::TRANSFER_ENCODING, HTTP::CHUNK_CODING);
@@ -50,5 +53,6 @@ void RequestContent::process(HttpRequest *request, HttpContext *context) throw (
         }
         if (entity->getContentType() != NULL && !request->containsHeader(HTTP::CONTENT_TYPE)) request->addHeader(entity->getContentType());
         if (entity->getContentEncoding() != NULL && !request->containsHeader(HTTP::CONTENT_ENCODING)) request->addHeader(entity->getContentEncoding()); 
+        ver->unref();
     }
 }

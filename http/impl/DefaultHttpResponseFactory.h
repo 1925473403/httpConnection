@@ -6,6 +6,7 @@ class DefaultHttpResponseFactory : public HttpResponseFactory {
         ReasonPhraseCatalog *reasonCatalog;
     public:
         DefaultHttpResponseFactory() ;
+        ~DefaultHttpResponseFactory();
         DefaultHttpResponseFactory(ReasonPhraseCatalog *catalog);
         HttpResponse* newHttpResponse(StatusLine* statusline, HttpContext *context);
         HttpResponse* newHttpResponse(ProtocolVersion *ver, int status, HttpContext *context);

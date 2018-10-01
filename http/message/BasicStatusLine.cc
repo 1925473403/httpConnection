@@ -18,7 +18,10 @@ BasicStatusLine::~BasicStatusLine() {
     if (protoVersion != NULL) protoVersion->unref();
 }
 int BasicStatusLine::getStatusCode() { return statusCode; }
-ProtocolVersion *BasicStatusLine::getProtocolVersion() { return protoVersion; }
+ProtocolVersion *BasicStatusLine::getProtocolVersion() { 
+    protoVersion->ref();
+    return protoVersion; 
+}
 std::string BasicStatusLine::getReasonPhrase() { return reasonPhrase; }
 std::string BasicStatusLine::toString() {
     CharArrayBuffer buffer(64);
